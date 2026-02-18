@@ -18,7 +18,7 @@ A modern React-based clothing e-commerce website UI where users can browse produ
 ## 🚀 Run Project Locally
 
 npm install  
-npm start  
+npm run dev
 
 ## 📸 Screenshots
 (Add UI screenshots here)
