@@ -1,0 +1,326 @@
+.main-header {
+    background: #fff;
+    border-bottom: 2px solid #f1f5f9;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    z-index: 1000;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.03);
+}
+
+.promotion-bar {
+    background: linear-gradient(90deg, #2d5a8e 0%, #2d5a8e 45%, #5dade2 45%, #5dade2 100%);
+    color: white;
+    font-size: 0.85rem;
+    font-weight: 700;
+    padding: 8px 0;
+    text-align: center;
+    letter-spacing: 0.8px;
+    text-transform: uppercase;
+}
+
+.header-top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: 90px;
+    padding: 0 4%;
+    position: relative;
+}
+
+/* Ensure Nav is always in the absolute center */
+.header-brand-section,
+.header-controls {
+    flex: 1;
+    display: flex;
+    align-items: center;
+}
+
+.header-controls {
+    justify-content: flex-end;
+}
+
+.main-nav {
+    flex: 0 1 auto;
+    display: flex;
+    align-items: center;
+    gap: 1.2rem;
+    justify-content: center;
+}
+
+.menu-trigger {
+    background: #ebf5ff;
+    color: #2d5a8e;
+    width: 48px;
+    height: 48px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: none;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.menu-trigger:hover {
+    background: #2d5a8e;
+    color: white;
+    transform: rotate(90deg);
+}
+
+.site-logo {
+    display: flex;
+    flex-direction: column;
+    line-height: 1;
+    text-decoration: none;
+}
+
+.logo-main {
+    font-size: 2.2rem;
+    font-weight: 900;
+    color: #1e3a5f;
+    /* Deep Professional Blue */
+    font-family: 'Playfair Display', serif;
+    letter-spacing: -1px;
+}
+
+.logo-sub {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: #3b82f6;
+    /* Accent Blue */
+    text-transform: uppercase;
+    letter-spacing: 4px;
+    margin-top: -2px;
+}
+
+/* Nav Section */
+.main-nav {
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+}
+
+.nav-item {
+    position: relative;
+    /* Added for dropdown positioning */
+    font-size: 1.05rem;
+    font-weight: 600;
+    color: #475569;
+    cursor: pointer;
+    text-decoration: none;
+    padding: 10px 18px;
+    border-radius: 10px;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.nav-item:hover,
+.nav-item.active {
+    color: #1e3a5f;
+    background: #f0f7ff;
+}
+
+.nav-item.highlight {
+    background: #f0f7ff;
+    color: #2d5a8e;
+    font-weight: 700;
+}
+
+.nav-dropdown-menu {
+    position: absolute;
+    top: 100%;
+    left: 50%;
+    background: white;
+    min-width: 260px;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+    border-radius: 16px;
+    padding: 0.8rem 0 0;
+    /* Adjust padding for bottom section */
+    margin-top: 15px;
+    transform: translateX(-50%) translateY(15px);
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    border: 1px solid #f1f5f9;
+    overflow: hidden;
+}
+
+.has-dropdown:hover .nav-dropdown-menu {
+    transform: translateX(-50%) translateY(0);
+    opacity: 1;
+    visibility: visible;
+}
+
+.nav-dropdown-menu a {
+    display: block;
+    padding: 0.9rem 2rem;
+    font-size: 0.95rem;
+    color: #64748b;
+    text-decoration: none;
+    font-weight: 600;
+    transition: all 0.2s ease;
+}
+
+.nav-dropdown-menu a:hover {
+    background: #f0f7ff;
+    color: #2d5a8e;
+    padding-left: 2.5rem;
+}
+
+.dropdown-divider {
+    height: 1.5px;
+    background: #f1f5f9;
+    margin: 5px 0 0;
+}
+
+.all-products-link {
+    background: #f8fafc;
+    color: #1e3a5f !important;
+    font-weight: 800 !important;
+    font-size: 1rem !important;
+    letter-spacing: 0.5px;
+    padding: 1.2rem 2rem !important;
+    text-align: center;
+}
+
+.all-products-link:hover {
+    background: #f0f7ff !important;
+}
+
+/* Controls */
+.header-controls {
+    display: flex;
+    align-items: center;
+    gap: 1.2rem;
+}
+
+.search-bar-wrapper {
+    display: flex;
+    align-items: center;
+    background: #f8fafc;
+    border: 1.5px solid #e2e8f0;
+    border-radius: 50px;
+    width: 260px;
+    /* More compact for better balance */
+    height: 46px;
+    padding-left: 1.2rem;
+    transition: all 0.3s ease;
+}
+
+.search-bar-wrapper:focus-within {
+    border-color: #1e3a5f;
+    background: white;
+    box-shadow: 0 0 0 4px rgba(30, 58, 95, 0.1);
+}
+
+.search-bar-wrapper input {
+    border: none;
+    outline: none;
+    background: transparent;
+    width: 100%;
+    font-size: 0.95rem;
+    font-weight: 500;
+    color: #1e293b;
+}
+
+.search-btn {
+    background: #2d5a8e;
+    /* Blue Search Button */
+    color: white;
+    height: 100%;
+    padding: 0 1.5rem;
+    border-radius: 0 50px 50px 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+}
+
+.control-icons {
+    display: flex;
+    align-items: center;
+    gap: 1.2rem;
+    height: 46px;
+    /* Match the height of search and login button */
+}
+
+.control-icon-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #64748b;
+    position: relative;
+    transition: all 0.3s ease;
+}
+
+.control-icon-btn:hover {
+    color: #2d5a8e;
+    transform: translateY(-2px);
+}
+
+.cart-badge {
+    position: absolute;
+    top: -5px;
+    right: -7px;
+    background: #3b82f6;
+    color: white;
+    font-size: 0.7rem;
+    font-weight: 800;
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.wishlist-badge-color {
+    background: #ef4444 !important;
+}
+
+.auth-button-pill {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    background: #1e3a5f;
+    color: white;
+    height: 46px;
+    /* Match search height for perfect alignment */
+    padding: 0 1.8rem;
+    border-radius: 50px;
+    font-weight: 700;
+    font-size: 0.95rem;
+    text-decoration: none;
+    box-shadow: 0 8px 15px rgba(30, 58, 95, 0.15);
+    transition: all 0.3s ease;
+}
+
+.auth-button-pill:hover {
+    background: #2d5a8e;
+    transform: translateY(-3px);
+    box-shadow: 0 12px 25px rgba(30, 58, 95, 0.3);
+}
+
+@media (max-width: 1250px) {
+    .search-bar-wrapper {
+        width: 200px;
+    }
+
+    .main-nav {
+        gap: 0.5rem;
+    }
+}
+
+@media (max-width: 1024px) {
+
+    .main-nav,
+    .search-bar-wrapper {
+        display: none;
+    }
+}

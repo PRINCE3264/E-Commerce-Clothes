@@ -1,0 +1,337 @@
+.sidebar {
+    position: fixed;
+    top: 0;
+    left: -400px;
+    width: 380px;
+    height: 100vh;
+    background: #ffffff;
+    z-index: 2000;
+    transition: transform 0.4s cubic-bezier(0.77, 0, 0.175, 1);
+    display: flex;
+    flex-direction: column;
+    box-shadow: 10px 0 50px rgba(0, 0, 0, 0.05);
+}
+
+.sidebar.open {
+    transform: translateX(400px);
+}
+
+.sidebar-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.4);
+    z-index: 1500;
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.3s ease;
+    backdrop-filter: blur(4px);
+}
+
+.sidebar-overlay.open {
+    opacity: 1;
+    visibility: visible;
+}
+
+/* User Header */
+.sidebar-user-header {
+    padding: 3rem 2rem;
+    background: white;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    border-bottom: 1px solid #f0f0f0;
+}
+
+.user-info-wrapper {
+    display: flex;
+    align-items: center;
+    gap: 1.2rem;
+}
+
+.user-avatar {
+    width: 70px;
+    height: 70px;
+    border-radius: 50%;
+    overflow: hidden;
+    border: 3px solid #fff;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+}
+
+.user-avatar img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.user-details h3 {
+    font-size: 1.2rem;
+    font-weight: 800;
+    color: #1a1a1a;
+    margin-bottom: 2px;
+}
+
+.user-details p {
+    font-size: 0.9rem;
+    color: #666;
+    margin-bottom: 8px;
+}
+
+.premium-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: #ebf5ff;
+    color: #2d5a8e;
+    padding: 6px 14px;
+    border-radius: 20px;
+    font-size: 0.8rem;
+    font-weight: 800;
+}
+
+.sidebar-close-btn {
+    background: #f3f4f6;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #1a1a1a;
+}
+
+/* Scrollable Content */
+.sidebar-scroll-content {
+    flex: 1;
+    overflow-y: auto;
+    padding: 2rem;
+}
+
+.sidebar-section {
+    margin-bottom: 2.5rem;
+}
+
+.section-label {
+    font-size: 0.8rem;
+    font-weight: 800;
+    color: #94a3b8;
+    letter-spacing: 1.5px;
+    margin-bottom: 1.5rem;
+}
+
+.sidebar-links {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.sidebar-link {
+    display: flex;
+    align-items: center;
+    padding: 0.8rem 0;
+    transition: transform 0.2s ease;
+}
+
+.sidebar-link:hover {
+    transform: translateX(5px);
+}
+
+.link-icon-bg {
+    width: 48px;
+    height: 48px;
+    background: #ebf5ff;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #2d5a8e;
+    margin-right: 1.2rem;
+    transition: all 0.3s ease;
+}
+
+.sidebar-link:hover .link-icon-bg {
+    background: #2d5a8e;
+    color: white;
+}
+
+.link-text {
+    font-size: 1rem;
+    font-weight: 600;
+    color: #334155;
+    flex: 1;
+}
+
+.chevron {
+    color: #94a3b8;
+    opacity: 0.5;
+}
+
+.new-badge {
+    background: #ff4757;
+    color: white;
+    font-size: 0.65rem;
+    font-weight: 800;
+    padding: 2px 8px;
+    border-radius: 10px;
+    letter-spacing: 0.5px;
+}
+
+/* Sidebar Footer */
+.sidebar-footer {
+    padding: 2rem;
+    border-top: 1px solid #f0f0f0;
+}
+
+.sign-out-btn {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    border: 1.5px solid #1e3a5f;
+    background: transparent;
+    color: #1e3a5f;
+    padding: 1rem;
+    border-radius: 12px;
+    font-weight: 800;
+    transition: all 0.3s ease;
+}
+
+.sign-out-btn:hover {
+    background: #1e3a5f;
+    color: white;
+}
+
+/* Custom Scrollbar */
+.sidebar-scroll-content::-webkit-scrollbar {
+    width: 4px;
+}
+
+.sidebar-scroll-content::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.sidebar-scroll-content::-webkit-scrollbar-thumb {
+    background: #e2e8f0;
+    border-radius: 10px;
+}
+
+/* Wishlist Preview Styles */
+.sidebar-wishlist-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 1.2rem;
+}
+
+.sidebar-wish-item {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 0.5rem;
+    background: #f8fafc;
+    border-radius: 12px;
+    border: 1px solid #f1f5f9;
+    transition: all 0.3s ease;
+}
+
+.sidebar-wish-item:hover {
+    border-color: #2d5a8e;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+}
+
+.wish-thumb {
+    width: 60px;
+    height: 60px;
+    background: white;
+    border-radius: 10px;
+    overflow: hidden;
+    position: relative;
+    border: 1px solid #f1f5f9;
+}
+
+.wish-thumb img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+}
+
+.remove-wish-mini {
+    position: absolute;
+    top: 2px;
+    right: 2px;
+    width: 18px;
+    height: 18px;
+    background: #ef4444;
+    color: white;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    transition: all 0.2s ease;
+    border: none;
+}
+
+.wish-thumb:hover .remove-wish-mini {
+    opacity: 1;
+}
+
+.wish-mini-info {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    flex: 1;
+}
+
+.wish-name {
+    font-size: 0.85rem;
+    font-weight: 700;
+    color: #1a1a1a;
+    display: -webkit-box;
+    -webkit-line-clamp: 1;
+    line-clamp: 1;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+.wish-name:hover {
+    color: #2d5a8e;
+}
+
+.wish-price {
+    font-size: 0.8rem;
+    font-weight: 800;
+    color: #2d5a8e;
+}
+
+.empty-wish-sidebar {
+    text-align: center;
+    padding: 2rem;
+    background: #f8fafc;
+    border-radius: 16px;
+    color: #94a3b8;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.8rem;
+    border: 1px dashed #e2e8f0;
+}
+
+.empty-wish-sidebar p {
+    font-size: 0.85rem;
+    font-weight: 600;
+}
+
+
+@media (max-width: 480px) {
+    .sidebar {
+        width: 100%;
+        left: -100%;
+    }
+
+    .sidebar.open {
+        transform: translateX(100%);
+    }
+}

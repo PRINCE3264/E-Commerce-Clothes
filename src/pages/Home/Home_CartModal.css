@@ -1,0 +1,228 @@
+/* Advanced Cart Success Modal - Form Size */
+.luxury-popup-container-advance {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(15, 23, 42, 0.6);
+    backdrop-filter: blur(8px);
+    z-index: 9999;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.advance-success-modal {
+    background: white;
+    width: 450px;
+    /* Form size as requested */
+    max-width: 90%;
+    border-radius: 24px;
+    padding: 15px 40px;
+    position: relative;
+    box-shadow: 0 40px 80px rgba(0, 0, 0, 0.2);
+    text-align: center;
+    animation: modalPopUp 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+@keyframes modalPopUp {
+    from {
+        opacity: 0;
+        transform: scale(0.9) translateY(20px);
+    }
+
+    to {
+        opacity: 1;
+        transform: scale(1) translateY(0);
+    }
+}
+
+.advance-close {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    background: #f1f5f9;
+    border: none;
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    color: #64748b;
+    transition: all 0.2s;
+}
+
+.advance-close:hover {
+    background: #e2e8f0;
+    color: #0f172a;
+}
+
+.vibrant-success-zone {
+    margin-bottom: 15px;
+}
+
+.checkmark-svg {
+    width: 80px;
+    height: 80px;
+    display: block;
+    margin: 0 auto 15px;
+}
+
+.checkmark-circle {
+    stroke: #10b981;
+    stroke-width: 2;
+    stroke-dasharray: 166;
+    stroke-dashoffset: 166;
+    animation: stroke 0.6s cubic-bezier(0.65, 0, 0.45, 1) forwards;
+}
+
+.checkmark-check {
+    stroke: #10b981;
+    stroke-width: 2;
+    stroke-dasharray: 48;
+    stroke-dashoffset: 48;
+    animation: stroke 0.3s cubic-bezier(0.65, 0, 0.45, 1) 0.6s forwards;
+}
+
+@keyframes stroke {
+    100% {
+        stroke-dashoffset: 0;
+    }
+}
+
+.glam-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 2rem;
+    font-weight: 800;
+    color: #0f172a;
+    margin-bottom: 10px;
+}
+
+.glam-subtitle {
+    font-size: 1rem;
+    color: #64748b;
+    line-height: 1.5;
+}
+
+.added-item-display {
+    background: #f8fafc;
+    border-radius: 16px;
+    padding: 15px;
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    margin-bottom: 20px;
+    text-align: left;
+    border: 1px solid #e2e8f0;
+}
+
+.item-image-premium {
+    width: 70px;
+    height: 70px;
+    border-radius: 10px;
+    overflow: hidden;
+    flex-shrink: 0;
+}
+
+.item-image-premium img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.item-brief-info {
+    flex: 1;
+}
+
+.ib-category {
+    font-size: 0.7rem;
+    color: #c5a059;
+    font-weight: 700;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    display: block;
+    margin-bottom: 4px;
+}
+
+.ib-name {
+    font-size: 0.95rem;
+    font-weight: 700;
+    color: #1e293b;
+    margin: 0 0 4px 0;
+    font-family: 'Playfair Display', serif;
+}
+
+.ib-price {
+    font-weight: 800;
+    color: #0f172a;
+    font-size: 1rem;
+    margin: 0;
+}
+
+.advance-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.btn-checkout-luxury {
+    width: 100%;
+    padding: 16px;
+    background: #0f172a;
+    color: white;
+    border: none;
+    border-radius: 12px;
+    font-weight: 700;
+    font-size: 0.95rem;
+    cursor: pointer;
+    box-shadow: 0 10px 25px rgba(15, 23, 42, 0.2);
+    transition: all 0.3s;
+    letter-spacing: 1px;
+}
+
+.btn-checkout-luxury:hover {
+    background: #1e293b;
+    transform: translateY(-2px);
+    box-shadow: 0 15px 35px rgba(15, 23, 42, 0.3);
+}
+
+.btn-continue-styling {
+    background: transparent;
+    color: #64748b;
+    border: none;
+    font-weight: 600;
+    font-size: 0.9rem;
+    cursor: pointer;
+    padding: 10px;
+    text-decoration: underline;
+    text-decoration-color: transparent;
+    transition: all 0.3s;
+}
+
+.btn-continue-styling:hover {
+    color: #0f172a;
+    text-decoration-color: #0f172a;
+}
+
+.cart-progress-bar {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    height: 4px;
+    background: #10b981;
+    width: 0;
+    animation: cartLoad 3s linear forwards;
+}
+
+@keyframes cartLoad {
+    from {
+        width: 0;
+    }
+
+    to {
+        width: 100%;
+    }
+}

@@ -1,0 +1,347 @@
+[
+    {
+        "id": 1,
+        "name": "Men's Premium Essential Tee",
+        "category": "Men's Wear",
+        "price": 25.99,
+        "image": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcR_eZJeDWLz40PYzd8RvLRm0BQyQa92d4QOtQ&s",
+        "rating": 4.5,
+        "size": [
+            "S",
+            "M",
+            "L",
+            "XL"
+        ],
+        "color": "Orange"
+    },
+    {
+        "id": 2,
+        "name": "Men's Slim Fit Chinos",
+        "category": "Men's Wear",
+        "price": 49.99,
+        "image": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQslhgUaGJaSegPklHqROUgvKbwbEVME_faeA&s",
+        "rating": 4.8,
+        "size": [
+            "30",
+            "32",
+            "34",
+            "36"
+        ],
+        "color": "Beige"
+    },
+    {
+        "id": 3,
+        "name": "Men's Classic Denim Jacket",
+        "category": "Men's Wear",
+        "price": 79.99,
+        "image": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQ_p_gDGH6zSr3DiyeOqHEOvWqZc504kIQpNw&s",
+        "rating": 4.2,
+        "size": [
+            "M",
+            "L",
+            "XL"
+        ],
+        "color": "Blue"
+    },
+    {
+        "id": 4,
+        "name": "Men's Lightweight Hooded Sweatshirt",
+        "category": "Men's Wear",
+        "price": 35.50,
+        "image": "https://images.unsplash.com/photo-1556821840-3a63f95609a7?q=80&w=1000",
+        "rating": 4.7,
+        "size": [
+            "S",
+            "M",
+            "L"
+        ],
+        "color": "Grey"
+    },
+    {
+        "id": 5,
+        "name": "Men's Performance Running Shorts",
+        "category": "Men's Wear",
+        "price": 19.99,
+        "image": "https://images.unsplash.com/photo-1591195853828-11db59a44f6b?q=80&w=1000",
+        "rating": 4.9,
+        "size": [
+            "M",
+            "L",
+            "XL"
+        ],
+        "color": "Black"
+    },
+    {
+        "id": 6,
+        "name": "Women's Floral Summer Dress",
+        "category": "Women's Wear",
+        "price": 55.00,
+        "image": "https://images.unsplash.com/photo-1515372039744-b8f02a3ae446?q=80&w=1000",
+        "rating": 4.6,
+        "size": [
+            "XS",
+            "S",
+            "M",
+            "L"
+        ],
+        "color": "Multicolor"
+    },
+    {
+        "id": 7,
+        "name": "Women's High-Waisted Leggings",
+        "category": "Women's Wear",
+        "price": 32.99,
+        "image": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSBG_-QLML3Xb_06YFzK-T81dVaoKv-mCRzVg&s",
+        "rating": 4.8,
+        "size": [
+            "S",
+            "M",
+            "L"
+        ],
+        "color": "Orange"
+    },
+    {
+        "id": 8,
+        "name": "Women's Oversized Knit Sweater",
+        "category": "Women's Wear",
+        "price": 45.00,
+        "image": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQsk2HsnbMnkMCXMeytJ6qtXa1-fZXeDAS7Cw&s",
+        "rating": 4.4,
+        "size": [
+            "One Size"
+        ],
+        "color": "Cream"
+    },
+    {
+        "id": 9,
+        "name": "Women's Classic Leather Handbag",
+        "category": "Women's Wear",
+        "price": 120.00,
+        "image": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTQjWnOIEQNydElafk-pPnEFC_laL7bbN-iag&s",
+        "rating": 4.9,
+        "size": [
+            "Large"
+        ],
+        "color": "Brown"
+    },
+    {
+        "id": 10,
+        "name": "Women's Sleeveless Silk Blouse",
+        "category": "Women's Wear",
+        "price": 65.00,
+        "image": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQLS6F5nop651z81T_9b55rZmwl9ATCupGCUg&s",
+        "rating": 4.5,
+        "size": [
+            "S",
+            "M",
+            "L"
+        ],
+        "color": "White"
+    },
+    {
+        "id": 11,
+        "name": "Kids' Cotton Graphic T-Shirt",
+        "category": "Kids Wear",
+        "price": 15.99,
+        "image": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSQ76tbyfCZ00asXVDXjb_cWiSgkEHPP1lh-Q&s",
+        "rating": 4.7,
+        "size": [
+            "2T",
+            "3T",
+            "4T",
+            "5T"
+        ],
+        "color": "Yellow"
+    },
+    {
+        "id": 12,
+        "name": "Kids' Comfort Fit Joggers",
+        "category": "Kids Wear",
+        "price": 22.50,
+        "image": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSKq1LBlwWb_N9_ytX4eI5tr_B3xMorwkFA-A&s",
+        "rating": 4.6,
+        "size": [
+            "XS",
+            "S",
+            "M"
+        ],
+        "color": "Orange"
+    },
+    {
+        "id": 13,
+        "name": "Kids' Waterproof Hooded Jacket",
+        "category": "Kids Wear",
+        "price": 39.99,
+        "image": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQ4H6VrTWSiUYSRU6lOhrxdlAk4A30sFjjsZw&s",
+        "rating": 4.8,
+        "size": [
+            "S",
+            "M",
+            "L"
+        ],
+        "color": "Red"
+    },
+    {
+        "id": 14,
+        "name": "Kids' Soft Knit Beanie",
+        "category": "Kids Wear",
+        "price": 12.00,
+        "image": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTZcIcVApe1huq2Q4aT7zyUngi8uRfbu28zwg&s",
+        "rating": 4.5,
+        "size": [
+            "One Size"
+        ],
+        "color": "Blue"
+    },
+    {
+        "id": 15,
+        "name": "Kids' Canvas Slip-On Shoes",
+        "category": "Kids Wear",
+        "price": 28.00,
+        "image": "https://images.unsplash.com/photo-1514989940723-e8e51635b782?q=80&w=1000",
+        "rating": 4.7,
+        "size": [
+            "5",
+            "6",
+            "7",
+            "8"
+        ],
+        "color": "Pink"
+    },
+    {
+        "id": 16,
+        "name": "Luxury Gold Chronograph Watch",
+        "category": "Accessories",
+        "price": 249.99,
+        "image": "https://images.unsplash.com/photo-1524592094714-0f0654e20314?q=80&w=1000",
+        "rating": 4.9,
+        "size": [
+            "One Size"
+        ],
+        "color": "Gold"
+    },
+    {
+        "id": 17,
+        "name": "Classic Aviator Sunglasses",
+        "category": "Accessories",
+        "price": 129.50,
+        "image": "https://images.unsplash.com/photo-1572635196237-14b3f281503f?q=80&w=1000",
+        "rating": 4.7,
+        "size": [
+            "One Size"
+        ],
+        "color": "Silver"
+    },
+    {
+        "id": 18,
+        "name": "Premium Leather Belt",
+        "category": "Accessories",
+        "price": 45.00,
+        "image": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRyvwmmsrjQHfVG4kzxjeVXzLhWIjEtT3uTFw&s",
+        "rating": 4.6,
+        "size": [
+            "S",
+            "M",
+            "L",
+            "XL"
+        ],
+        "color": "Dark Brown"
+    },
+    {
+        "id": 19,
+        "name": "Urban Streetwear Sneakers",
+        "category": "Footwear",
+        "price": 89.99,
+        "image": "https://images.unsplash.com/photo-1549298916-b41d501d3772?q=80&w=1000",
+        "rating": 4.8,
+        "size": [
+            "8",
+            "9",
+            "10",
+            "11"
+        ],
+        "color": "White/Blue"
+    },
+    {
+        "id": 20,
+        "name": "Rugged Outdoor Adventure Boots",
+        "category": "Footwear",
+        "price": 155.00,
+        "image": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQ-r4N1MUvjMj46A3K1fDU4SK5QLlGM8ACavw&s",
+        "rating": 4.5,
+        "size": [
+            "9",
+            "10",
+            "11"
+        ],
+        "color": "Tan"
+    },
+    {
+        "id": 21,
+        "name": "Women's Elegant Evening Clutch",
+        "category": "Accessories",
+        "price": 75.00,
+        "image": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS28x1bPLYlrORRR4Y0HrnZ850jFr57PLgU0Q&s",
+        "rating": 4.7,
+        "size": [
+            "Small"
+        ],
+        "color": "Black/Gold"
+    },
+    {
+        "id": 22,
+        "name": "Men's Structured Wool Coat",
+        "category": "Men's Wear",
+        "price": 185.00,
+        "image": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRP9IObR0a7LG9hzF3MDcMblI5bRbj89S2lxQ&s",
+        "rating": 4.9,
+        "size": [
+            "M",
+            "L",
+            "XL"
+        ],
+        "color": "Navy"
+    },
+    {
+        "id": 23,
+        "name": "Women's Bohemian Maxi Skirt",
+        "category": "Women's Wear",
+        "price": 52.00,
+        "image": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQ0H76TzIjmf_lKIuun_OGVosGY3WBWbb1LsQ&s",
+        "rating": 4.4,
+        "size": [
+            "S",
+            "M",
+            "L"
+        ],
+        "color": "Earth Tones"
+    },
+    {
+        "id": 24,
+        "name": "Kids' Cozy Fleece Onesie",
+        "category": "Kids Wear",
+        "price": 29.99,
+        "image": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSv53H4aZQ3jxV9l2BOWt5CZUX2Z5gGuFlb6Q&s",
+        "rating": 4.8,
+        "size": [
+            "2T",
+            "3T",
+            "4T"
+        ],
+        "color": "Cloud Grey"
+    },
+    {
+        "id": 25,
+        "name": "Men's Hybrid Training Joggers",
+        "category": "Men's Wear",
+        "price": 54.50,
+        "image": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTHcw1UbI7cq-G-Fecm3hsfi0jL3zfdSPJ09g&s",
+        "rating": 4.6,
+        "size": [
+            "S",
+            "M",
+            "L"
+        ],
+        "color": "Deep Olive"
+    }
+]

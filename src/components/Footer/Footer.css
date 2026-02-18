@@ -1,0 +1,218 @@
+.site-footer {
+    background: #1e3a5f;
+    /* Deep Professional Blue */
+    color: #ffffff;
+    padding: 80px 0 0;
+    font-family: 'Inter', sans-serif;
+}
+
+.footer-main-grid {
+    display: grid;
+    grid-template-columns: 1.5fr 1fr 1fr 1.5fr;
+    gap: 3rem;
+    padding-bottom: 60px;
+}
+
+/* Brand Column */
+.logo-icon {
+    color: #ffffff;
+    margin-right: 10px;
+}
+
+.footer-logo-container {
+    display: flex;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.footer-logo-text {
+    font-size: 1.8rem;
+    font-weight: 800;
+    letter-spacing: -0.5px;
+}
+
+.footer-logo-text span {
+    color: #3b82f6;
+    /* Brand Accent Blue */
+}
+
+.footer-tagline {
+    color: #bdc3c7;
+    font-size: 0.95rem;
+    line-height: 1.6;
+    margin-bottom: 25px;
+}
+
+.footer-socials {
+    display: flex;
+    gap: 12px;
+}
+
+.social-circle {
+    width: 36px;
+    height: 36px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #ffffff;
+    transition: all 0.3s ease;
+}
+
+.social-circle:hover {
+    background: var(--primary);
+    transform: translateY(-3px);
+}
+
+.p-icon {
+    font-weight: 900;
+    font-size: 14px;
+}
+
+/* Column Headings */
+.footer-column h3 {
+    font-size: 1.2rem;
+    font-weight: 700;
+    margin-bottom: 25px;
+    position: relative;
+}
+
+/* Links List */
+.footer-links-list {
+    list-style: none;
+    padding: 0;
+}
+
+.footer-links-list li {
+    margin-bottom: 15px;
+}
+
+.footer-links-list a {
+    color: #bdc3c7;
+    text-decoration: none;
+    font-size: 0.95rem;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    transition: color 0.3s ease;
+}
+
+.footer-links-list a:hover {
+    color: #00d2ff;
+    padding-left: 5px;
+}
+
+/* Newsletter Column */
+.news-desc {
+    color: #bdc3c7;
+    font-size: 0.95rem;
+    margin-bottom: 20px;
+}
+
+.news-form {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    margin-bottom: 20px;
+}
+
+.news-input {
+    width: 100%;
+    padding: 14px 20px;
+    border-radius: 8px;
+    border: none;
+    background: #ffffff;
+    outline: none;
+    font-size: 0.9rem;
+}
+
+.news-btn {
+    background: #3b82f6;
+    /* Accent Blue Button */
+    color: white;
+    padding: 14px;
+    border-radius: 8px;
+    font-weight: 700;
+    font-size: 1rem;
+    text-transform: capitalize;
+    transition: all 0.3s ease;
+}
+
+.news-btn:hover {
+    background: #2d5a8e;
+    transform: translateY(-2px);
+}
+
+.payment-badges {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    background: rgba(255, 255, 255, 0.05);
+    padding: 10px;
+    border-radius: 5px;
+    width: fit-content;
+}
+
+.payment-badges img {
+    height: 20px;
+    filter: grayscale(1) brightness(2);
+    opacity: 0.7;
+}
+
+.apple-pay {
+    height: 15px !important;
+}
+
+/* Bottom Bar */
+.footer-bottom-bar {
+    background: #162c4a;
+    /* Deeper shade */
+    padding: 25px 0;
+    text-align: center;
+    border-top: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.footer-bottom-bar p {
+    color: #bdc3c7;
+    font-size: 0.9rem;
+    margin: 0;
+}
+
+.heart {
+    color: #ff7675;
+}
+
+/* Responsive */
+@media (max-width: 1024px) {
+    .footer-main-grid {
+        grid-template-columns: 1.5fr 1fr 1fr;
+    }
+
+    .newsletter-col {
+        grid-column: span 3;
+        max-width: 500px;
+    }
+}
+
+@media (max-width: 768px) {
+    .footer-main-grid {
+        grid-template-columns: 1fr 1fr;
+    }
+
+    .brand-info,
+    .newsletter-col {
+        grid-column: span 2;
+    }
+}
+
+@media (max-width: 480px) {
+    .footer-main-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .brand-info,
+    .newsletter-col {
+        grid-column: span 1;
+    }
+}
