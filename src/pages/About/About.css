@@ -14,6 +14,7 @@
     background-attachment: fixed;
     display: flex;
     align-items: center;
+    justify-content: center;
     position: relative;
     color: white;
     /* Removed individual padding-top to avoid conflict with global page margin */
@@ -22,7 +23,7 @@
 .hero-overlay {
     position: absolute;
     inset: 0;
-    background: linear-gradient(90deg, rgba(30, 58, 95, 0.9) 0%, rgba(30, 58, 95, 0.4) 100%);
+    background: linear-gradient(to bottom, rgba(30, 58, 95, 0.9) 0%, rgba(30, 58, 95, 0.7) 100%);
     z-index: 1;
 }
 
@@ -32,7 +33,9 @@
 }
 
 .hero-content {
-    max-width: 800px;
+    max-width: 900px;
+    margin: 0 auto;
+    text-align: center;
 }
 
 .hero-badge {
@@ -140,7 +143,7 @@
     height: 600px;
     object-fit: cover;
     border-radius: 20px;
-    box-shadow: 0 30px 60px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 40px 80px rgba(0, 0, 0, 0.15);
 }
 
 .experience-badge {
@@ -172,8 +175,13 @@
     opacity: 0.8;
 }
 
+.story-content {
+    padding-left: 2rem;
+    text-align: center;
+}
+
 .story-content h2.section-title {
-    font-size: 3rem;
+    font-size: 3.5rem;
     color: #1e3a5f;
     font-family: 'Playfair Display', serif;
     margin-bottom: 2rem;

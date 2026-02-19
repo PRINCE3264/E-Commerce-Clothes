@@ -258,6 +258,12 @@
     transition: all 0.3s ease;
 }
 
+.cart-control-group {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
 .control-icon-btn:hover {
     color: #2d5a8e;
     transform: translateY(-2px);

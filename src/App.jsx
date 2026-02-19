@@ -37,6 +37,8 @@ function App() {
     setIsSidebarOpen(!isSidebarOpen);
   };
 
+  const [lastAdded, setLastAdded] = useState(null);
+
   const addToCart = (product) => {
     setCart((prevCart) => {
       const existingItem = prevCart.find((item) => item.id === product.id);
@@ -47,6 +49,8 @@ function App() {
       }
       return [...prevCart, { ...product, quantity: 1, cartId: Date.now() }];
     });
+    setLastAdded(product);
+    setTimeout(() => setLastAdded(null), 3000);
   };
 
   const toggleWishlist = (product) => {
@@ -78,6 +82,8 @@ function App() {
           toggleSidebar={toggleSidebar}
           cartCount={cart.length}
           wishlistCount={wishlist.length}
+          cart={cart}
+          lastAdded={lastAdded}
         />
         <Sidebar
           isOpen={isSidebarOpen}

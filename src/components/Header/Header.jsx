@@ -3,7 +3,7 @@ import { Link, useLocation } from 'react-router-dom';
 import { Search, ShoppingBag, Menu, ChevronDown, UserCircle, ShoppingCart, Heart } from 'lucide-react';
 import './Header.css';
 
-const Header = ({ toggleSidebar, cartCount, wishlistCount }) => {
+const Header = ({ toggleSidebar, cartCount, wishlistCount, cart, lastAdded }) => {
     const location = useLocation();
 
     return (
@@ -62,10 +62,14 @@ const Header = ({ toggleSidebar, cartCount, wishlistCount }) => {
                             <Heart size={26} />
                             {wishlistCount > 0 && <span className="cart-badge wishlist-badge-color">{wishlistCount}</span>}
                         </Link>
-                        <Link to="/cart" className="control-icon-btn">
-                            <ShoppingCart size={26} />
-                            {cartCount > 0 && <span className="cart-badge">{cartCount}</span>}
-                        </Link>
+
+                        <div className="cart-control-group">
+                            <Link to="/cart" className="control-icon-btn">
+                                <ShoppingCart size={28} />
+                                {cartCount > 0 && <span className="cart-badge">{cartCount}</span>}
+                            </Link>
+                        </div>
+
                         <Link to="/login" className="auth-button-pill">
                             <UserCircle size={20} />
                             <span>Login</span>

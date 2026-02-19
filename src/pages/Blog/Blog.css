@@ -7,7 +7,7 @@
 /* Hero Section */
 .blog-hero {
     height: 50vh;
-    background: url('https://images.unsplash.com/photo-1490221338947-28012bbd5137?q=80&w=2148&auto=format&fit=crop') no-repeat center center/cover;
+    background: url('https://images.unsplash.com/photo-1539109136881-3be0616acf4b?q=80&w=2000&auto=format&fit=crop') no-repeat center center/cover;
     background-attachment: fixed;
     display: flex;
     align-items: center;

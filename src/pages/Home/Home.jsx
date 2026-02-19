@@ -32,7 +32,6 @@ const Home = ({ onAddToCart, onToggleWishlist, wishlist = [] }) => {
     ]);
 
     // Modal States
-    const [cartPopup, setCartPopup] = useState(null); // { product, visible }
     const [wishlistPopup, setWishlistPopup] = useState(null); // { product, visible }
     const [quickView, setQuickView] = useState(null); // { product, visible }
     const [selectedSize, setSelectedSize] = useState('M'); // For Quick View
@@ -196,9 +195,7 @@ const Home = ({ onAddToCart, onToggleWishlist, wishlist = [] }) => {
     const handleAddToCart = (product) => {
         // Map 'title' to 'name' for consistency with global cart system
         const productWithStandardName = { ...product, name: product.title || product.name };
-        setCartPopup(productWithStandardName);
         if (onAddToCart) onAddToCart(productWithStandardName);
-        setTimeout(() => setCartPopup(null), 3000);
     };
 
     const handleWishlist = (product) => {
@@ -362,22 +359,21 @@ const Home = ({ onAddToCart, onToggleWishlist, wishlist = [] }) => {
                                     {product.badge && <span className={`product-badge ${product.badge.toLowerCase()}`}>{product.badge}</span>}
                                 </div>
                                 <div className="product-info">
-                                    <span className="product-category-label">{product.category}</span>
+                                    <div className="product-meta-row">
+                                        <span className="product-category-label">{product.category}</span>
+                                        <div className="product-rating-compact">
+                                            <Star
+                                                size={14}
+                                                fill="#f59e0b"
+                                                color="#f59e0b"
+                                            />
+                                            <span className="rating-value">{product.rating || 4.5}</span>
+                                        </div>
+                                    </div>
                                     <h4 className="product-title">{product.title || product.name}</h4>
                                     <div className="product-price">
                                         <span className="current-price">₹{product.price.toFixed(2)}</span>
-                                        {product.originalPrice && <span className="old-price" style={{ textDecoration: 'line-through', color: '#94a3b8', fontSize: '0.9em', marginLeft: '8px' }}>₹{product.originalPrice.toFixed(2)}</span>}
-                                    </div>
-                                    <div className="product-rating-compact" style={{ marginBottom: '10px' }}>
-                                        {[...Array(5)].map((_, i) => (
-                                            <Star
-                                                key={i}
-                                                size={14}
-                                                fill={i < Math.floor(product.rating || 4.5) ? "#f59e0b" : "none"}
-                                                color={i < Math.floor(product.rating || 4.5) ? "#f59e0b" : "#ccc"}
-                                            />
-                                        ))}
-                                        <span className="rating-value" style={{ marginLeft: '5px', color: '#94a3b8', fontSize: '0.8rem' }}>({product.rating || 4.5})</span>
+                                        {product.originalPrice && <span className="old-price">₹{product.originalPrice.toFixed(2)}</span>}
                                     </div>
                                     {product.sizes && (
                                         <div className="product-sizes-selector" style={{ display: 'flex', gap: '8px', marginBottom: '15px' }}>
@@ -422,52 +418,7 @@ const Home = ({ onAddToCart, onToggleWishlist, wishlist = [] }) => {
                 </div>
             </section>
 
-            {/* Ultra-Premium Advanced Level Success Modal */}
-            {cartPopup && (
-                <div className="luxury-popup-container-advance">
-                    <div className="advance-success-modal animate-wow">
-                        <div className="modal-glass-base"></div>
-                        <button className="advance-close" onClick={() => setCartPopup(null)}>
-                            <X size={20} />
-                        </button>
-
-                        <div className="advance-modal-body">
-                            <div className="vibrant-success-zone">
-                                <div className="success-lottie-emulation">
-                                    <svg viewBox="0 0 52 52" className="checkmark-svg">
-                                        <circle className="checkmark-circle" cx="26" cy="26" r="25" fill="none" />
-                                        <path className="checkmark-check" fill="none" d="M14.1 27.2l7.1 7.2 16.7-16.8" />
-                                    </svg>
-                                </div>
-                                <h2 className="glam-title">Excellent Choice!</h2>
-                                <p className="glam-subtitle">Your selection has been moved to the shopping bag.</p>
-                            </div>
-
-                            <div className="added-item-display">
-                                <div className="item-glow-back"></div>
-                                <div className="item-image-premium">
-                                    <img src={cartPopup.image} alt={cartPopup.name} />
-                                </div>
-                                <div className="item-brief-info">
-                                    <span className="ib-category">{cartPopup.category}</span>
-                                    <h4 className="ib-name">{cartPopup.name || cartPopup.title}</h4>
-                                    <p className="ib-price">₹{cartPopup.price?.toFixed(2)}</p>
-                                </div>
-                            </div>
-
-                            <div className="advance-actions">
-                                <button className="btn-checkout-luxury" onClick={() => navigate('/cart')}>
-                                    CHECKOUT NOW
-                                </button>
-                                <button className="btn-continue-styling" onClick={() => setCartPopup(null)}>
-                                    CONTINUE STYLING
-                                </button>
-                            </div>
-                        </div>
-                        <div className="cart-progress-bar"></div>
-                    </div>
-                </div>
-            )}
+            {/* Ultra-Premium Advanced Level Success Modal REMOVED - Using Mini-Cart Preview */}
 
             {/* Premium Red Wishlist Modal */}
             {wishlistPopup && (
@@ -630,7 +581,7 @@ const Home = ({ onAddToCart, onToggleWishlist, wishlist = [] }) => {
                             <X size={20} />
                         </button>
                         <div className="welcome-image-top">
-                            <img src="https://images.unsplash.com/photo-1489987707025-afc232f7ea0f?q=80&w=2070&auto=format&fit=crop" alt="Premium Collection" />
+                            <img src="https://images.unsplash.com/photo-1490481651871-ab68de25d43d?q=80&w=2000&auto=format&fit=" alt="Premium Collection" />
                         </div>
                         <div className="welcome-content-bottom">
                             <span className="studio-badge">STUDIO EXCLUSIVE</span>

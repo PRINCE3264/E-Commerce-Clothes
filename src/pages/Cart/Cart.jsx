@@ -17,8 +17,7 @@ const Cart = ({ cartItems = [], onRemoveItem, onUpdateQuantity }) => {
 
     const subtotal = (cartItems || []).reduce((acc, item) => acc + (item.price * (item.quantity || 1)), 0);
     const shipping = 0.00; // Free shipping
-    const tax = subtotal * 0.05;
-    const total = subtotal + shipping + tax;
+    const total = subtotal + shipping;
 
     return (
         <div className="cart-page">
@@ -109,10 +108,6 @@ const Cart = ({ cartItems = [], onRemoveItem, onUpdateQuantity }) => {
                                     <div className="summary-row">
                                         <span>Estimated Shipping</span>
                                         <span className="shipping-tag">FREE</span>
-                                    </div>
-                                    <div className="summary-row">
-                                        <span>Sales Tax (5%)</span>
-                                        <span>₹{tax.toFixed(2)}</span>
                                     </div>
                                     <div className="promo-code-box">
                                         <input type="text" placeholder="Promo Code" />

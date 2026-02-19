@@ -26,7 +26,6 @@ const Products = ({ onAddToCart, onToggleWishlist, wishlist }) => {
     const [priceRange, setPriceRange] = useState(300);
     const [searchQuery, setSearchQuery] = useState('');
     const [selectedProduct, setSelectedProduct] = useState(null);
-    const [isCartModalOpen, setIsCartModalOpen] = useState(false);
     const [cartProduct, setCartProduct] = useState(null);
     const [isWishlistModalOpen, setIsWishlistModalOpen] = useState(false);
     const [wishlistProduct, setWishlistProduct] = useState(null);
@@ -60,10 +59,7 @@ const Products = ({ onAddToCart, onToggleWishlist, wishlist }) => {
 
     const handleAddToCart = (e, product) => {
         e.stopPropagation();
-        setCartProduct(product);
-        setIsCartModalOpen(true);
         if (onAddToCart) onAddToCart(product);
-        setTimeout(() => setIsCartModalOpen(false), 3000);
     };
 
     const handleAddToWishlist = (e, product) => {
@@ -261,54 +257,7 @@ const Products = ({ onAddToCart, onToggleWishlist, wishlist }) => {
             )}
 
 
-            {/* Ultra-Premium Advanced Level Success Modal */}
-            {isCartModalOpen && (
-                <div className="luxury-popup-container-advance">
-                    <div className="advance-success-modal animate-wow">
-                        <div className="modal-glass-base"></div>
-                        <button className="advance-close" onClick={() => setIsCartModalOpen(false)}>
-                            <X size={20} />
-                        </button>
-
-                        <div className="advance-modal-body">
-                            <div className="vibrant-success-zone">
-                                <div className="success-lottie-emulation">
-                                    <svg viewBox="0 0 52 52" className="checkmark-svg">
-                                        <circle className="checkmark-circle" cx="26" cy="26" r="25" fill="none" />
-                                        <path className="checkmark-check" fill="none" d="M14.1 27.2l7.1 7.2 16.7-16.8" />
-                                    </svg>
-                                </div>
-                                <h2 className="glam-title">Excellent Choice!</h2>
-                                <p className="glam-subtitle">Your selection has been moved to your shopping bag.</p>
-                            </div>
-
-                            {cartProduct && (
-                                <div className="added-item-display">
-                                    <div className="item-glow-back"></div>
-                                    <div className="item-image-premium">
-                                        <img src={cartProduct.image} alt={cartProduct.name} />
-                                    </div>
-                                    <div className="item-brief-info">
-                                        <span className="ib-category">{cartProduct.category}</span>
-                                        <h4 className="ib-name">{cartProduct.name}</h4>
-                                        <p className="ib-price">₹{cartProduct.price.toFixed(2)}</p>
-                                    </div>
-                                </div>
-                            )}
-
-                            <div className="advance-actions">
-                                <button className="btn-checkout-luxury" onClick={() => navigate('/cart')}>
-                                    CHECKOUT NOW
-                                </button>
-                                <button className="btn-continue-styling" onClick={() => setIsCartModalOpen(false)}>
-                                    CONTINUE SHOPPING
-                                </button>
-                            </div>
-                        </div>
-                        <div className="cart-progress-bar"></div>
-                    </div>
-                </div>
-            )}
+            {/* Ultra-Premium Advanced Level Success Modal REMOVED - Using Mini-Cart Preview */}
 
             {/* Premium Red Wishlist Modal */}
             {isWishlistModalOpen && (
