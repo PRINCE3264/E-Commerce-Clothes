@@ -15,15 +15,15 @@
 
 .advance-success-modal {
     background: white;
-    width: 450px;
-    /* Form size as requested */
-    max-width: 90%;
-    border-radius: 24px;
-    padding: 15px 40px;
+    width: 420px;
+    /* Perfect architectural width */
+    max-width: 95%;
+    border-radius: 32px;
+    padding: 30px 40px;
     position: relative;
-    box-shadow: 0 40px 80px rgba(0, 0, 0, 0.2);
+    box-shadow: 0 40px 100px rgba(15, 23, 42, 0.25);
     text-align: center;
-    animation: modalPopUp 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    animation: modalPopUp 0.6s cubic-bezier(0.19, 1, 0.22, 1) forwards;
 }
 
 @keyframes modalPopUp {
@@ -73,7 +73,7 @@
 
 .checkmark-circle {
     stroke: #10b981;
-    stroke-width: 2;
+    stroke-width: 2.2;
     stroke-dasharray: 166;
     stroke-dashoffset: 166;
     animation: stroke 0.6s cubic-bezier(0.65, 0, 0.45, 1) forwards;
@@ -81,7 +81,7 @@
 
 .checkmark-check {
     stroke: #10b981;
-    stroke-width: 2;
+    stroke-width: 3.5;
     stroke-dasharray: 48;
     stroke-dashoffset: 48;
     animation: stroke 0.3s cubic-bezier(0.65, 0, 0.45, 1) 0.6s forwards;
@@ -108,15 +108,15 @@
 }
 
 .added-item-display {
-    background: #f8fafc;
-    border-radius: 16px;
-    padding: 15px;
+    background: #fdfdfd;
+    border-radius: 20px;
+    padding: 20px;
     display: flex;
     align-items: center;
-    gap: 15px;
-    margin-bottom: 20px;
+    gap: 18px;
+    margin-bottom: 25px;
     text-align: left;
-    border: 1px solid #e2e8f0;
+    border: 1px solid #f1f5f9;
 }
 
 .item-image-premium {
@@ -156,10 +156,11 @@
 }
 
 .ib-price {
-    font-weight: 800;
+    font-weight: 700;
     color: #0f172a;
-    font-size: 1rem;
+    font-size: 1.1rem;
     margin: 0;
+    letter-spacing: -0.5px;
 }
 
 .advance-actions {
@@ -170,41 +171,44 @@
 
 .btn-checkout-luxury {
     width: 100%;
-    padding: 16px;
-    background: #0f172a;
+    padding: 18px;
+    background: #2b5a91;
     color: white;
     border: none;
-    border-radius: 12px;
-    font-weight: 700;
-    font-size: 0.95rem;
+    border-radius: 14px;
+    font-weight: 800;
+    font-size: 0.9rem;
     cursor: pointer;
-    box-shadow: 0 10px 25px rgba(15, 23, 42, 0.2);
-    transition: all 0.3s;
-    letter-spacing: 1px;
+    box-shadow: 0 12px 30px rgba(43, 90, 145, 0.2);
+    transition: all 0.4s cubic-bezier(0.19, 1, 0.22, 1);
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
 }
 
 .btn-checkout-luxury:hover {
-    background: #1e293b;
+    background: #234d7d;
     transform: translateY(-2px);
-    box-shadow: 0 15px 35px rgba(15, 23, 42, 0.3);
+    box-shadow: 0 15px 35px rgba(43, 90, 145, 0.3);
 }
 
 .btn-continue-styling {
     background: transparent;
     color: #64748b;
     border: none;
-    font-weight: 600;
-    font-size: 0.9rem;
+    font-weight: 700;
+    font-size: 0.85rem;
     cursor: pointer;
     padding: 10px;
-    text-decoration: underline;
-    text-decoration-color: transparent;
+    text-decoration: none;
+    text-transform: uppercase;
+    letter-spacing: 1px;
     transition: all 0.3s;
+    margin-top: 5px;
 }
 
 .btn-continue-styling:hover {
-    color: #0f172a;
-    text-decoration-color: #0f172a;
+    color: #2b5a91;
+    transform: translateY(-1px);
 }
 
 .cart-progress-bar {

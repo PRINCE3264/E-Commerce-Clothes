@@ -659,34 +659,33 @@
 .btn-add-to-cart {
     width: 100%;
     margin-top: 15px;
-    padding: 1rem;
-    background: linear-gradient(135deg, #1e3a5f 0%, #2d5a8e 100%);
+    padding: 1.1rem;
+    background: #2b5a91;
     color: white;
     border: none;
-    border-radius: 12px;
+    border-radius: 50px;
     font-weight: 800;
-    font-size: 0.9rem;
-    text-transform: uppercase;
-    letter-spacing: 1px;
+    font-size: 0.95rem;
     cursor: pointer;
-    transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+    transition: all 0.4s cubic-bezier(0.19, 1, 0.22, 1);
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: 10px;
-    box-shadow: 0 5px 15px rgba(30, 58, 95, 0.15);
+    gap: 12px;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    box-shadow: 0 10px 25px rgba(43, 90, 145, 0.2);
 }
 
 .btn-add-to-cart:hover {
+    background: #1e4575;
     transform: translateY(-4px);
-    box-shadow: 0 12px 25px rgba(30, 58, 95, 0.25);
-    background: linear-gradient(135deg, #2d5a8e 0%, #3b82f6 100%);
+    box-shadow: 0 15px 35px rgba(43, 90, 145, 0.35);
 }
 
-.btn-add-to-cart::before {
-    content: '+';
-    font-size: 1.4rem;
-    font-weight: 300;
+.btn-plus-icon {
+    margin-right: -4px;
+    opacity: 0.9;
 }
 
 /* Testimonials */

@@ -16,6 +16,7 @@ import {
     ArrowRight,
     CheckCircle,
     ShoppingCart,
+    ShoppingBag,
     Plus,
     Minus
 } from 'lucide-react';
@@ -406,7 +407,9 @@ const Home = ({ onAddToCart, onToggleWishlist, wishlist = [] }) => {
                                             handleAddToCart({ ...product, size: sizeToAdd });
                                         }}
                                     >
-                                        Add to Cart
+                                        <Plus size={18} className="btn-plus-icon" />
+                                        <ShoppingBag size={20} />
+                                        <span>ADD TO CART</span>
                                     </button>
                                 </div>
                             </div>

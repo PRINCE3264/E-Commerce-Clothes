@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { Search, ShoppingBag, Menu, ChevronDown, UserCircle, ShoppingCart, Heart } from 'lucide-react';
+import { Search, ShoppingBag, Menu, ChevronDown, UserCircle, ShoppingCart, Heart, CheckCircle, Trash2 } from 'lucide-react';
 import './Header.css';
 
 const Header = ({ toggleSidebar, cartCount, wishlistCount, cart, lastAdded }) => {
@@ -68,6 +68,7 @@ const Header = ({ toggleSidebar, cartCount, wishlistCount, cart, lastAdded }) =>
                                 <ShoppingCart size={28} />
                                 {cartCount > 0 && <span className="cart-badge">{cartCount}</span>}
                             </Link>
+
                         </div>
 
                         <Link to="/login" className="auth-button-pill">

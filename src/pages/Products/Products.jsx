@@ -11,6 +11,7 @@ import {
     Star,
     X,
     ShoppingCart,
+    Plus,
     Search
 } from 'lucide-react';
 import productsData from '../../data/products.json';
@@ -179,8 +180,9 @@ const Products = ({ onAddToCart, onToggleWishlist, wishlist }) => {
                                                 handleAddToCart(e, { ...product, size: sizeToAdd });
                                             }}
                                         >
-                                            <ShoppingBag size={18} />
-                                            <span>Add to Bag</span>
+                                            <Plus size={18} className="btn-plus-icon" />
+                                            <ShoppingBag size={20} />
+                                            <span>ADD TO CART</span>
                                         </button>
                                     </div>
                                 </div>

@@ -11,7 +11,7 @@
 }
 
 .promotion-bar {
-    background: linear-gradient(90deg, #2d5a8e 0%, #2d5a8e 45%, #5dade2 45%, #5dade2 100%);
+    background: linear-gradient(90deg, #2b5a91 0%, #2b5a91 45%, #5dade2 45%, #5dade2 100%);
     color: white;
     font-size: 0.85rem;
     font-weight: 700;
@@ -52,7 +52,7 @@
 
 .menu-trigger {
     background: #ebf5ff;
-    color: #2d5a8e;
+    color: #2b5a91;
     width: 48px;
     height: 48px;
     border-radius: 12px;
@@ -65,7 +65,7 @@
 }
 
 .menu-trigger:hover {
-    background: #2d5a8e;
+    background: #2b5a91;
     color: white;
     transform: rotate(90deg);
 }
@@ -80,7 +80,7 @@
 .logo-main {
     font-size: 2.2rem;
     font-weight: 900;
-    color: #1e3a5f;
+    color: #2b5a91;
     /* Deep Professional Blue */
     font-family: 'Playfair Display', serif;
     letter-spacing: -1px;
@@ -121,13 +121,13 @@
 
 .nav-item:hover,
 .nav-item.active {
-    color: #1e3a5f;
+    color: #2b5a91;
     background: #f0f7ff;
 }
 
 .nav-item.highlight {
     background: #f0f7ff;
-    color: #2d5a8e;
+    color: #2b5a91;
     font-weight: 700;
 }
 
@@ -168,7 +168,7 @@
 
 .nav-dropdown-menu a:hover {
     background: #f0f7ff;
-    color: #2d5a8e;
+    color: #2b5a91;
     padding-left: 2.5rem;
 }
 
@@ -180,7 +180,7 @@
 
 .all-products-link {
     background: #f8fafc;
-    color: #1e3a5f !important;
+    color: #2b5a91 !important;
     font-weight: 800 !important;
     font-size: 1rem !important;
     letter-spacing: 0.5px;
@@ -213,9 +213,9 @@
 }
 
 .search-bar-wrapper:focus-within {
-    border-color: #1e3a5f;
+    border-color: #2b5a91;
     background: white;
-    box-shadow: 0 0 0 4px rgba(30, 58, 95, 0.1);
+    box-shadow: 0 0 0 4px rgba(43, 90, 145, 0.1);
 }
 
 .search-bar-wrapper input {
@@ -229,7 +229,7 @@
 }
 
 .search-btn {
-    background: #2d5a8e;
+    background: #2b5a91;
     /* Blue Search Button */
     color: white;
     height: 100%;
@@ -265,7 +265,7 @@
 }
 
 .control-icon-btn:hover {
-    color: #2d5a8e;
+    color: #2b5a91;
     transform: translateY(-2px);
 }
 
@@ -294,7 +294,7 @@
     align-items: center;
     justify-content: center;
     gap: 10px;
-    background: #1e3a5f;
+    background: #2b5a91;
     color: white;
     height: 46px;
     /* Match search height for perfect alignment */
@@ -303,14 +303,14 @@
     font-weight: 700;
     font-size: 0.95rem;
     text-decoration: none;
-    box-shadow: 0 8px 15px rgba(30, 58, 95, 0.15);
+    box-shadow: 0 8px 15px rgba(43, 90, 145, 0.15);
     transition: all 0.3s ease;
 }
 
 .auth-button-pill:hover {
-    background: #2d5a8e;
+    background: #234d7d;
     transform: translateY(-3px);
-    box-shadow: 0 12px 25px rgba(30, 58, 95, 0.3);
+    box-shadow: 0 12px 25px rgba(43, 90, 145, 0.3);
 }
 
 @media (max-width: 1250px) {

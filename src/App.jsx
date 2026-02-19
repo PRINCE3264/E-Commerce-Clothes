@@ -12,6 +12,11 @@ import Login from './pages/Login/Login';
 import Cart from './pages/Cart/Cart';
 import Profile from './pages/Profile/Profile';
 import Wishlist from './pages/Wishlist/Wishlist';
+import Register from './pages/Register/Register';
+import ForgotPassword from './pages/ForgotPassword/ForgotPassword';
+import { X, CheckCircle, ShoppingBag, AlertCircle } from 'lucide-react';
+import './pages/Home/Home_CartModal.css';
+import './components/Modals/WishlistModal.css';
 import './index.css';
 
 function App() {
@@ -38,6 +43,8 @@ function App() {
   };
 
   const [lastAdded, setLastAdded] = useState(null);
+  const [showCartModal, setShowCartModal] = useState(false);
+  const [wishlistConfirm, setWishlistConfirm] = useState({ show: false, product: null });
 
   const addToCart = (product) => {
     setCart((prevCart) => {
@@ -50,17 +57,32 @@ function App() {
       return [...prevCart, { ...product, quantity: 1, cartId: Date.now() }];
     });
     setLastAdded(product);
-    setTimeout(() => setLastAdded(null), 3000);
+    setWishlistConfirm({ show: false, product: null }); // Close wishlist modal if open
+    setShowCartModal(true);
   };
 
   const toggleWishlist = (product) => {
     setWishlist((prevWish) => {
       const exists = prevWish.find(item => item.id === product.id);
       if (exists) {
-        return prevWish.filter(item => item.id !== product.id);
+        setShowCartModal(false); // Close cart modal if open
+        setWishlistConfirm({ show: true, product });
+        return prevWish; // Don't remove yet, wait for confirmation
       }
       return [...prevWish, product];
     });
+  };
+
+  const removeFromWishlist = (product) => {
+    // Direct removal without confirmation - used for "Add to Cart" or direct delete in Wishlist page
+    setWishlist((prevWish) => prevWish.filter(item => item.id !== product.id));
+  };
+
+  const confirmWishlistRemoval = () => {
+    if (wishlistConfirm.product) {
+      setWishlist((prevWish) => prevWish.filter(item => item.id !== wishlistConfirm.product.id));
+      setWishlistConfirm({ show: false, product: null });
+    }
   };
 
   const removeCartItem = (cartId) => {
@@ -106,6 +128,8 @@ function App() {
             <Route path="/blog" element={<Blog />} />
             <Route path="/contact" element={<Contact />} />
             <Route path="/login" element={<Login />} />
+            <Route path="/register" element={<Register />} />
+            <Route path="/forgot-password" element={<ForgotPassword />} />
             <Route path="/cart" element={
               <Cart
                 cartItems={cart}
@@ -116,7 +140,8 @@ function App() {
             <Route path="/wishlist" element={
               <Wishlist
                 wishlistItems={wishlist}
-                onRemoveFromWishlist={toggleWishlist}
+                onRemoveFromWishlist={removeFromWishlist}
+                onToggleWishlist={toggleWishlist}
                 onAddToCart={addToCart}
               />
             } />
@@ -125,6 +150,84 @@ function App() {
         </main>
 
         <Footer />
+
+        {/* Global Premium Centered Cart Modal */}
+        {showCartModal && lastAdded && (
+          <div className="luxury-popup-container-advance" onClick={() => setShowCartModal(false)}>
+            <div className="advance-success-modal animate-wow" onClick={e => e.stopPropagation()}>
+              <button className="advance-close" onClick={() => setShowCartModal(false)}>
+                <X size={20} />
+              </button>
+
+              <div className="vibrant-success-zone">
+                <div className="success-lottie-emulation">
+                  <svg viewBox="0 0 52 52" className="checkmark-svg">
+                    <circle className="checkmark-circle" cx="26" cy="26" r="25" fill="none" />
+                    <path className="checkmark-check" fill="none" d="M14.1 27.2l7.1 7.2 16.7-16.8" />
+                  </svg>
+                </div>
+                <h2 className="glam-title">Excellent Choice!</h2>
+                <p className="glam-subtitle">Your selection has been moved to your shopping bag.</p>
+              </div>
+
+              <div className="added-item-display">
+                <div className="item-image-premium">
+                  <img src={lastAdded.image} alt={lastAdded.name || lastAdded.title} />
+                </div>
+                <div className="item-brief-info">
+                  <span className="ib-category">{lastAdded.category || "Premium Collection"}</span>
+                  <h4 className="ib-name">{lastAdded.name || lastAdded.title}</h4>
+                  <p className="ib-price">₹{(lastAdded.price || 0).toFixed(2)}</p>
+                </div>
+              </div>
+
+              <div className="advance-actions">
+                <button
+                  className="btn-checkout-luxury"
+                  onClick={() => {
+                    setShowCartModal(false);
+                    window.location.href = '/cart'; // Force navigation or use navigate if available
+                  }}
+                >
+                  CHECKOUT NOW
+                </button>
+                <button className="btn-continue-styling" onClick={() => setShowCartModal(false)}>
+                  CONTINUE SHOPPING
+                </button>
+              </div>
+
+              <div className="cart-progress-bar"></div>
+            </div>
+          </div>
+        )}
+
+        {/* Premium Wishlist Confirmation Modal */}
+        {wishlistConfirm.show && (
+          <div className="wishlist-confirm-overlay" onClick={() => setWishlistConfirm({ show: false, product: null })}>
+            <div className="wishlist-confirm-modal animate-wow" onClick={e => e.stopPropagation()}>
+              <div className="wishlist-modal-icon">
+                <AlertCircle size={32} />
+              </div>
+              <h2>Remove from Wishlist?</h2>
+              <p>Are you sure you want to remove from your favorites?</p>
+
+              <div className="wishlist-modal-actions">
+                <button
+                  className="btn-modal-cancel"
+                  onClick={() => setWishlistConfirm({ show: false, product: null })}
+                >
+                  CANCEL
+                </button>
+                <button
+                  className="btn-modal-remove"
+                  onClick={confirmWishlistRemoval}
+                >
+                  REMOVE ITEM
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
     </Router>
   );

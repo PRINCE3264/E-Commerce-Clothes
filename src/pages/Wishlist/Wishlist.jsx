@@ -1,10 +1,10 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { Heart, ShoppingBag, Trash2, ArrowLeft, Star, X, CheckCircle, AlertCircle, Eye } from 'lucide-react';
+import { Heart, ShoppingBag, Trash2, ArrowLeft, Star, X, CheckCircle, AlertCircle, Eye, Plus } from 'lucide-react';
 import './Wishlist.css';
 import './Wishlist_ProductCard.css';
 
-const Wishlist = ({ wishlistItems = [], onRemoveFromWishlist, onAddToCart }) => {
+const Wishlist = ({ wishlistItems = [], onRemoveFromWishlist, onAddToCart, onToggleWishlist }) => {
     const navigate = useNavigate();
     const [addedProduct, setAddedProduct] = useState(null);
     const [deletingProduct, setDeletingProduct] = useState(null);
@@ -18,20 +18,15 @@ const Wishlist = ({ wishlistItems = [], onRemoveFromWishlist, onAddToCart }) => 
     const handleMoveToCart = (item) => {
         if (onAddToCart) {
             onAddToCart(item);
-            onRemoveFromWishlist(item); // Move means remove from wishlist
-            setAddedProduct(item);
-            setTimeout(() => setAddedProduct(null), 4000);
+            onRemoveFromWishlist(item); // This will now correctly trigger the global confirmation OR direct removal via App.jsx logic
         }
     };
 
     const confirmDelete = (item) => {
-        setDeletingProduct(item);
-    };
-
-    const handleDelete = () => {
-        if (deletingProduct) {
-            onRemoveFromWishlist(deletingProduct);
-            setDeletingProduct(null);
+        if (onToggleWishlist) {
+            onToggleWishlist(item);
+        } else {
+            onRemoveFromWishlist(item);
         }
     };
 
@@ -129,8 +124,9 @@ const Wishlist = ({ wishlistItems = [], onRemoveFromWishlist, onAddToCart }) => 
                                             handleMoveToCart({ ...item, size: sizeToAdd });
                                         }}
                                     >
-                                        <ShoppingBag size={18} />
-                                        <span>MOVE TO BAG</span>
+                                        <Plus size={18} className="btn-plus-icon" />
+                                        <ShoppingBag size={20} />
+                                        <span>ADD TO CART</span>
                                     </button>
                                 </div>
                             </div>
@@ -152,52 +148,6 @@ const Wishlist = ({ wishlistItems = [], onRemoveFromWishlist, onAddToCart }) => 
                     </div>
                 )}
             </div>
-
-            {/* Ultra-Premium Advanced Level Success Modal */}
-            {addedProduct && (
-                <div className="luxury-popup-container-advance">
-                    <div className="advance-success-modal animate-wow">
-                        <div className="modal-glass-base"></div>
-                        <button className="advance-close" onClick={() => setAddedProduct(null)}>
-                            <X size={20} />
-                        </button>
-
-                        <div className="advance-modal-body">
-                            <div className="vibrant-success-zone">
-                                <div className="success-lottie-emulation">
-                                    <svg viewBox="0 0 52 52" className="checkmark-svg">
-                                        <circle className="checkmark-circle" cx="26" cy="26" r="25" fill="none" />
-                                        <path className="checkmark-check" fill="none" d="M14.1 27.2l7.1 7.2 16.7-16.8" />
-                                    </svg>
-                                </div>
-                                <h2 className="glam-title">Excellent Choice!</h2>
-                                <p className="glam-subtitle">Your selection has been moved to the shopping bag.</p>
-                            </div>
-
-                            <div className="added-item-display">
-                                <div className="item-glow-back"></div>
-                                <div className="item-image-premium">
-                                    <img src={addedProduct.image} alt={addedProduct.name} />
-                                </div>
-                                <div className="item-brief-info">
-                                    <span className="ib-category">{addedProduct.category}</span>
-                                    <h4 className="ib-name">{addedProduct.name}</h4>
-                                    <p className="ib-price">₹{addedProduct.price.toFixed(2)}</p>
-                                </div>
-                            </div>
-
-                            <div className="advance-actions">
-                                <button className="btn-checkout-luxury" onClick={() => navigate('/cart')}>
-                                    CHECKOUT NOW
-                                </button>
-                                <button className="btn-continue-styling" onClick={() => setAddedProduct(null)}>
-                                    CONTINUE STYLING
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            )}
 
             {/* Advance Level Quick View Modal */}
             {quickViewProduct && (
@@ -259,23 +209,6 @@ const Wishlist = ({ wishlistItems = [], onRemoveFromWishlist, onAddToCart }) => 
                                     </button>
                                 </div>
                             </div>
-                        </div>
-                    </div>
-                </div>
-            )}
-
-            {/* Delete Confirmation Modal */}
-            {deletingProduct && (
-                <div className="confirm-modal-overlay" onClick={() => setDeletingProduct(null)}>
-                    <div className="confirm-modal-box scale-up" onClick={e => e.stopPropagation()}>
-                        <div className="confirm-header">
-                            <AlertCircle size={32} color="#ef4444" />
-                            <h3>Remove from Wishlist?</h3>
-                        </div>
-                        <p>Are you sure you want to remove <strong>{deletingProduct.name}</strong> from your favorites?</p>
-                        <div className="confirm-actions">
-                            <button className="btn-cancel-modal" onClick={() => setDeletingProduct(null)}>CANCEL</button>
-                            <button className="btn-confirm-delete" onClick={handleDelete}>REMOVE ITEM</button>
                         </div>
                     </div>
                 </div>
