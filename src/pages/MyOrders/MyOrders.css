@@ -289,8 +289,48 @@
 @keyframes rotate { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
 
 @media (max-width: 800px) {
-    .orders-header { flex-direction: column; align-items: flex-start; gap: 30px; }
+    .my-orders-page {
+        padding-top: 100px;
+    }
+    .orders-header { 
+        flex-direction: column; 
+        align-items: flex-start; 
+        gap: 30px; 
+        margin-bottom: 30px;
+    }
     .orders-search { width: 100%; }
     .order-main-meta { gap: 20px; flex-wrap: wrap; }
-    .header-content h1 { font-size: 2.2rem; }
+    .header-content h1 { font-size: 2.22rem; }
+}
+
+@media (max-width: 600px) {
+    .order-card-header {
+        padding: 15px 20px;
+    }
+    .order-main-meta {
+        gap: 15px;
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        width: 100%;
+    }
+    .order-id-meta {
+        text-align: left;
+        width: 100%;
+    }
+    .order-card-body {
+        padding: 20px;
+    }
+    .status-badge {
+        font-size: 0.9rem;
+    }
+    .prod-img {
+        width: 60px;
+        height: 60px;
+    }
+    .prod-info h5 {
+        font-size: 0.95rem;
+    }
+    .order-card-footer {
+        padding: 15px 20px;
+    }
 }

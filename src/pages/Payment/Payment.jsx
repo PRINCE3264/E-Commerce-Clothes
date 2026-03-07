@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useLocation, Link, useNavigate } from 'react-router-dom';
+import { motion } from 'framer-motion';
 import { 
     CheckCircle, 
     XCircle, 
@@ -14,7 +15,13 @@ import {
     Download,
     FileText,
     ArrowLeft,
-    Loader
+    Loader,
+    Package,
+    Truck,
+    MapPin,
+    Phone,
+    Shirt,
+    Star
 } from 'lucide-react';
 import API from '../../utils/api';
 import './Payment.css';
@@ -30,13 +37,19 @@ const Payment = ({ setCart }) => {
     const [order, setOrder] = useState(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
-    const [redirectTimer, setRedirectTimer] = useState(60);
+    const [redirectTimer, setRedirectTimer] = useState(15);
 
     useEffect(() => {
-        const token = localStorage.getItem('auth_token') || localStorage.getItem('admin_token');
-        if (!token && !orderId?.startsWith('temp_')) {
-            navigate('/login');
-            return;
+        const token = localStorage.getItem('auth_token');
+        const userData = localStorage.getItem('user_data');
+        
+        // Match the logic used in App.jsx for consistency
+        if (!token || !userData) {
+            if (!orderId?.startsWith('temp_')) {
+                const currentPath = window.location.pathname + window.location.search;
+                window.location.href = `/login?redirect=${encodeURIComponent(currentPath)}`;
+                return;
+            }
         }
 
         const fetchOrderDetails = async () => {
@@ -47,7 +60,6 @@ const Payment = ({ setCart }) => {
             }
 
             try {
-                // If coming back from Stripe, verify first
                 if (gateway?.toLowerCase() === 'stripe' && sessionId) {
                     try {
                         const verifyRes = await API.post('/payments/verify-stripe', { sessionId, orderId });
@@ -56,15 +68,12 @@ const Payment = ({ setCart }) => {
                         }
                     } catch (vErr) {
                         console.error("Stripe verification call failed:", vErr.response?.data || vErr.message);
-                        // We don't necessarily stop here, we try to fetch the order anyway 
-                        // as it might have been verified by a previous attempt or webhook
                     }
                 }
 
                 const res = await API.get(`/orders/${orderId}`);
                 if (res.data.success) {
                     setOrder(res.data.data);
-                    // Clear cart only after successful order load
                     if (setCart) {
                         setCart([]);
                         localStorage.removeItem('khushi_cart');
@@ -81,11 +90,6 @@ const Payment = ({ setCart }) => {
         };
 
         fetchOrderDetails();
-        
-        // Clear cart globally when reaching this page (Success fallback)
-        if (orderId && setCart) {
-            setCart([]);
-        }
     }, [orderId, setCart, gateway, sessionId, navigate]);
 
     useEffect(() => {
@@ -108,168 +112,248 @@ const Payment = ({ setCart }) => {
     if (loading) {
         return (
             <div className="payment-page-loading">
-                <div className="loader"></div>
-                <p>Retrieving payment data...</p>
+                <motion.div 
+                    initial={{ opacity: 0, scale: 0.8 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    className="loader-container-elite"
+                >
+                    <div className="loader-glam-orbit"></div>
+                    <p>Confirming your premium purchase...</p>
+                </motion.div>
             </div>
         );
     }
 
     if (error || !order) {
         return (
-            <div className="container payment-error-view">
-                <XCircle size={64} color="#ef4444" />
-                <h2>Payment Reference Error</h2>
-                <p>{error || "We couldn't find the transaction details you're looking for."}</p>
-                <Link to="/" className="btn-return">Return to Shop</Link>
+            <div className="payment-status-page error-state">
+                <div className="page-accents">
+                    <div className="accent-orb orb-1"></div>
+                    <div className="accent-orb orb-2"></div>
+                </div>
+                <div className="container payment-error-view">
+                    <motion.div 
+                        initial={{ opacity: 0, y: 30 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        className="error-card-glass"
+                    >
+                        <XCircle size={64} className="err-icon-pulse" />
+                        <h2>Payment Reference Issue</h2>
+                        <p>{error || "We couldn't find the transaction details you're looking for."}</p>
+                        <div className="error-actions">
+                            <button onClick={() => navigate('/')} className="btn-return-elite">Return to Shop</button>
+                            <button onClick={() => navigate('/login')} className="btn-relogin-elite">Re-login</button>
+                        </div>
+                    </motion.div>
+                </div>
             </div>
         );
     }
 
     const isSuccess = order.isPaid || order.paymentMethod === 'COD';
 
+    const containerVariants = {
+        hidden: { opacity: 0, y: 40 },
+        visible: { 
+            opacity: 1, 
+            y: 0,
+            transition: { duration: 0.8, staggerChildren: 0.15, ease: "easeOut" }
+        }
+    };
+
+    const cardVariants = {
+        hidden: { opacity: 0, scale: 0.95 },
+        visible: { opacity: 1, scale: 1 }
+    };
+
     return (
         <div className="payment-status-page">
-            <div className="container">
-                <div className="payment-main-card glass-panel animate-slide-up">
-                    <div className={`status-banner ${isSuccess ? 'success' : 'pending'}`}>
-                        {isSuccess ? (
-                            <>
-                                <CheckCircle size={48} />
-                                <div>
-                                    <h1>Payment Confirmed</h1>
-                                    <p>Your transaction was processed successfully.</p>
-                                    <p style={{ fontSize: '0.85rem', marginTop: '8px', color: '#059669', display: 'flex', alignItems: 'center', gap: '5px' }}><Loader size={14} className="spin" /> Redirecting to your tracking dashboard in {redirectTimer}s...</p>
+            <div className="page-accents">
+                <div className="accent-orb orb-1"></div>
+                <div className="accent-orb orb-2"></div>
+            </div>
+
+            <motion.div 
+                className="container"
+                initial="hidden"
+                animate="visible"
+                variants={containerVariants}
+            >
+                <div className="payment-header-elite">
+                    <div className="success-lottie-emulation">
+                        <svg viewBox="0 0 52 52" className="checkmark-svg-elite">
+                            <circle className="checkmark-circle-elite" cx="26" cy="26" r="25" fill="none" />
+                            <path className="checkmark-check-elite" fill="none" d="M14.1 27.2l7.1 7.2 16.7-16.8" />
+                        </svg>
+                    </div>
+                    <motion.h1 className="luxury-brand-title" variants={cardVariants}>PANDIT FASHION</motion.h1>
+                    <motion.h2 className="header-title-glam" variants={cardVariants}>
+                        {isSuccess ? 'Transaction Perfected' : 'Order Secured'}
+                    </motion.h2>
+                    <motion.p className="header-subtitle-glam" variants={cardVariants}>
+                        Thank you for choosing Pandit Fashion. Your curated collection is being prepared.
+                    </motion.p>
+                </div>
+
+                <div className="payment-main-grid-layout">
+                    {/* Left: Primary Status & Details */}
+                    <div className="payment-column-primary">
+                        <motion.div className="status-hero-card glass-panel shadow-premium" variants={cardVariants}>
+                            <div className={`status-highlight-bar ${isSuccess ? 'success' : 'pending'}`}></div>
+                            <div className="hero-content-wrap">
+                                <div className="hero-icon-box">
+                                    {isSuccess ? <ShieldCheck size={40} /> : <Package size={40} />}
                                 </div>
-                            </>
-                        ) : (
-                            <>
-                                <Hash size={48} />
-                                <div>
-                                    <h1>Order Received</h1>
-                                    <p>Your order is placed. Our team will begin processing it shortly.</p>
-                                    <p style={{ fontSize: '0.85rem', marginTop: '8px', color: '#1e293b', display: 'flex', alignItems: 'center', gap: '5px' }}><Loader size={14} className="spin" /> Redirecting to your tracking dashboard in {redirectTimer}s...</p>
+                                <div className="hero-text-box">
+                                    <h3>{isSuccess ? "Payment Verified" : "Order Processing"}</h3>
+                                    <p>Order ID: <strong>#{order._id.toUpperCase()}</strong></p>
                                 </div>
-                            </>
-                        )}
+                                <div className="redirect-countdown-pill">
+                                    <Loader size={12} className="spin" />
+                                    <span>Tracking in {redirectTimer}s</span>
+                                </div>
+                            </div>
+                        </motion.div>
+
+                        <div className="details-two-column">
+                            <motion.div className="info-sub-card glass-panel" variants={cardVariants}>
+                                <div className="card-tag">BILLING DETAILS</div>
+                                <div className="info-entry">
+                                    <User size={16} />
+                                    <div>
+                                        <span>Customer</span>
+                                        <p>{order.user?.name || 'Valued Client'}</p>
+                                    </div>
+                                </div>
+                                <div className="info-entry">
+                                    <Phone size={16} />
+                                    <div>
+                                        <span>Contact</span>
+                                        <p>+91 {order.shippingAddress?.phone || 'N/A'}</p>
+                                    </div>
+                                </div>
+                                <div className="info-entry">
+                                    <Calendar size={16} />
+                                    <div>
+                                        <span>Date</span>
+                                        <p>{new Date(order.createdAt).toLocaleDateString(undefined, { month: 'long', day: 'numeric', year: 'numeric' })}</p>
+                                    </div>
+                                </div>
+                            </motion.div>
+
+                            <motion.div className="info-sub-card glass-panel" variants={cardVariants}>
+                                <div className="card-tag">PAYMENT METHOD</div>
+                                <div className="payment-method-large">
+                                    <CreditCard size={24} />
+                                    <div className="pm-details">
+                                        <p>{order.paymentMethod === 'ONLINE' ? 'Razorpay Integrated' : 
+                                           order.paymentMethod === 'STRIPE' ? 'Stripe International' : 'Cash on Delivery'}</p>
+                                        <span>Secure 256-bit Transaction</span>
+                                    </div>
+                                </div>
+                                <div className="payment-id-tag">
+                                    <Hash size={12} /> ID: {order?.paymentResult?.id || order?.razorpayOrderId || 'OFFLINE'}
+                                </div>
+                            </motion.div>
+                        </div>
+
+                        <motion.div className="purchase-list-card glass-panel shadow-premium" variants={cardVariants}>
+                            <div className="card-header-elite">
+                                <Shirt size={18} /> Purchase Content
+                            </div>
+                            <div className="purchase-items-scroller">
+                                {order.orderItems.map((item, idx) => (
+                                    <div className="purchase-item-row-elite" key={idx}>
+                                        <div className="p-item-img-elite">
+                                            <img src={item.image} alt={item.name} />
+                                        </div>
+                                        <div className="p-item-core-elite">
+                                            <h4>{item.name}</h4>
+                                            <p>{item.size} • {item.color || 'Premium Edit'}</p>
+                                        </div>
+                                        <div className="p-item-math-elite">
+                                            <span className="p-qty">{item.quantity} x</span>
+                                            <span className="p-price">₹{item.price.toLocaleString()}</span>
+                                            <strong className="p-subtotal">₹{(item.quantity * item.price).toLocaleString()}</strong>
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+                        </motion.div>
                     </div>
 
-                    <div className="payment-details-grid">
-                        <section className="detail-section">
-                            <h3 className="section-title"><CreditCard size={18}/> Transaction Details</h3>
-                            <div className="detail-card">
-                                <div className="detail-row">
-                                    <span>Transaction ID</span>
-                                    <strong>{order?.paymentResult?.id || 'N/A (Offline)'}</strong>
+                    {/* Right: Summary & Actions */}
+                    <div className="payment-column-secondary">
+                        <motion.div className="summary-sticky-card glass-panel shadow-premium" variants={cardVariants}>
+                            <div className="card-header-elite">ORDER SUMMARY</div>
+                            <div className="summary-math-block">
+                                <div className="math-row">
+                                    <span>Subtotal</span>
+                                    <span>₹{order.itemsPrice.toLocaleString()}</span>
                                 </div>
-                                <div className="detail-row">
-                                    <span>{order?.paymentMethod === 'STRIPE' ? 'Stripe Intent ID' : 'Razorpay Order ID'}</span>
-                                    <strong>{order?.stripePaymentIntentId || order?.razorpayOrderId || 'N/A'}</strong>
-                                </div>
-                                <div className="detail-row">
-                                    <span>Payment Method</span>
-                                    <strong className="method-badge">
-                                        {order?.paymentMethod === 'ONLINE' ? 'Razorpay Secure' : 
-                                         order?.paymentMethod === 'STRIPE' ? 'Stripe Global' : 'Cash on Delivery'}
-                                    </strong>
-                                </div>
-                                <div className="detail-row">
-                                    <span>Status</span>
-                                    <span className={`status-pill ${order?.isPaid ? 'paid' : 'unpaid'}`}>
-                                        {order?.isPaid ? 'Payment Verified' : 'Awaiting Payment'}
+                                <div className="math-row">
+                                    <span>Shipping</span>
+                                    <span className={order.shippingPrice === 0 ? 'text-free' : ''}>
+                                        {order.shippingPrice === 0 ? 'FREE' : `₹${order.shippingPrice.toLocaleString()}`}
                                     </span>
                                 </div>
-                            </div>
-                        </section>
-
-                        <section className="detail-section">
-                            <h3 className="section-title"><FileText size={18}/> Summarized Receipt</h3>
-                            <div className="detail-card summary-receipt">
-                                <div className="detail-row">
-                                    <span>Total Amount Paid</span>
-                                    <strong className="amount-big"><IndianRupee size={20}/>{order?.totalPrice?.toLocaleString() || '0'}</strong>
+                                <div className="math-row">
+                                    <span>GST (12%)</span>
+                                    <span>₹{order.taxPrice.toLocaleString()}</span>
                                 </div>
-                                <div className="detail-row">
-                                    <span>Date & Time</span>
-                                    <span>{order?.createdAt ? new Date(order.createdAt).toLocaleString() : 'N/A'}</span>
-                                </div>
-                                <div className="detail-row">
-                                    <span>Billing Name</span>
-                                    <span>{order?.user?.name || 'Customer'}</span>
-                                </div>
-                                <div className="detail-row">
-                                    <span>Billing Phone</span>
-                                    <span>{order?.shippingAddress?.phone ? `+91 ${order.shippingAddress.phone}` : 'N/A'}</span>
-                                </div>
-                            </div>
-                        </section>
-                    </div>
-
-                    <div className="payment-items-summary">
-                        <h3 className="section-title"><ShoppingBag size={18}/> Purchase Details</h3>
-                        <div className="payment-items-list">
-                            {order?.orderItems && order.orderItems.map((item, idx) => (
-                                <div className="p-item-row" key={idx}>
-                                    <div className="p-item-thumb">
-                                        <img src={item.image} alt={item.name} />
+                                <div className="math-divider"></div>
+                                <div className="math-row-grand">
+                                    <div>
+                                        <span>Total Paid</span>
+                                        <p>Incl. all taxes</p>
                                     </div>
-                                    <div className="p-item-info">
-                                        <h4>{item.name}</h4>
-                                        <p>{item.size} • {item.color || 'Default'}</p>
-                                    </div>
-                                    <div className="p-item-pricing">
-                                        <span>{item.quantity} x ₹{item.price?.toLocaleString()}</span>
-                                        <strong>₹{(item.quantity * item.price)?.toLocaleString()}</strong>
+                                    <div className="grand-amount-wrap">
+                                        <IndianRupee size={18} />
+                                        <strong>{order.totalPrice.toLocaleString()}</strong>
                                     </div>
                                 </div>
-                            ))}
-                        </div>
-                        
-                        <div className="payment-total-breakdown">
-                            <div className="p-break-row">
-                                <span>Subtotal</span>
-                                <span>₹{order?.itemsPrice?.toLocaleString() || '0'}</span>
                             </div>
-                            <div className="p-break-row">
-                                <span>Shipping Fees</span>
-                                <span>{order?.shippingPrice === 0 ? 'FREE' : `₹${order?.shippingPrice?.toLocaleString() || '0'}`}</span>
-                            </div>
-                            <div className="p-break-row">
-                                <span>GST (12%)</span>
-                                <span>₹{order?.taxPrice?.toLocaleString() || '0'}</span>
-                            </div>
-                            <div className="p-break-row grand-total">
-                                <span>Grand Total Paid</span>
-                                <strong>₹{order?.totalPrice?.toLocaleString() || '0'}</strong>
-                            </div>
-                        </div>
-                    </div>
 
-                    <div className="payment-actions">
-                        <div className="primary-actions">
-                            <button className="btn-track" onClick={() => navigate(`/order/${order._id}`)}>
-                                VIEW ORDER DETAILS <ArrowRight size={18}/>
-                            </button>
-                            <button className="btn-invoice" onClick={() => navigate(`/order/${order._id}`)}>
-                                <Download size={18}/> DOWNLOAD INVOICE
-                            </button>
-                        </div>
-                        <Link to="/" className="back-link">
-                            <ArrowLeft size={16}/> CONTINUE SHOPPING
-                        </Link>
+                            <div className="summary-actions-elite">
+                                <button className="btn-track-elite" onClick={() => navigate(`/order/${order._id}`)}>
+                                    TRACK YOUR COLLECTION <ArrowRight size={18} />
+                                </button>
+                                <div className="secondary-action-buttons">
+                                    <button className="btn-icon-elite" title="Download Receipt">
+                                        <Download size={18} /> RECEIPT
+                                    </button>
+                                    <button className="btn-icon-elite" title="View History">
+                                        <FileText size={18} /> INVOICE
+                                    </button>
+                                </div>
+                            </div>
+                        </motion.div>
+
+                        <motion.div className="trust-badges-card glass-panel" variants={cardVariants}>
+                            <div className="trust-item-elite">
+                                <ShieldCheck size={20} className="text-blue" />
+                                <div>
+                                    <h5>Buyer Protection</h5>
+                                    <p>Secure global fashion assets</p>
+                                </div>
+                            </div>
+                            <div className="trust-item-elite">
+                                <Star size={20} className="text-gold" />
+                                <div>
+                                    <h5>Premium Quality</h5>
+                                    <p>Verified designer standards</p>
+                                </div>
+                            </div>
+                        </motion.div>
+
+                        <motion.div className="continue-shopping-wrap" variants={cardVariants}>
+                            <Link to="/" className="btn-back-to-shop-elite">
+                                <ArrowLeft size={16} /> CONTINUE SHOPPING
+                            </Link>
+                        </motion.div>
                     </div>
                 </div>
-
-                <div className="payment-security-footer">
-                    <div className="security-item">
-                        <ShieldCheck size={20} />
-                        <span>Secure Payments by Razorpay</span>
-                    </div>
-                    <div className="security-item">
-                        <ShoppingBag size={20} />
-                        <span>256-bit SSL Encryption</span>
-                    </div>
-                </div>
-            </div>
+            </motion.div>
         </div>
     );
 };

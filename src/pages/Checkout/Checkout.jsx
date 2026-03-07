@@ -43,12 +43,7 @@ const Checkout = ({ cartItems, onOrderComplete }) => {
     useEffect(() => {
         if (!userData) {
             // If not logged in, redirect to login with redirect param
-            navigate('/login?redirect=checkout');
-        }
-
-        if (!userData) {
-            // If not logged in, redirect to login with redirect param
-            navigate('/login?redirect=checkout');
+            navigate('/login?redirect=/checkout');
         }
     }, [navigate, userData]);
 
@@ -156,7 +151,9 @@ const Checkout = ({ cartItems, onOrderComplete }) => {
                     window.location.href = res.data.stripeUrl;
                 } else if (res.data.data?._id) {
                     if (onOrderComplete) onOrderComplete();
-                    setLastOrderId(res.data.data._id);
+                    const orderId = res.data.data._id;
+                    setLastOrderId(orderId);
+                    localStorage.setItem('pf_last_order_id', orderId);
                     setShowSuccessModal(true);
                     setLoading(false);
                 } else {

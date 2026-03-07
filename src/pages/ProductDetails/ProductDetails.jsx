@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { ShoppingBag, Heart, Star, ShieldCheck, Truck, RefreshCcw, ArrowLeft, Plus, Minus, Share2 } from 'lucide-react';
+import { ShoppingBag, Heart, Star, ShieldCheck, Truck, RefreshCcw, ArrowLeft, Plus, Minus, Share2, AlertCircle } from 'lucide-react';
 import API from '../../utils/api';
 import './ProductDetails.css';
 
@@ -28,6 +28,9 @@ const ProductDetails = ({ onAddToCart, onToggleWishlist, wishlist }) => {
 
     const getColorName = (val) => {
         if (!val) return '';
+        // Support "Label:Hex" format
+        if (val.includes(':')) return val.split(':')[0].trim();
+        
         const lowerVal = val.toLowerCase().trim();
         const colorMap = {
             '#2d6acd': 'Ocean Blue',
@@ -46,10 +49,19 @@ const ProductDetails = ({ onAddToCart, onToggleWishlist, wishlist }) => {
             '#f43f5e': 'Rose',
             '#f97316': 'Orange',
             '#71717a': 'Zinc Grey',
+            '#fbbf24': 'Golden',
+            '#8b4513': 'Brown',
+            '#808080': 'Grey',
             '#000': 'Black',
             '#fff': 'White'
         };
         return colorMap[lowerVal] || val;
+    };
+
+    const getColorCode = (val) => {
+        if (!val) return 'transparent';
+        if (val.includes(':')) return val.split(':')[1].trim();
+        return val.toLowerCase().trim();
     };
 
     const isHex = (val) => /^#[0-9A-F]{3,6}$/i.test(val);
@@ -73,9 +85,14 @@ const ProductDetails = ({ onAddToCart, onToggleWishlist, wishlist }) => {
                 // Fetch dynamic variants
                 const resVars = await API.get('/variants');
                 if (resVars.data.success && foundProduct && isMounted) {
-                    const prodVariants = resVars.data.data.filter(v => v.productId === id && v.status !== 'Out of Stock');
+                    const prodVariants = resVars.data.data.filter(v => v.productId === id);
                     setVariants(prodVariants);
-                    if (prodVariants.length > 0) {
+                    
+                    // Prefer selecting first available variant
+                    const firstAvailable = prodVariants.find(v => v.stock > 0);
+                    if (firstAvailable) {
+                        handleVariantSelect(firstAvailable);
+                    } else if (prodVariants.length > 0) {
                         handleVariantSelect(prodVariants[0]);
                     }
                 }
@@ -89,11 +106,10 @@ const ProductDetails = ({ onAddToCart, onToggleWishlist, wishlist }) => {
         return () => { isMounted = false; };
     }, [id]);
 
+
+
     const handleVariantSelect = (v) => {
         setSelectedVariant(v);
-        // Reset manual selections when variant is picked if they are mutually exclusive in logic
-        setSelectedSize('');
-        setSelectedColor('');
         setSelectionError('');
         if (v.image) setMainImage(v.image);
     };
@@ -101,13 +117,24 @@ const ProductDetails = ({ onAddToCart, onToggleWishlist, wishlist }) => {
     const handleAddToCart = () => {
         setSelectionError('');
         
-        // Validation logic
-        if (variants.length > 0 && !selectedVariant) {
-            setSelectionError('Please select a specific variant configuration.');
-            return;
-        }
+        const hasSizeVariants = variants.some(v => v.type === 'Size' || ['s', 'm', 'l', 'xl', 'xxl', 'xxxl'].includes(v.value.toLowerCase().trim()));
+        const hasColorVariants = variants.some(v => v.type === 'Color' || ['black','white','red','blue','green','yellow','grey','gray','orange','purple','pink','brown'].includes(v.value.toLowerCase().trim()) || isHex(getColorCode(v.value)) || v.value.includes(':'));
 
-        if (variants.length === 0) {
+        // Validation logic
+        if (variants.length > 0) {
+            if (!selectedVariant) {
+                setSelectionError('Please select a specific style or model.');
+                return;
+            }
+            if (!hasSizeVariants && product.size?.length > 0 && !selectedSize) {
+                setSelectionError('Please choose your preferred size.');
+                return;
+            }
+            if (!hasColorVariants && product.color?.length > 0 && !selectedColor) {
+                setSelectionError('Please choose your preferred color.');
+                return;
+            }
+        } else {
             if (product.size?.length > 0 && !selectedSize) {
                 setSelectionError('Please choose your preferred size.');
                 return;
@@ -123,8 +150,8 @@ const ProductDetails = ({ onAddToCart, onToggleWishlist, wishlist }) => {
             ...product, 
             price: displayPrice,
             selectedVariant: selectedVariant ? selectedVariant : null,
-            size: selectedVariant ? undefined : (selectedSize || undefined),
-            color: selectedVariant ? undefined : (selectedColor || undefined),
+            size: !hasSizeVariants && selectedSize ? selectedSize : undefined,
+            color: !hasColorVariants && selectedColor ? selectedColor : undefined,
             quantity 
         });
     };
@@ -169,7 +196,53 @@ const ProductDetails = ({ onAddToCart, onToggleWishlist, wishlist }) => {
 
     // Calculate dynamic price based on variant priceMod
     const displayPrice = product ? (product.price + (selectedVariant?.priceMod || 0)) : 0;
-    const isOutOfStock = selectedVariant ? selectedVariant.stock <= 0 : (product ? product.stock <= 0 : true);
+    
+    // Check if a specific variant is sold out using both count and admin status string
+    const checkVariantSoldOut = (v) => {
+        if (!v) return true;
+        const lowStock = Number(v.stock) <= 0;
+        const manualOut = v.status && (v.status.toLowerCase() === 'out of stock' || v.status.toLowerCase() === 'sold out');
+        
+        // Also respect the product-level Out of Stock lists for Sizes and Colors
+        let blacklisted = false;
+        if (product) {
+            const vVal = v.value.trim().toLowerCase();
+            const isColorType = v.type === 'Color' || isHex(getColorCode(v.value)) || v.value.includes(':') || ['black','white','red','blue','green','yellow','grey','gray','orange','purple','pink','brown'].includes(vVal);
+            
+            if (isColorType) {
+                const cName = getColorName(v.value).toLowerCase();
+                if (product.outOfStockColors?.some(ooc => ooc.toLowerCase() === vVal || ooc.toLowerCase() === cName)) {
+                    blacklisted = true;
+                }
+            } else {
+                if (product.outOfStockSizes?.some(oos => oos.toLowerCase() === vVal)) {
+                    blacklisted = true;
+                }
+            }
+        }
+        
+        return lowStock || manualOut || blacklisted;
+    };
+
+    let isOutOfStock = product ? product.stock <= 0 : true;
+    if (variants.length > 0) {
+        if (selectedVariant) {
+            isOutOfStock = checkVariantSoldOut(selectedVariant);
+        } else {
+            isOutOfStock = variants.every(v => checkVariantSoldOut(v));
+        }
+    }
+
+    // Advanced Matrix: Verify Fallback logic independently
+    const hasSizeVariants = variants.some(v => v.type === 'Size' || ['s', 'm', 'l', 'xl', 'xxl', 'xxxl'].includes(v.value.toLowerCase().trim()));
+    const hasColorVariants = variants.some(v => v.type === 'Color' || ['black','white','red','blue','green','yellow','grey','gray','orange','purple','pink','brown'].includes(v.value.toLowerCase().trim()) || isHex(getColorCode(v.value)) || v.value.includes(':'));
+
+    if (!hasSizeVariants && selectedSize) {
+        if (product?.outOfStockSizes?.some(s => s.toLowerCase() === selectedSize.toLowerCase())) isOutOfStock = true;
+    }
+    if (!hasColorVariants && selectedColor) {
+        if (product?.outOfStockColors?.some(c => c.toLowerCase() === selectedColor.toLowerCase() || getColorName(c).toLowerCase() === getColorName(selectedColor).toLowerCase())) isOutOfStock = true;
+    }
 
     const isWishlisted = product ? wishlist.some(item => item._id === product._id) : false;
 
@@ -215,9 +288,17 @@ const ProductDetails = ({ onAddToCart, onToggleWishlist, wishlist }) => {
                         </div>
                         {/* Custom thumbnails if we had multiple images, currently showing the one we have */}
                         <div className="pd-thumbs-row">
-                            <div className="thumb active" onClick={() => setMainImage(product.image)}>
+                            {/* Main Product Image */}
+                            <div className={`thumb ${mainImage === product.image ? 'active' : ''}`} onClick={() => setMainImage(product.image)}>
                                 <img src={product.image} alt="Thumbnail" />
                             </div>
+                            
+                            {/* Unique Variant Images */}
+                            {[...new Map(variants.filter(v => v.image && v.image !== product.image).map(v => [v.image, v])).values()].map((v, idx) => (
+                                <div key={idx} className={`thumb ${mainImage === v.image ? 'active' : ''}`} onClick={() => handleVariantSelect(v)}>
+                                    <img src={v.image} alt={`Variant ${idx}`} />
+                                </div>
+                            ))}
                         </div>
                     </div>
 
@@ -253,6 +334,13 @@ const ProductDetails = ({ onAddToCart, onToggleWishlist, wishlist }) => {
                             </div>
                         </div>
 
+                        {isOutOfStock && (
+                            <div className="pd-out-of-stock-alert">
+                                <AlertCircle size={20} />
+                                <span>The selected variant is currently <strong>Out of Stock</strong>. Please check back later for restock updates.</span>
+                            </div>
+                        )}
+
                         <div className="pd-description">
                             <p>{product.description}</p>
                         </div>
@@ -260,64 +348,122 @@ const ProductDetails = ({ onAddToCart, onToggleWishlist, wishlist }) => {
                         <div className="pd-selectors">
                             {/* Dynamic Variants Representation */}
                             {variants.length > 0 && (
-                                <div className="selector-group">
-                                    <div className="label-row">
-                                        <label>Select Variant: <span style={{fontWeight: '700', color: '#10b981'}}>{getColorName(selectedVariant?.value)}</span></label>
-                                    </div>
-                                    <div className="size-grid">
-                                        {variants.map(v => (
-                                            <button
-                                                key={v._id}
-                                                className={`size-btn variant-btn-flex ${selectedVariant?._id === v._id ? 'active' : ''}`}
-                                                onClick={() => handleVariantSelect(v)}
-                                            >
-                                                {isHex(v.value) && (
-                                                    <span className="var-color-dot" style={{ background: v.value }}></span>
-                                                )}
-                                                <span className="var-btn-text">{getColorName(v.value)}</span>
-                                                {v.priceMod > 0 && <span className="var-price-tag">+₹{v.priceMod}</span>}
-                                            </button>
-                                        ))}
-                                    </div>
-                                </div>
+                                <>
+                                    {/* Visual/Color Variants */}
+                                    {variants.filter(v => v.type === 'Color' || isHex(getColorCode(v.value)) || v.value.includes(':') || ['black','white','red','blue','green','yellow','grey','gray','orange','purple','pink','brown'].includes(v.value.toLowerCase().trim())).length > 0 && (
+                                        <div className="selector-group">
+                                            <div className="label-row">
+                                                <label>Select Style: <span style={{fontWeight: '700', color: '#10b981'}}>{['Color'].includes(selectedVariant?.type) || isHex(getColorCode(selectedVariant?.value)) ? getColorName(selectedVariant?.value) : ''}</span></label>
+                                            </div>
+                                            <div className="size-grid">
+                                                {variants.filter(v => v.type === 'Color' || isHex(getColorCode(v.value)) || v.value.includes(':') || ['black','white','red','blue','green','yellow','grey','gray','orange','purple','pink','brown'].includes(v.value.toLowerCase().trim())).map(v => (
+                                                    <button
+                                                        key={v._id}
+                                                        className={`size-btn variant-btn-flex ${selectedVariant?._id === v._id ? 'active' : ''} ${checkVariantSoldOut(v) ? 'sold-out' : ''}`}
+                                                        onClick={() => {
+                                                            handleVariantSelect(v);
+                                                        }}
+                                                    >
+                                                        <span className="var-color-dot" style={{ background: getColorCode(v.value) }}></span>
+                                                        <div className="var-btn-content">
+                                                            {checkVariantSoldOut(v) && <span className="sold-out-badge mini">SOLD OUT</span>}
+                                                        </div>
+                                                        {v.priceMod > 0 && (
+                                                            <div className="var-price-tag">
+                                                                <span className="price-plus">+</span>
+                                                                <span className="price-val">₹{v.priceMod}</span>
+                                                            </div>
+                                                        )}
+                                                    </button>
+                                                ))}
+                                            </div>
+                                        </div>
+                                    )}
+
+                                    {/* Text/Size Variants */}
+                                    {variants.filter(v => !(v.type === 'Color' || isHex(getColorCode(v.value)) || v.value.includes(':') || ['black','white','red','blue','green','yellow','grey','gray','orange','purple','pink','brown'].includes(v.value.toLowerCase().trim()))).length > 0 && (
+                                        <div className="selector-group">
+                                            <div className="label-row">
+                                                <label>Select Size/Model: <span style={{fontWeight: '700', color: '#10b981'}}>{selectedVariant?.type !== 'Color' && !isHex(getColorCode(selectedVariant?.value)) ? selectedVariant?.value : ''}</span></label>
+                                            </div>
+                                            <div className="size-grid fallback-size-grid">
+                                                {variants.filter(v => !(v.type === 'Color' || isHex(getColorCode(v.value)) || v.value.includes(':') || ['black','white','red','blue','green','yellow','grey','gray','orange','purple','pink','brown'].includes(v.value.toLowerCase().trim()))).map(v => (
+                                                    <button
+                                                        key={v._id}
+                                                        className={`size-btn ${selectedVariant?._id === v._id ? 'active' : ''} ${checkVariantSoldOut(v) ? 'sold-out' : ''}`}
+                                                        style={{ position: 'relative' }}
+                                                        onClick={() => {
+                                                            handleVariantSelect(v);
+                                                        }}
+                                                    >
+                                                        <span className="var-btn-text">{v.value}</span>
+                                                        {checkVariantSoldOut(v) && <span className="sold-out-badge mini" style={{ position: 'absolute', top: '-8px', right: '-8px' }}>OUT</span>}
+                                                        {v.priceMod > 0 && <span className="var-price-tag" style={{ position: 'absolute', bottom: '-10px', right: '-10px', fontSize: '0.6rem', padding: '1px 4px' }}>+₹{v.priceMod}</span>}
+                                                    </button>
+                                                ))}
+                                            </div>
+                                        </div>
+                                    )}
+                                </>
                             )}
 
-                            {/* Fallback to generic sizes if NO variants found from database */}
-                            {variants.length === 0 && product.size && product.size.length > 0 && (
+                            {/* Fallback to generic sizes if NO SIZE variants found from database */}
+                            {!variants.some(v => v.type === 'Size' || ['s', 'm', 'l', 'xl', 'xxl', 'xxxl'].includes(v.value.toLowerCase().trim())) && product.size && product.size.length > 0 && (
                                 <div className="selector-group">
                                     <div className="label-row">
                                         <label>Select Size: <span style={{color: '#3b82f6'}}>{selectedSize}</span></label>
                                     </div>
-                                    <div className="size-grid">
-                                        {product.size.map(s => (
-                                            <button 
-                                                key={s} 
-                                                className={`size-btn ${selectedSize === s ? 'active' : ''}`}
-                                                onClick={() => { setSelectedSize(s); setSelectionError(''); }}
-                                            >
-                                                {s}
-                                            </button>
-                                        ))}
+                                    <div className="size-grid fallback-size-grid">
+                                        {product.size.map(s => {
+                                            const isDerivedSoldOut = selectedVariant ? checkVariantSoldOut(selectedVariant) : false;
+                                            const isSizeSoldOut = product.stock <= 0 || product.outOfStockSizes?.some(oos => oos.toLowerCase() === s.toLowerCase()) || isDerivedSoldOut;
+                                            return (
+                                                <button 
+                                                    key={s} 
+                                                    className={`size-btn ${selectedSize === s ? 'active' : ''} ${isSizeSoldOut ? 'sold-out' : ''}`}
+                                                    onClick={() => { 
+                                                        setSelectedSize(s); 
+                                                        setSelectionError('');
+                                                    }}
+                                                >
+                                                    <span className="var-btn-text">{s}</span>
+                                                    {isSizeSoldOut && <span className="sold-out-badge mini">OUT</span>}
+                                                </button>
+                                            );
+                                        })}
                                     </div>
                                 </div>
                             )}
 
                             {/* Color Selection if available in base product */}
-                            {variants.length === 0 && product.color && product.color.length > 0 && (
+                            {!variants.some(v => v.type === 'Color' || ['black','white','red','blue','green','yellow','grey','gray','orange','purple','pink','brown'].includes(v.value.toLowerCase().trim()) || isHex(getColorCode(v.value)) || v.value.includes(':')) && product.color && product.color.length > 0 && (
                                 <div className="selector-group">
                                     <div className="label-row">
                                         <label>Select Color: <span style={{color: '#3b82f6'}}>{getColorName(selectedColor)}</span></label>
                                     </div>
-                                    <div className="color-dots">
-                                        {product.color.map(c => (
-                                            <button 
-                                                key={c}
-                                                className={`color-dot-btn ${selectedColor === c ? 'active' : ''}`}
-                                                style={{ backgroundColor: c.toLowerCase() }}
-                                                onClick={() => { setSelectedColor(c); setSelectionError(''); }}
-                                                title={c}
-                                            />
-                                        ))}
+                                    <div className="size-grid">
+                                        {product.color.map(c => {
+                                            const cName = getColorName(c);
+                                            const cCode = getColorCode(c);
+                                            const isDerivedSoldOut = selectedVariant ? checkVariantSoldOut(selectedVariant) : false;
+                                            const isColorSoldOut = product.stock <= 0 || product.outOfStockColors?.some(ooc => ooc.toLowerCase() === cName.toLowerCase() || ooc.toLowerCase() === c.toLowerCase()) || isDerivedSoldOut;
+                                            return (
+                                                <button 
+                                                    key={c}
+                                                    className={`size-btn variant-btn-flex ${selectedColor === c ? 'active' : ''} ${isColorSoldOut ? 'sold-out' : ''}`}
+                                                    onClick={() => { 
+                                                        setSelectedColor(c); 
+                                                        setSelectionError('');
+                                                    }}
+                                                    title={isColorSoldOut ? `${cName} - Out of Stock` : cName}
+                                                >
+                                                    <span className="var-color-dot" style={{ background: cCode }}></span>
+                                                    <div className="var-btn-content">
+                                                        {isColorSoldOut && <span className="sold-out-badge mini">SOLD OUT</span>}
+                                                    </div>
+                                                </button>
+                                            );
+                                        })}
                                     </div>
                                 </div>
                             )}
@@ -430,7 +576,7 @@ const ProductDetails = ({ onAddToCart, onToggleWishlist, wishlist }) => {
                                 ) : (
                                     <div className="rev-login-prompt">
                                         <p>Please sign in to share your feedback with the community.</p>
-                                        <button className="pd-btn-primary" onClick={() => navigate('/login')}>SIGN IN</button>
+                                        <button className="pd-btn-primary" onClick={() => navigate(`/login?redirect=${encodeURIComponent(window.location.pathname)}`)}>SIGN IN</button>
                                     </div>
                                 )}
                             </div>

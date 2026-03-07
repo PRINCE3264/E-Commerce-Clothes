@@ -57,13 +57,16 @@ const Login = () => {
                     showConfirmButton: false
                 });
 
+                const queryParams = new URLSearchParams(location.search);
+                const redirectTo = queryParams.get('redirect') || '/';
+
                 if (res.data.user.role === 'admin') {
                     localStorage.setItem('admin_auth', 'true');
                     localStorage.setItem('admin_token', res.data.token);
                     localStorage.setItem('admin_user', JSON.stringify(res.data.user));
                     navigate('/admin/dashboard');
                 } else {
-                    navigate('/');
+                    navigate(redirectTo);
                 }
             }
         } catch (err) {

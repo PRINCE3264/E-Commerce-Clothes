@@ -57,10 +57,11 @@ const AppContent = ({
   const navigate = useNavigate();
   const location = useLocation();
   const isAdminRoute = location.pathname.startsWith('/admin');
+  const isMinimalRoute = isAdminRoute;
 
   return (
     <div className="app">
-      {!isAdminRoute && (
+      {!isMinimalRoute && (
         <>
           <Header
             toggleSidebar={toggleSidebar}
@@ -82,7 +83,7 @@ const AppContent = ({
         </>
       )}
 
-      <main className="main-content" style={isAdminRoute ? { margin: 0, padding: 0 } : {}}>
+      <main className="main-content" style={isMinimalRoute ? { margin: 0, padding: 0 } : {}}>
         <Routes>
           <Route path="/" element={<Home onAddToCart={addToCart} onToggleWishlist={toggleWishlist} wishlist={wishlist} />} />
           <Route path="/about" element={<About />} />
@@ -328,6 +329,10 @@ function App() {
   const [wishlistConfirm, setWishlistConfirm] = useState({ show: false, product: null });
 
   const addToCart = (product) => {
+    if (!localStorage.getItem('auth_token')) {
+      window.location.href = `/login?redirect=${encodeURIComponent(window.location.pathname)}`;
+      return;
+    }
     const qtyToAdd = product.quantity || 1;
     setCart((prevCart) => {
       // Find item with same ID AND same size AND same color
@@ -352,6 +357,10 @@ function App() {
   };
 
   const toggleWishlist = (product) => {
+    if (!localStorage.getItem('auth_token')) {
+      window.location.href = `/login?redirect=${encodeURIComponent(window.location.pathname)}`;
+      return;
+    }
     setWishlist((prevWish) => {
       const exists = prevWish.find(item => item._id === product._id);
       if (exists) {

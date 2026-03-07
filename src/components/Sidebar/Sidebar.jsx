@@ -22,6 +22,8 @@ const Sidebar = ({ isOpen, toggleSidebar, userData, handleLogout }) => {
         return `${DEFAULT_AVATAR}${encodeURIComponent(nameForAvatar)}`;
     };
 
+    const latestOrderId = localStorage.getItem('pf_last_order_id') || '69ac07c5cbf16865b7e979a5';
+
     return (
         <>
             <div className={`sidebar-overlay ${isOpen ? 'open' : ''}`} onClick={toggleSidebar}></div>
@@ -115,9 +117,9 @@ const Sidebar = ({ isOpen, toggleSidebar, userData, handleLogout }) => {
                         <ul className="sidebar-links">
                             {[
                                 { to: '/my-orders',       icon: <ShoppingBag size={20} />, label: 'My Orders' },
-                                { to: '/payment?orderId=69ac07c5cbf16865b7e979a5', icon: <CreditCard size={20} />, label: 'Confirm Payment' },
+                                { to: `/payment?orderId=${latestOrderId}`, icon: <CreditCard size={20} />, label: 'Confirm Payment' },
                                 { to: '/checkout',     icon: <CheckSquare size={20} />, label: 'Checkout' },
-                                { to: '/mypayments',   icon: <CreditCard size={20} />,  label: 'Transaction Details' },
+                                { to: '/mypayments',   icon: <CreditCard size={20} />,  label: 'Payments Details' },
                                 { to: '/arrivals',     icon: <Truck size={20} />,       label: 'Arrivals' },
                                 { to: '/best-products',icon: <Star size={20} />,        label: 'Best Products' },
                             ].map(({ to, icon, label }) => (

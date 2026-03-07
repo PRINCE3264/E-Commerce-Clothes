@@ -691,12 +691,27 @@
    RESPONSIVE
 ═══════════════════════════════════════════ */
 @media (max-width: 640px) {
-    .pf-page { margin-top: 90px; }
+    .pf-page { margin-top: 100px; padding-bottom: 60px; }
+    .pf-wrap { gap: 12px; }
+
+    .pf-hero-bg { height: 110px; }
+    .pf-hero-content { margin-top: -40px; }
+    .pf-avatar { width: 90px; height: 90px; }
+    .pf-avatar-ring { width: 90px; height: 90px; }
 
     .pf-orders-grid { grid-template-columns: repeat(3, 1fr); gap: 10px; }
+    .pf-stat-icon { width: 50px; height: 50px; }
+    .pf-stat-label { font-size: 0.7rem; }
 
     .pf-form-grid { grid-template-columns: 1fr; }
     .pf-full-col  { grid-column: 1; }
 
-    .pf-hero-name { font-size: 1.3rem; }
+    .pf-hero-name { font-size: 1.35rem; }
+    .pf-section-card { padding: 18px 20px; }
+}
+
+@media (max-width: 480px) {
+    .pf-orders-grid { grid-template-columns: repeat(2, 1fr); gap: 15px; }
+    .pf-hero-name { font-size: 1.25rem; }
+    .pf-banner { border-radius: 8px; font-size: 0.8rem; }
 }

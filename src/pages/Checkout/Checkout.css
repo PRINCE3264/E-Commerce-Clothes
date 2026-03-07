@@ -592,6 +592,10 @@
 }
 
 @media (max-width: 1024px) {
+    .checkout-page {
+        padding-top: 100px;
+    }
+
     .checkout-layout {
         grid-template-columns: 1fr;
     }
@@ -599,16 +603,54 @@
     .checkout-summary-area {
         position: static;
         order: -1;
+        margin-bottom: 30px;
+    }
+}
+
+@media (max-width: 768px) {
+    .checkout-stepper {
+        gap: 10px;
+        margin-bottom: 30px;
+    }
+
+    .step-item span {
+        font-size: 0.7rem;
+    }
+
+    .step-circle {
+        width: 40px;
+        height: 40px;
+    }
+
+    .step-connector {
+        margin: -20px 5px 0;
+    }
+
+    .checkout-card {
+        padding: 30px 20px;
+    }
+
+    .card-header h3 {
+        font-size: 1.5rem;
+    }
+
+    .form-actions {
+        flex-direction: column-reverse;
+    }
+
+    .btn-back, .btn-continue {
+        width: 100%;
+        justify-content: center;
     }
 }
 
 @media (max-width: 600px) {
     .checkout-card {
-        padding: 25px;
+        padding: 25px 15px;
     }
     .form-row.split {
         flex-direction: column;
-        gap: 25px;
+        gap: 20px;
     }
 }
 

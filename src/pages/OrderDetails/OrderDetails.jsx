@@ -195,14 +195,22 @@ Thank you for shopping with us!
                 animate="visible"
                 variants={containerVariants}
             >
+                {/* Header Navigation & Actions */}
                 <div className="order-details-header">
-                    <button className="btn-back" onClick={() => navigate('/my-orders')}>
-                        <ChevronLeft size={20} /> BACK TO ORDERS
-                    </button>
-                    <h1>Order Details & Tracking</h1>
-                    <div className="order-meta-summary">
-                        <span className="order-id"># {order._id.toUpperCase()}</span>
-                        <span className="order-date"><Calendar size={14}/> {new Date(order.createdAt).toLocaleDateString()}</span>
+                    <div className="header-main-flex">
+                        <div className="header-info-group">
+                            <button className="btn-back" onClick={() => navigate('/my-orders')}>
+                                <ChevronLeft size={18} /> BACK TO ORDERS
+                            </button>
+                            <h1 className="luxury-header-title">PANDIT FASHION</h1>
+                            <p className="luxury-header-subtitle">Premium Luxury Apparel Boutique</p>
+                            <div className="header-meta-pills">
+                                <span className="order-id-label">ORD ID: #{order._id.toUpperCase()}</span>
+                                <span className="order-date"><Calendar size={14}/> {new Date(order.createdAt).toLocaleDateString()}</span>
+                                {order.isPaid && <span className="paid-entirely-badge">PAID ENTIRELY</span>}
+                            </div>
+                        </div>
+                        
                         <div className="order-actions-wrap">
                             <div className="print-action" onClick={() => window.print()}>
                                 <Printer size={16} /> <span>Print</span>
@@ -211,215 +219,254 @@ Thank you for shopping with us!
                                 <Download size={16} /> <span>Invoice PDF</span>
                             </div>
                             <div className="whatsapp-action" onClick={handleWhatsAppShare}>
-                                <MessageCircle size={16} /> <span>WhatsApp Share</span>
+                                <MessageCircle size={16} /> <span>WhatsApp</span>
                             </div>
                         </div>
                     </div>
                 </div>
 
                 <div className="order-details-layout" id="order-printable-section">
-                    <motion.div className="order-main-view" variants={itemVariants}>
-                        <div className="track-status-advanced glass-panel shadow-premium">
-                            <div className="track-status-line">
-                                <div className="line-fill" style={{ 
-                                    width: order.status === 'Delivered' ? '100%' : (order.status === 'Out for Delivery' ? '75%' : (order.status === 'Shipped' ? '40%' : '0%')),
-                                    background: getStatusColor(order.status)
-                                }}></div>
-                            </div>
-                            
-                            <div className="track-step active">
-                                <div className="step-point-with-icon" style={{color: '#fff', background: '#2b5a91', boxShadow: '0 0 20px rgba(43, 90, 145, 0.4)'}}>
-                                    <ShoppingCart size={22} />
+                    <div className="order-main-view">
+                        {/* Tracking Section */}
+                        <motion.div className="track-status-advanced glass-panel shadow-premium" variants={itemVariants}>
+                            <h3>COLLECTION TRACKING</h3>
+                            <div className="tracking-container">
+                                <div className="track-status-line">
+                                    <div className="line-fill" style={{ 
+                                        width: order.status === 'Delivered' ? '100%' : (order.status === 'Out for Delivery' ? '75%' : (order.status === 'Shipped' ? '40%' : '0%')),
+                                        background: getStatusColor(order.status)
+                                    }}></div>
                                 </div>
-                                <div className="step-text">
-                                    <span className="s-label">Confirmed</span>
-                                    <span className="s-time">{new Date(order.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
+                                
+                                <div className="track-step active">
+                                    <div className="step-point-with-icon" style={{ borderColor: '#2b5a91', color: '#2b5a91' }}>
+                                        <ShoppingCart size={22} />
+                                    </div>
+                                    <span className="s-label">CONFIRMED</span>
                                 </div>
-                            </div>
 
-                            <div className={`track-step ${['Shipped', 'Delivered'].includes(order.status) ? 'active' : ''}`}>
-                                <div className="step-point-with-icon" style={{
-                                    color: ['Shipped', 'Delivered'].includes(order.status) ? '#fff' : '#94a3b8',
-                                    background: ['Shipped', 'Delivered'].includes(order.status) ? '#3b82f6' : '#e2e8f0',
-                                    boxShadow: ['Shipped', 'Delivered'].includes(order.status) ? '0 0 20px rgba(59, 130, 246, 0.4)' : 'none'
-                                }}>
-                                    <Truck size={22} />
+                                <div className={`track-step ${['Shipped', 'Delivered'].includes(order.status) ? 'active' : ''}`}>
+                                    <div className="step-point-with-icon" style={{ 
+                                        borderColor: ['Shipped', 'Delivered'].includes(order.status) ? '#3b82f6' : '#e2e8f0',
+                                        color: ['Shipped', 'Delivered'].includes(order.status) ? '#3b82f6' : '#94a3b8'
+                                    }}>
+                                        <Truck size={22} />
+                                    </div>
+                                    <span className="s-label">SHIPPED</span>
                                 </div>
-                                <div className="step-text">
-                                    <span className="s-label">Shipped</span>
-                                    <span className="s-time">{order.status === 'Shipped' ? 'In Transit' : (order.status === 'Delivered' ? 'Completed' : 'Pending')}</span>
-                                </div>
-                            </div>
 
-                            <div className={`track-step ${['Out for Delivery', 'Delivered'].includes(order.status) ? 'active' : ''}`}>
-                                <div className="step-point-with-icon" style={{
-                                    color: ['Out for Delivery', 'Delivered'].includes(order.status) ? '#fff' : '#94a3b8',
-                                    background: ['Out for Delivery', 'Delivered'].includes(order.status) ? '#8b5cf6' : '#e2e8f0',
-                                    boxShadow: ['Out for Delivery', 'Delivered'].includes(order.status) ? '0 0 20px rgba(139, 92, 246, 0.4)' : 'none'
-                                }}>
-                                    <Navigation size={22} />
+                                <div className={`track-step ${['Out for Delivery', 'Delivered'].includes(order.status) ? 'active' : ''}`}>
+                                    <div className="step-point-with-icon" style={{ 
+                                        borderColor: ['Out for Delivery', 'Delivered'].includes(order.status) ? '#8b5cf6' : '#e2e8f0',
+                                        color: ['Out for Delivery', 'Delivered'].includes(order.status) ? '#8b5cf6' : '#94a3b8'
+                                    }}>
+                                        <Navigation size={22} />
+                                    </div>
+                                    <span className="s-label">TRANSIT</span>
                                 </div>
-                                <div className="step-text">
-                                    <span className="s-label">Out for Delivery</span>
-                                    <span className="s-time">{order.status === 'Out for Delivery' ? 'Arriving Today' : (order.status === 'Delivered' ? 'Completed' : 'Pending')}</span>
-                                </div>
-                            </div>
 
-                            <div className={`track-step ${order.status === 'Delivered' ? 'active' : ''}`}>
-                                <div className="step-point-with-icon" style={{
-                                    color: order.status === 'Delivered' ? '#fff' : '#94a3b8',
-                                    background: order.status === 'Delivered' ? '#10b981' : '#e2e8f0',
-                                    boxShadow: order.status === 'Delivered' ? '0 0 20px rgba(16, 185, 129, 0.4)' : 'none'
-                                }}>
-                                    <Package size={22} />
-                                </div>
-                                <div className="step-text">
-                                    <span className="s-label">Delivered</span>
-                                    <span className="s-time">{order.status === 'Delivered' ? 'Package Arrived' : 'Awaiting Delivery'}</span>
+                                <div className={`track-step ${order.status === 'Delivered' ? 'active' : ''}`}>
+                                    <div className="step-point-with-icon" style={{ 
+                                        borderColor: order.status === 'Delivered' ? '#10b981' : '#e2e8f0',
+                                        color: order.status === 'Delivered' ? '#10b981' : '#94a3b8'
+                                    }}>
+                                        <Package size={22} />
+                                    </div>
+                                    <span className="s-label">DELIVERED</span>
                                 </div>
                             </div>
+                        </motion.div>
+
+                        {/* Invoice Info Grid */}
+                        <div className="invoice-info-grid" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '25px', marginBottom: '35px' }}>
+                            <motion.div className="invoice-card-lite glass-panel" variants={itemVariants}>
+                                <h4>BILLING TO:</h4>
+                                <p className="customer-name">{order.user?.name?.toUpperCase() || 'VALUED CUSTOMER'}</p>
+                                <p>{order.user?.email}</p>
+                                <p>Ph: +91 {order.shippingAddress.phone}</p>
+                            </motion.div>
+                            <motion.div className="invoice-card-lite glass-panel" variants={itemVariants}>
+                                <h4>SHIPPING DESTINATION:</h4>
+                                <p className="customer-name">{order.shippingAddress.city}, India</p>
+                                <p>{order.shippingAddress.address}, {order.shippingAddress.postalCode}</p>
+                                <p>{order.shippingAddress.country}</p>
+                            </motion.div>
                         </div>
 
-                        {order.trackingLog && order.trackingLog.length > 0 && (
-                            <div className="tracking-timeline-card glass-panel shadow-premium" style={{ padding: '30px' }}>
-                                <h3 style={{ fontSize: '1.25rem', color: '#1e293b', marginBottom: '20px', display: 'flex', alignItems: 'center', gap: '10px' }}><Activity size={20} color="#2b5a91"/> Transit History</h3>
-                                <div className="timeline-container" style={{ display: 'flex', flexDirection: 'column', gap: '20px', borderLeft: '2px dashed #cbd5e1', marginLeft: '10px', paddingLeft: '20px' }}>
-                                    {[...order.trackingLog].reverse().map((log, idx) => (
-                                        <div key={idx} className="timeline-event" style={{ position: 'relative' }}>
-                                            <div style={{ position: 'absolute', left: '-29px', top: '0', width: '16px', height: '16px', borderRadius: '50%', background: getStatusColor(log.status), border: '3px solid #fff', boxShadow: '0 0 0 1px #cbd5e1' }}></div>
-                                            <h4 style={{ fontSize: '1rem', color: '#1e293b', margin: '0 0 5px 0' }}>{log.status}</h4>
-                                            <p style={{ fontSize: '0.9rem', color: '#64748b', margin: '0 0 5px 0' }}>{log.message}</p>
-                                            <div style={{ display: 'flex', gap: '15px', fontSize: '0.8rem', color: '#94a3b8', fontWeight: 'bold' }}>
-                                                <span style={{ display: 'flex', alignItems: 'center', gap: '4px' }}><MapPin size={12}/> {log.location}</span>
-                                                <span style={{ display: 'flex', alignItems: 'center', gap: '4px' }}><Clock size={12}/> {new Date(log.timestamp).toLocaleString()}</span>
+                        {/* Items Table Card */}
+                        <motion.div className="premium-items-card shadow-premium glass-panel" variants={itemVariants}>
+                            <div className="p-items-header">
+                                <div>IMAGE</div>
+                                <div>ITEM DESCRIPTION</div>
+                                <div style={{ textAlign: 'center' }}>PRICE</div>
+                                <div style={{ textAlign: 'center' }}>QTY</div>
+                                <div style={{ textAlign: 'right' }}>TOTAL</div>
+                            </div>
+                            <div className="p-items-body">
+                                {order.orderItems.map((item, idx) => (
+                                    <div className="p-item-row" key={idx}>
+                                        <img src={item.image} alt={item.name} className="p-item-img" />
+                                        <div className="p-item-info">
+                                            <h5>{item.name}</h5>
+                                            <div className="p-item-variant-meta">
+                                                <span>{item.size} • {item.color || 'Premium Edit'}</span>
+                                                <div className="mobile-only-price-qty">
+                                                    <span>Qty: {item.quantity}</span>
+                                                    <span>Unit: ₹{item.price.toLocaleString()}</span>
+                                                </div>
                                             </div>
                                         </div>
-                                    ))}
-                                </div>
-                            </div>
-                        )}
-
-                        <div className="order-items-card glass-panel shadow-premium">
-                            <div className="card-header"><Shirt size={20}/> Product Details</div>
-                            <div className="items-list">
-                                {order.orderItems.map((item, idx) => (
-                                    <div key={idx} className="order-item-row">
-                                        <div className="oi-img">
-                                            <img src={item.image} alt={item.name} />
-                                        </div>
-                                        <div className="oi-info">
-                                            <h3>{item.name}</h3>
-                                            <p>{item.size} • {item.color || 'Default'}</p>
-                                            <span className="oi-qty">Quantity: {item.quantity}</span>
-                                        </div>
-                                        <div className="oi-price">
-                                            <IndianRupee size={14} />{(item.price * item.quantity).toLocaleString()}
-                                        </div>
+                                        <div className="p-item-price">₹{item.price.toLocaleString()}</div>
+                                        <div className="p-item-qty">{item.quantity}</div>
+                                        <div className="p-item-total">₹{(item.price * item.quantity).toLocaleString()}</div>
                                     </div>
                                 ))}
                             </div>
-                        </div>
-                    </motion.div>
+                        </motion.div>
+                    </div>
 
                     <aside className="order-sidebar-view">
-                        <div className="order-info-card glass-panel shadow-premium">
-                            <div className="card-header"><User size={20}/> Customer Info</div>
-                            <div className="card-body">
-                                <div className="info-item">
-                                    <span className="info-label">Recipient</span>
-                                    <span className="info-val">{order.user?.name || 'Customer'}</span>
+                        {/* Summary Receipt Box */}
+                        <motion.div className="receipt-summary-box shadow-premium glass-panel" variants={itemVariants}>
+                            <h3 style={{ margin: '0 0 25px 0', fontSize: '1.2rem', fontWeight: '900', color: '#2b5a91', textTransform: 'uppercase' }}>
+                                PAYMENT SUMMARY
+                            </h3>
+                            <div className="receipt-row">
+                                <span>Basket Amount:</span>
+                                <span>₹{order.itemsPrice.toLocaleString()}</span>
+                            </div>
+                            <div className="receipt-row">
+                                <span>Shipping Cost:</span>
+                                <span style={{ color: order.shippingPrice === 0 ? '#10b981' : '#1e293b' }}>
+                                    {order.shippingPrice === 0 ? 'FREE' : `₹${order.shippingPrice.toLocaleString()}`}
+                                </span>
+                            </div>
+                            <div className="receipt-row">
+                                <span>GST Applied (12%):</span>
+                                <span>₹{order.taxPrice.toLocaleString()}</span>
+                            </div>
+                            
+                            <div className="receipt-row total-row">
+                                <span>GRAND TOTAL:</span>
+                                <span className="grand-total-val">₹{order.totalPrice.toLocaleString()}</span>
+                            </div>
+
+                            <div style={{ marginTop: '25px', display: 'flex', flexDirection: 'column', gap: '10px' }}>
+                                <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.8rem', fontWeight: 'bold', color: '#94a3b8' }}>
+                                    <span>PAYMENT MODE</span>
+                                    <span>{order.paymentMethod}</span>
                                 </div>
-                                <div className="info-item">
-                                    <span className="info-label">Email</span>
-                                    <span className="info-val">{order.user?.email}</span>
-                                </div>
-                                <div className="info-item">
-                                    <span className="info-label"><Phone size={14}/> Phone</span>
-                                    <span className="info-val">+91 {order.shippingAddress.phone}</span>
+                                <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.8rem', fontWeight: 'bold', color: '#94a3b8' }}>
+                                    <span>TRANSACTION ID</span>
+                                    <span style={{ fontFamily: 'monospace' }}>#{order.razorpayOrderId || 'OFFLINE'}</span>
                                 </div>
                             </div>
-                        </div>
+                        </motion.div>
 
-                        <div className="order-info-card glass-panel shadow-premium">
-                            <div className="card-header"><MapPin size={20}/> Shipping Address</div>
-                            <div className="card-body">
-                                <div className="address-content">
-                                    <p>{order.shippingAddress.address}</p>
-                                    <p>{order.shippingAddress.city}, {order.shippingAddress.postalCode}</p>
-                                    <p>{order.shippingAddress.country}</p>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div className="order-info-card glass-panel shadow-premium summary-card">
-                            <div className="card-header"><CreditCard size={20}/> Payment Summary</div>
-                            <div className="card-body">
-                                <div className="payment-method-badge">
-                                    {order.paymentMethod === 'ONLINE' ? 'Razorpay Secure' : order.paymentMethod === 'STRIPE' ? 'Stripe Global' : 'Cash on Delivery'}
-                                    {order.isPaid ? <span className="status paid"><CheckCircle size={12}/> Paid</span> : <span className="status pending"><Clock size={12}/> Pending</span>}
-                                </div>
-
-                                <div className="calc-group">
-                                    <div className="calc-row"><span>Items Total</span><span><IndianRupee size={15}/>{order.itemsPrice.toLocaleString()}</span></div>
-                                    <div className="calc-row"><span>Shipping</span><span>{order.shippingPrice === 0 ? 'FREE' : <><IndianRupee size={14}/>{order.shippingPrice.toLocaleString()}</>}</span></div>
-                                    <div className="calc-row"><span>Tax (GST)</span><span><IndianRupee size={14}/>{order.taxPrice.toLocaleString()}</span></div>
-                                    <div className="calc-divider"></div>
-                                    <div className="calc-row total"><span>Total Amount</span><span><IndianRupee size={22}/>{order.totalPrice.toLocaleString()}</span></div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div className="order-info-card glass-panel shadow-premium whatsapp-card">
-                            <div className="card-header"><MessageCircle size={20} color="#25D366"/> WhatsApp Connect</div>
-                            <div className="card-body">
-                                <p className="v-whatsapp-hint">Send this order summary for easy access and updates.</p>
-                                <button className="v-whatsapp-btn" onClick={handleWhatsAppShare}>
-                                    <Send size={16} /> SEND DETAILS NOW
-                                </button>
-                            </div>
-                        </div>
+                        {/* Additional Branding */}
+                        <motion.div style={{ textAlign: 'center', marginTop: '30px' }} variants={itemVariants}>
+                            <p style={{ color: '#94a3b8', fontSize: '0.85rem', fontWeight: '600' }}>
+                                Thank you for shopping with Pandit Fashion. Your satisfaction is our priority.
+                            </p>
+                            <p style={{ color: '#2b5a91', fontSize: '0.85rem', fontWeight: '900', letterSpacing: '1px', marginTop: '10px' }}>
+                                STAY STYLISH | STAY BOLD
+                            </p>
+                        </motion.div>
                     </aside>
                 </div>
 
-                <div id="invoice-pdf-template" style={{ display: 'none', width: '800px', padding: '40px', background: '#fff' }}>
-                    <div className="invoice-brand-header" style={{ display: 'flex', justifyContent: 'space-between', borderBottom: '4px solid #2b5a91', paddingBottom: '20px', marginBottom: '30px' }}>
+                {/* HIDDEN TEMPLATE FOR PDF GENERATION */}
+                <div id="invoice-pdf-template" style={{ 
+                    display: 'none', 
+                    width: '794px', 
+                    minHeight: '1123px', 
+                    padding: '50px', 
+                    background: '#fff',
+                    fontFamily: "'Inter', sans-serif",
+                    color: '#1e293b',
+                    boxSizing: 'border-box'
+                }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '10px' }}>
                         <div>
-                            <h1 style={{ margin: 0, color: '#2b5a91', fontSize: '36px', fontWeight: '900' }}>PANDIT FASHION</h1>
-                            <p style={{ margin: 0, color: '#94a3b8', fontSize: '12px' }}>Order ID: #{order._id.toUpperCase()}</p>
+                            <h1 style={{ margin: 0, color: '#2b5a91', fontSize: '42px', fontWeight: '900', letterSpacing: '-1.5px' }}>PANDIT FASHION</h1>
+                            <p style={{ margin: '5px 0 0 0', color: '#64748b', fontSize: '15px', fontWeight: '600' }}>Premium Luxury Apparel Boutique</p>
+                            <p style={{ margin: '3px 0 0 0', color: '#94a3b8', fontSize: '11px' }}>Order ID: #{order._id.toUpperCase()}</p>
                         </div>
                         <div style={{ textAlign: 'right' }}>
-                            <h2 style={{ margin: 0, color: '#1e293b', fontSize: '24px' }}>INVOICE</h2>
-                            <p>Date: {new Date(order.createdAt).toLocaleDateString()}</p>
+                            <h2 style={{ margin: 0, color: '#1e293b', fontSize: '26px', fontWeight: '800', letterSpacing: '1px' }}>OFFICIAL INVOICE</h2>
+                            <p style={{ margin: '5px 0 0 0', color: '#64748b', fontSize: '14px' }}>Date: {new Date(order.createdAt).toLocaleDateString()}</p>
+                            {order.isPaid && <div style={{ marginTop: '12px', display: 'inline-block', background: '#10b981', color: '#fff', padding: '6px 14px', borderRadius: '4px', fontSize: '11px', fontWeight: '900' }}>PAID ENTIRELY</div>}
                         </div>
                     </div>
 
-                    <table style={{ width: '100%', borderCollapse: 'collapse', marginBottom: '30px' }}>
-                        <thead>
-                            <tr style={{ background: '#2b5a91', color: '#fff' }}>
-                                <th style={{ padding: '12px', textAlign: 'left' }}>ITEM</th>
-                                <th style={{ padding: '12px', textAlign: 'center' }}>PRICE</th>
-                                <th style={{ padding: '12px', textAlign: 'center' }}>QTY</th>
-                                <th style={{ padding: '12px', textAlign: 'right' }}>TOTAL</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {order.orderItems.map((item, i) => (
-                                <tr key={i} style={{ borderBottom: '1px solid #f1f5f9' }}>
-                                    <td style={{ padding: '15px' }}>{item.name} ({item.size})</td>
-                                    <td style={{ padding: '15px', textAlign: 'center' }}>₹{item.price.toLocaleString()}</td>
-                                    <td style={{ padding: '15px', textAlign: 'center' }}>{item.quantity}</td>
-                                    <td style={{ padding: '15px', textAlign: 'right' }}>₹{(item.price * item.quantity).toLocaleString()}</td>
-                                </tr>
-                            ))}
-                        </tbody>
-                    </table>
+                    <div style={{ height: '4px', background: '#2b5a91', marginBottom: '40px', borderRadius: '2px' }}></div>
 
-                    <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
-                        <div style={{ width: '300px', background: '#f8fafc', padding: '20px' }}>
-                            <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                                <span>Grand Total:</span>
-                                <strong>₹{order.totalPrice.toLocaleString()}</strong>
+                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '30px', marginBottom: '45px' }}>
+                        <div style={{ background: '#f8fafc', padding: '25px', borderRadius: '12px', border: '1px solid #f1f5f9' }}>
+                            <h4 style={{ margin: '0 0 15px 0', color: '#2b5a91', fontSize: '14px', fontWeight: '900', borderBottom: '1px solid #e2e8f0', paddingBottom: '10px' }}>BILLING TO:</h4>
+                            <p style={{ margin: '0', fontWeight: '900', fontSize: '16px' }}>{order.user?.name?.toUpperCase() || 'VALUED CUSTOMER'}</p>
+                            <p style={{ margin: '5px 0', color: '#64748b', fontSize: '14px' }}>{order.user?.email}</p>
+                            <p style={{ margin: '0', color: '#64748b', fontSize: '14px' }}>Ph: +91 {order.shippingAddress.phone}</p>
+                        </div>
+                        <div style={{ background: '#f8fafc', padding: '25px', borderRadius: '12px', border: '1px solid #f1f5f9' }}>
+                            <h4 style={{ margin: '0 0 15px 0', color: '#2b5a91', fontSize: '14px', fontWeight: '900', borderBottom: '1px solid #e2e8f0', paddingBottom: '10px' }}>SHIPPING DESTINATION:</h4>
+                            <p style={{ margin: '0', fontWeight: '900', fontSize: '16px' }}>{order.shippingAddress.city}, India</p>
+                            <p style={{ margin: '5px 0', color: '#64748b', fontSize: '14px' }}>{order.shippingAddress.address}, {order.shippingAddress.postalCode}</p>
+                            <p style={{ margin: '0', color: '#64748b', fontSize: '14px' }}>India</p>
+                        </div>
+                    </div>
+
+                    <div style={{ background: '#2b5a91', color: '#fff', padding: '15px 25px', borderRadius: '8px 8px 0 0', display: 'flex', fontWeight: '800', fontSize: '13px', letterSpacing: '1px' }}>
+                        <div style={{ width: '80px' }}>IMAGE</div>
+                        <div style={{ flex: 2 }}>ITEM DESCRIPTION</div>
+                        <div style={{ width: '100px', textAlign: 'center' }}>PRICE</div>
+                        <div style={{ width: '60px', textAlign: 'center' }}>QTY</div>
+                        <div style={{ width: '100px', textAlign: 'right' }}>TOTAL</div>
+                    </div>
+
+                    {order.orderItems.map((item, idx) => (
+                        <div key={idx} style={{ padding: '20px 25px', borderBottom: '1px solid #f1f5f9', display: 'flex', alignItems: 'center', fontSize: '14px' }}>
+                            <div style={{ width: '80px' }}>
+                                <img src={item.image} alt="" style={{ width: '50px', height: '65px', objectFit: 'cover', borderRadius: '6px' }} />
                             </div>
+                            <div style={{ flex: 2 }}>
+                                <p style={{ margin: 0, fontWeight: '900', fontSize: '15px' }}>{item.name}</p>
+                                <p style={{ margin: '5px 0 0 0', color: '#94a3b8', fontSize: '11px' }}>Size: {item.size} | Color: {item.color || 'Premium Edit'}</p>
+                            </div>
+                            <div style={{ width: '100px', textAlign: 'center', fontWeight: '700' }}>₹{item.price.toLocaleString()}</div>
+                            <div style={{ width: '60px', textAlign: 'center', fontWeight: '700' }}>{item.quantity}</div>
+                            <div style={{ width: '100px', textAlign: 'right', fontWeight: '900' }}>₹{(item.price * item.quantity).toLocaleString()}</div>
+                        </div>
+                    ))}
+
+                    <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: '40px' }}>
+                        <div style={{ width: '350px', background: '#f8fafc', padding: '30px', borderRadius: '20px', border: '1px solid #f1f5f9' }}>
+                            <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '12px', fontSize: '15px', color: '#64748b' }}>
+                                <span>Basket Amount:</span>
+                                <span style={{ fontWeight: '800', color: '#1e293b' }}>₹{order.itemsPrice.toLocaleString()}</span>
+                            </div>
+                            <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '12px', fontSize: '15px', color: '#64748b' }}>
+                                <span>Shipping Cost:</span>
+                                <span style={{ fontWeight: '800', color: order.shippingPrice === 0 ? '#10b981' : '#1e293b' }}>{order.shippingPrice === 0 ? 'FREE' : `₹${order.shippingPrice.toLocaleString()}`}</span>
+                            </div>
+                            <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '20px', fontSize: '15px', color: '#64748b' }}>
+                                <span>GST Applied (12%):</span>
+                                <span style={{ fontWeight: '800', color: '#1e293b' }}>₹{order.taxPrice.toLocaleString()}</span>
+                            </div>
+                            <div style={{ height: '2px', background: '#e2e8f0', marginBottom: '20px' }}></div>
+                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                                <span style={{ fontSize: '18px', fontWeight: '900', color: '#2b5a91' }}>GRAND TOTAL:</span>
+                                <span style={{ fontSize: '26px', fontWeight: '900', color: '#1e293b' }}>₹{order.totalPrice.toLocaleString()}</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div style={{ marginTop: '100px', textAlign: 'center', borderTop: '1px solid #f1f5f9', paddingTop: '40px' }}>
+                        <h4 style={{ margin: '0', fontSize: '18px', fontWeight: '900', color: '#1e293b' }}>Thank you for choosing Pandit Fashion!</h4>
+                        <p id="pdf-gen-time" style={{ margin: '10px 0', fontSize: '11px', color: '#94a3b8' }}>Invoice Generated On: {new Date().toLocaleString()}</p>
+                        <p style={{ margin: '5px 0', fontSize: '11px', color: '#94a3b8' }}>This is a computer generated invoice and does not require a physical signature.</p>
+                        <div style={{ margin: '20px 0 0 0', padding: '10px 0', borderTop: '1px dashed #e2e8f0' }}>
+                            <p style={{ margin: '0', fontSize: '12px', color: '#2b5a91', fontWeight: '900', letterSpacing: '4px', textTransform: 'uppercase' }}>STAY STYLISH | STAY BOLD</p>
                         </div>
                     </div>
                 </div>

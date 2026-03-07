@@ -34,7 +34,7 @@
     backdrop-filter: blur(10px);
     border: 1px solid rgba(255, 255, 255, 0.2);
     border-radius: 50px;
-    font-size: 0.85rem;
+    font-size: 0.75rem;
     font-weight: 800;
     letter-spacing: 2px;
     text-transform: uppercase;
@@ -401,11 +401,26 @@
 @media (max-width: 1200px) {
     .blog-grid {
         grid-template-columns: repeat(2, 1fr);
+        gap: 2rem;
     }
 
     .newsletter-box {
         flex-direction: column;
         text-align: center;
+        padding: 4rem 2rem;
+    }
+}
+
+@media (max-width: 900px) {
+    .blog-page {
+        margin-top: 100px;
+    }
+    .blog-hero {
+        height: 60vh;
+        background-attachment: scroll;
+    }
+    .blog-title {
+        font-size: 2.8rem;
     }
 }
 
@@ -417,5 +432,44 @@
     .filter-box {
         flex-direction: column;
         align-items: stretch;
+        padding: 2rem;
+        gap: 1.5rem;
+    }
+    .search-wrapper {
+        width: 100%;
+    }
+    .newsletter-content h2 {
+        font-size: 2.2rem;
+    }
+    .newsletter-form {
+        flex-direction: column;
+        background: transparent;
+        padding: 0;
+        width: 100%;
+    }
+    .newsletter-form input {
+        height: 55px;
+        background: white;
+        border-radius: 12px;
+    }
+    .newsletter-form button {
+        height: 55px;
+        border-radius: 12px;
+        justify-content: center;
+    }
+}
+
+@media (max-width: 480px) {
+    .blog-hero {
+        height: 50vh;
+    }
+    .blog-title {
+        font-size: 2.22rem;
+    }
+    .blog-content {
+        padding: 1.5rem;
+    }
+    .blog-post-title {
+        font-size: 1.4rem;
     }
 }

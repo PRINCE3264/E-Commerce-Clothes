@@ -69,6 +69,14 @@ const productSchema = new mongoose.Schema({
         type: Boolean,
         default: false
     },
+    outOfStockSizes: {
+        type: [String],
+        default: []
+    },
+    outOfStockColors: {
+        type: [String],
+        default: []
+    },
     createdAt: {
         type: Date,
         default: Date.now

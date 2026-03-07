@@ -30,6 +30,37 @@ const AdminVariants = () => {
     const [dbProducts, setDbProducts] = useState([]);
     const [loading, setLoading] = useState(false);
 
+    const getColorName = (val) => {
+        if (!val) return '';
+        if (val.includes(':')) return val.split(':')[0].trim();
+        
+        const lowerVal = val.toLowerCase().trim();
+        const colorMap = {
+            '#2d6acd': 'Ocean Blue',
+            '#ff0000': 'Red',
+            '#0000ff': 'Blue',
+            '#00ff00': 'Green',
+            '#000000': 'Black',
+            '#ffffff': 'White',
+            '#f59e0b': 'Amber',
+            '#ef4444': 'Red',
+            '#3b82f6': 'Blue',
+            '#10b981': 'Green',
+            '#6366f1': 'Indigo',
+            '#a855f7': 'Purple',
+            '#71717a': 'Grey',
+            '#000': 'Black',
+            '#fff': 'White'
+        };
+        return colorMap[lowerVal] || val;
+    };
+
+    const getColorCode = (val) => {
+        if (!val) return 'transparent';
+        if (val.includes(':')) return val.split(':')[1].trim();
+        return val.toLowerCase().trim();
+    };
+
     // Fetch Products for the selection dropdown
     useEffect(() => {
         const fetchProds = async () => {
@@ -117,18 +148,34 @@ const AdminVariants = () => {
                             </div>
                             <div className="swal-input-group">
                                 <label>Attribute Category</label>
-                                <select id="swal-var-type" className="swal2-select" defaultValue={variant?.type || 'Color'}>
+                                <select id="swal-var-type" className="swal2-select" defaultValue={variant?.type || 'Color'} onChange={(e) => {
+                                    const picker = document.getElementById('swal-var-picker');
+                                    const valInput = document.getElementById('swal-var-value');
+                                    if(e.target.value === 'Color') {
+                                        picker.style.display = 'block';
+                                        valInput.placeholder = 'e.g. #000000 or Red:#FF0000';
+                                    } else {
+                                        picker.style.display = 'none';
+                                        valInput.placeholder = e.target.value === 'Size' ? 'e.g. S, M, L, XL' : 'e.g. Cotton, Silk';
+                                    }
+                                }}>
                                     <option value="Color">Color Palette</option>
                                     <option value="Size">Size Scale</option>
                                     <option value="Material">Material Type</option>
                                 </select>
                             </div>
-                            <div className="swal-input-group">
+                             <div className="swal-input-group">
                                 <label>Assigned Value (Code/Label)</label>
                                 <div className="v-dual-input">
-                                    <input id="swal-var-value" className="swal2-input" defaultValue={variant?.value || ''} placeholder="e.g. #000000 or XL" />
-                                    <input type="color" id="swal-var-picker" className="v-color-iris" defaultValue={variant?.type === 'Color' && variant.value.startsWith('#') ? variant.value : '#3b82f6'} onInput={(e) => {
-                                        document.getElementById('swal-var-value').value = e.target.value;
+                                    <input id="swal-var-value" className="swal2-input" defaultValue={variant?.value || ''} placeholder={variant?.type === 'Size' ? 'e.g. S, M, L, XL' : 'e.g. #000000 or Red:#FF0000'} />
+                                    <input type="color" id="swal-var-picker" className="v-color-iris" style={{ display: (variant?.type && variant.type !== 'Color') ? 'none' : 'block' }} defaultValue={variant?.type === 'Color' && getColorCode(variant.value).startsWith('#') ? getColorCode(variant.value) : '#3b82f6'} onInput={(e) => {
+                                        const currentVal = document.getElementById('swal-var-value').value;
+                                        if (currentVal.includes(':')) {
+                                            const [label] = currentVal.split(':');
+                                            document.getElementById('swal-var-value').value = `${label.trim()}:${e.target.value}`;
+                                        } else {
+                                            document.getElementById('swal-var-value').value = e.target.value;
+                                        }
                                         const preview = document.getElementById('swal-live-iris');
                                         if(preview) preview.style.background = e.target.value;
                                     }} />
@@ -140,7 +187,33 @@ const AdminVariants = () => {
                         <div className="v-swal-sec no-border">
                             <div className="v-sec-head-blue"><Hash size={16}/> 2. SKU & Logic</div>
                             <div className="swal-input-group">
-                                <label>SKU Reference ID</label>
+                                <label style={{ display: 'flex', justifyContent: 'space-between' }}>
+                                    <span>SKU Reference ID</span>
+                                    <button 
+                                        type="button" 
+                                        onClick={() => {
+                                            const prod = document.getElementById('swal-var-product');
+                                            const val = document.getElementById('swal-var-value');
+                                            const skuInput = document.getElementById('swal-var-sku');
+                                            if (prod.value && val.value) {
+                                                const prodName = prod.options[prod.selectedIndex].text.substring(0, 3).toUpperCase();
+                                                const attrVal = val.value.replace(/[:#]/g, '').substring(0, 4).toUpperCase();
+                                                skuInput.value = `${prodName}-${attrVal}-${Math.floor(Math.random() * 1000)}`;
+                                            } else {
+                                                Swal.fire({
+                                                    icon: 'warning',
+                                                    title: 'Missing Info',
+                                                    text: 'Select Product and Value first to generate SKU',
+                                                    toast: true,
+                                                    position: 'top-end',
+                                                    showConfirmButton: false,
+                                                    timer: 2000
+                                                });
+                                            }
+                                        }}
+                                        style={{ background: 'none', border: 'none', color: '#3b82f6', fontSize: '0.65rem', fontWeight: '800', cursor: 'pointer', padding: '0' }}
+                                    >GENERATE SKU</button>
+                                </label>
                                 <input id="swal-var-sku" className="swal2-input" defaultValue={variant?.sku || ''} placeholder="SKU-GEN-001" />
                             </div>
                             <div className="v-stat-row">
@@ -157,11 +230,16 @@ const AdminVariants = () => {
                                 <label>Media URI Link</label>
                                 <input id="swal-var-image" className="swal2-input" defaultValue={variant?.image || ''} placeholder="Direct image URL..." onInput={(e) => {
                                     const previewImg = document.getElementById('swal-v-preview');
-                                    if(previewImg) previewImg.src = e.target.value || 'https://via.placeholder.com/150?text=No+Variant+Image';
+                                    if(previewImg) previewImg.src = e.target.value || 'https://placehold.co/150x150?text=No+Image';
                                 }} />
                             </div>
                             <div className="v-iris-preview-viewport mt-10">
-                                <img id="swal-v-preview" src={variant?.image || 'https://via.placeholder.com/150?text=No+Variant+Image'} alt="SKU Preview" />
+                                <img 
+                                    id="swal-v-preview" 
+                                    src={variant?.image || 'https://placehold.co/150x150?text=No+Image'} 
+                                    alt="SKU Preview" 
+                                    onError={(e) => { e.target.src = 'https://placehold.co/150x150?text=Invalid+URL'; }}
+                                />
                             </div>
                             <div className="swal-input-group">
                                 <label>System Status</label>
@@ -231,7 +309,8 @@ const AdminVariants = () => {
                 fetchVariants();
             } catch (err) {
                 console.error(err);
-                MySwal.fire('Error', 'Failed to save variant.', 'error');
+                const errorMsg = err.response?.data?.message || 'Failed to save variant. Ensure SKU is unique.';
+                MySwal.fire('Constraint Violation', errorMsg, 'error');
             }
         }
     };
@@ -306,6 +385,7 @@ const AdminVariants = () => {
                                 <th>Attr Type</th>
                                 <th>Calibration</th>
                                 <th>Stock</th>
+                                <th>Status</th>
                                 <th>Surcharge</th>
                                 <th>Control</th>
                             </tr>
@@ -316,11 +396,13 @@ const AdminVariants = () => {
                                     <tr key={variant._id}>
                                         <td>
                                             <div className="v-asset-thumb">
-                                                {variant.image ? (
-                                                    <img src={variant.image} alt="" />
-                                                ) : (
-                                                    <ImageIcon size={18} color="#cbd5e1" />
-                                                )}
+                                                <img 
+                                                    src={variant.image || 'https://placehold.co/150x150?text=No+Img'} 
+                                                    alt="" 
+                                                    onError={(e) => { e.target.src = 'https://placehold.co/150x150?text=No+Img'; }}
+                                                    style={{ display: variant.image ? 'block' : 'none' }}
+                                                />
+                                                {!variant.image && <ImageIcon size={18} color="#cbd5e1" />}
                                             </div>
                                         </td>
                                         <td className="v-p-ref">
@@ -336,12 +418,15 @@ const AdminVariants = () => {
                                         </td>
                                         <td>
                                             <div className="v-calib-data">
-                                                {variant.type === 'Color' && (variant.value.startsWith('#') || variant.value.startsWith('rgb')) ? (
-                                                    <div className="v-chip" style={{ background: variant.value }}></div>
+                                                {variant.type === 'Color' ? (
+                                                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                                                        <div className="v-chip" style={{ background: getColorCode(variant.value) }}></div>
+                                                        <span className="v-label-p">{getColorName(variant.value)}</span>
+                                                    </div>
                                                 ) : (
                                                     <span className="v-label-p">{variant.value}</span>
                                                 )}
-                                                <span className="v-val-text">{variant.value}</span>
+                                                <span className="v-val-text" style={{ fontSize: '0.7rem' }}>{variant.value}</span>
                                             </div>
                                         </td>
                                         <td>
@@ -349,6 +434,11 @@ const AdminVariants = () => {
                                                 <div className="gauge-bar" style={{ width: `${Math.min(100, (variant.stock / 50) * 100)}%` }}></div>
                                                 <span className="v-qnt">{variant.stock} <small>UNIT</small></span>
                                             </div>
+                                        </td>
+                                        <td>
+                                            <span className={`v-status-pill ${variant.status?.toLowerCase().replace(/\s+/g, '-') || 'in-stock'} ${variant.stock <= 0 ? 'out-of-stock' : ''}`}>
+                                                {variant.stock <= 0 ? 'Sold Out' : (variant.status || 'In Stock')}
+                                            </span>
                                         </td>
                                         <td className="v-price-mod">
                                             <span className={`mod-pill ${variant.priceMod > 0 ? 'inc' : ''}`}>

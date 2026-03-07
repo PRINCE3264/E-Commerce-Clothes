@@ -31,6 +31,37 @@ const AdminProducts = () => {
     const [sortOrder, setSortOrder] = useState('asc');
     const [dbCategories, setDbCategories] = useState([]);
 
+    const getColorName = (val) => {
+        if (!val) return '';
+        if (val.includes(':')) return val.split(':')[0].trim();
+        
+        const lowerVal = val.toLowerCase().trim();
+        const colorMap = {
+            '#2d6acd': 'Ocean Blue',
+            '#ff0000': 'Red',
+            '#0000ff': 'Blue',
+            '#00ff00': 'Green',
+            '#000000': 'Black',
+            '#ffffff': 'White',
+            '#f59e0b': 'Amber',
+            '#ef4444': 'Red',
+            '#3b82f6': 'Blue',
+            '#10b981': 'Green',
+            '#6366f1': 'Indigo',
+            '#a855f7': 'Purple',
+            '#71717a': 'Grey',
+            '#000': 'Black',
+            '#fff': 'White'
+        };
+        return colorMap[lowerVal] || val;
+    };
+
+    const getColorCode = (val) => {
+        if (!val) return 'transparent';
+        if (val.includes(':')) return val.split(':')[1].trim();
+        return val.toLowerCase().trim();
+    };
+
     // Fetch Data from API
     const fetchData = async () => {
         setLoading(true);
@@ -185,7 +216,7 @@ const AdminProducts = () => {
                                     <ImageIcon size={16} className="field-icon" />
                                     <input id="swal-image" className="swal2-input" defaultValue={product?.image || ''} placeholder="https://..." onInput={(e) => {
                                         const previewImg = document.getElementById('swal-p-preview');
-                                        if(previewImg) previewImg.src = e.target.value || 'https://via.placeholder.com/150?text=No+Preview';
+                                        if(previewImg) previewImg.src = e.target.value || 'https://placehold.co/150x150?text=No+Preview';
                                     }} />
                                 </div>
                             </div>
@@ -243,8 +274,18 @@ const AdminProducts = () => {
                                     <input id="swal-size" className="swal2-input no-ico" defaultValue={Array.isArray(product?.size) ? product.size.join(', ') : (product?.size || 'S, M, L, XL')} placeholder="S, M, L..." style={{ paddingLeft: '15px' }} />
                                 </div>
                                 <div className="swal-input-group">
-                                    <label>Palette (Colors)</label>
-                                    <input id="swal-color" className="swal2-input no-ico" defaultValue={Array.isArray(product?.color) ? product.color.join(', ') : (product?.color || 'Blue, White, Black')} placeholder="Blue, Black..." style={{ paddingLeft: '15px' }} />
+                                    <label>Palette (Label:Hex, e.g. Red:#FF0000)</label>
+                                    <input id="swal-color" className="swal2-input no-ico" defaultValue={Array.isArray(product?.color) ? product.color.join(', ') : (product?.color || 'Blue, White, Black')} placeholder="Red:#FF0000, Blue:#0000FF..." style={{ paddingLeft: '15px' }} />
+                                </div>
+                            </div>
+                            <div className="v-stat-row mt-10" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '15px' }}>
+                                <div className="swal-input-group">
+                                    <label style={{color: '#ef4444'}}>Out of Stock Sizes</label>
+                                    <input id="swal-out-size" className="swal2-input no-ico" defaultValue={Array.isArray(product?.outOfStockSizes) ? product.outOfStockSizes.join(', ') : ''} placeholder="S, XL..." style={{ paddingLeft: '15px', borderColor: '#fecaca' }} />
+                                </div>
+                                <div className="swal-input-group">
+                                    <label style={{color: '#ef4444'}}>Out of Stock Colors</label>
+                                    <input id="swal-out-color" className="swal2-input no-ico" defaultValue={Array.isArray(product?.outOfStockColors) ? product.outOfStockColors.join(', ') : ''} placeholder="Red, Green..." style={{ paddingLeft: '15px', borderColor: '#fecaca' }} />
                                 </div>
                             </div>
                             <div className="compliance-note" style={{ fontSize: '0.7rem', color: '#94a3b8', marginTop: '10px' }}>
@@ -298,6 +339,8 @@ const AdminProducts = () => {
                     description,
                     size: sizeRaw.split(',').map(s => s.trim()).filter(s => s !== ''),
                     color: colorRaw.split(',').map(c => c.trim()).filter(c => c !== ''),
+                    outOfStockSizes: document.getElementById('swal-out-size').value.split(',').map(s => s.trim()).filter(s => s !== ''),
+                    outOfStockColors: document.getElementById('swal-out-color').value.split(',').map(c => c.trim()).filter(c => c !== ''),
                     isNewArrival,
                     isBestSeller
                 };
@@ -422,15 +465,36 @@ const AdminProducts = () => {
                             <div className="v-label">VALUATION</div>
                             <div className="v-val">₹{product.price.toLocaleString()}</div>
                             
-                            <div className="v-label">AVAILABILITY</div>
+                             <div className="v-label">AVAILABILITY</div>
                             <div className="v-val">{product.stock || 50} Units in Core</div>
+
+                            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '15px', marginBottom: '15px' }}>
+                                <div>
+                                    <div className="v-label" style={{color: '#ef4444'}}>OUT OF STOCK SIZES</div>
+                                    <div className="v-val" style={{fontSize: '0.9rem'}}>{product.outOfStockSizes?.length > 0 ? product.outOfStockSizes.join(', ') : 'None'}</div>
+                                </div>
+                                <div>
+                                    <div className="v-label" style={{color: '#ef4444'}}>OUT OF STOCK COLORS</div>
+                                    <div className="v-val" style={{fontSize: '0.9rem'}}>{product.outOfStockColors?.length > 0 ? product.outOfStockColors.join(', ') : 'None'}</div>
+                                </div>
+                            </div>
+
+                            <div className="v-label">AVAILABILITY MATRIX</div>
+                            <div style={{ display: 'flex', flexWrap: 'wrap', gap: '10px', marginBottom: '15px' }}>
+                                {product.color?.map(c => (
+                                    <div key={c} style={{ display: 'flex', alignItems: 'center', gap: '6px', background: '#f8fafc', padding: '4px 10px', borderRadius: '50px', border: '1px solid #e2e8f0' }}>
+                                        <span style={{ width: '12px', height: '12px', borderRadius: '50%', background: getColorCode(c), border: '1px solid #ddd' }}></span>
+                                        <span style={{ fontSize: '0.75rem', fontWeight: '700', color: '#475569' }}>{getColorName(c)}</span>
+                                    </div>
+                                ))}
+                            </div>
                             
                             <div className="v-label">ABSTRACT</div>
                             <div className="v-val desc">{product.description || 'No detailed blueprint available.'}</div>
                             
                             <div className="v-badges" style={{ display: 'flex', gap: '10px', marginTop: '10px' }}>
                                 {product.isNewArrival && <span className="p-badge arrival">NEW ARRIVAL</span>}
-                                {product.isBestSeller && <span className="p-badge seller">BEST SELLER</span>}
+                                {product.isBestSeller && <span className="p-badge arrival" style={{background: '#fee2e2', color: '#ef4444', borderColor: '#fecaca'}}>BEST SELLER</span>}
                             </div>
                         </div>
                     </div>
@@ -529,7 +593,14 @@ const AdminProducts = () => {
                                                         </div>
                                                         <div className="p-meta-mini">
                                                             {product.size && product.size.length > 0 && <span className="mini-pill size">{product.size.length} sizes</span>}
-                                                            {product.color && product.color.length > 0 && <span className="mini-pill color">{product.color.length} colors</span>}
+                                                            {product.color && product.color.length > 0 && (
+                                                                <div className="admin-table-color-dots">
+                                                                    {product.color.slice(0, 4).map(c => (
+                                                                        <span key={c} className="table-dot" style={{ background: getColorCode(c) }} title={getColorName(c)}></span>
+                                                                    ))}
+                                                                    {product.color.length > 4 && <span className="more-count">+{product.color.length - 4}</span>}
+                                                                </div>
+                                                            )}
                                                         </div>
                                                     </div>
                                                 </div>

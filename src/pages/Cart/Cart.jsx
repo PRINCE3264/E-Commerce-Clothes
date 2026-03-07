@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import {
     Trash2,
@@ -14,6 +14,12 @@ import './Cart.css';
 
 const Cart = ({ cartItems = [], onRemoveItem, onUpdateQuantity }) => {
     const navigate = useNavigate();
+
+    useEffect(() => {
+        if (!localStorage.getItem('auth_token')) {
+            navigate('/login?redirect=/cart');
+        }
+    }, [navigate]);
     // Note: We use the cartItems prop passed from App.jsx for live data
 
     const subtotal = (cartItems || []).reduce((acc, item) => acc + (item.price * (item.quantity || 1)), 0);

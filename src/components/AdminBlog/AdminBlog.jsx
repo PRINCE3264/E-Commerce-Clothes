@@ -116,10 +116,10 @@ const AdminBlog = () => {
                             </div>
                             <div className="swal-input-group">
                                 <label>CDN Source URI (Image URL)</label>
-                                <input id="swal-blog-image" className="swal2-input" defaultValue={post?.image || ''} placeholder="https://..." onInput={(e) => {
-                                    const previewImg = document.getElementById('swal-b-preview');
-                                    if(previewImg) previewImg.src = e.target.value || 'https://via.placeholder.com/150?text=No+Cover';
-                                }} />
+                                    <input id="swal-blog-image" className="swal2-input" defaultValue={post?.image || ''} placeholder="https://..." onInput={(e) => {
+                                        const previewImg = document.getElementById('swal-b-preview');
+                                        if(previewImg) previewImg.src = e.target.value || 'https://placehold.co/150x150?text=No+Cover';
+                                    }} />
                             </div>
                             <div className="swal-input-group b-upload-zone-mini">
                                 <label>Or Upload Featured Image</label>
@@ -167,7 +167,12 @@ const AdminBlog = () => {
                                 </div>
                             </div>
                             <div className="b-iris-viewport mt-10">
-                                <img id="swal-b-preview" src={post?.image || 'https://via.placeholder.com/150?text=No+Cover'} alt="Cover Preview" />
+                                <img 
+                                    id="swal-b-preview" 
+                                    src={post?.image || 'https://placehold.co/150x150?text=No+Cover'} 
+                                    alt="Cover Preview" 
+                                    onError={(e) => { e.target.src = 'https://placehold.co/150x150?text=No+Cover'; }}
+                                />
                             </div>
                             <div className="swal-input-group">
                                 <label>Live Status</label>
@@ -303,7 +308,13 @@ const AdminBlog = () => {
                                         <td className="blog-title-cell">
                                             <div className="blog-preview-info">
                                                 <div className="blog-thumb">
-                                                    {post.image ? <img src={post.image} alt="" /> : <ImageIcon size={16} />}
+                                                    <img 
+                                                        src={post.image || 'https://placehold.co/150x150?text=Article'} 
+                                                        alt="" 
+                                                        onError={(e) => { e.target.src = 'https://placehold.co/150x150?text=Article'; }}
+                                                        style={{ display: post.image ? 'block' : 'none' }}
+                                                    />
+                                                    {!post.image && <ImageIcon size={16} />}
                                                 </div>
                                                 <div className="blog-text-info">
                                                     <span className="b-title">{post.title}</span>
