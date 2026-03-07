@@ -1,4 +1,4 @@
-# 👕 E-Commerce Clothing Store (Frontend)
+# 👕 E-Commerce Clothing Store (Mern Stack)
 
 A modern React-based clothing e-commerce website UI where users can browse products, view categories, and manage cart visually.
 
