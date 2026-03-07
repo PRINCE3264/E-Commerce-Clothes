@@ -1,5 +1,5 @@
 import React from 'react';
-import { Link } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import {
     Trash2,
     Plus,
@@ -13,12 +13,12 @@ import {
 import './Cart.css';
 
 const Cart = ({ cartItems = [], onRemoveItem, onUpdateQuantity }) => {
+    const navigate = useNavigate();
     // Note: We use the cartItems prop passed from App.jsx for live data
 
     const subtotal = (cartItems || []).reduce((acc, item) => acc + (item.price * (item.quantity || 1)), 0);
     const shipping = 0.00; // Free shipping
-    const tax = subtotal * 0.05;
-    const total = subtotal + shipping + tax;
+    const total = subtotal + shipping;
 
     return (
         <div className="cart-page">
@@ -39,16 +39,16 @@ const Cart = ({ cartItems = [], onRemoveItem, onUpdateQuantity }) => {
                         <div className="cart-items-column">
                             <div className="cart-items-list">
                                 {cartItems.map((item, index) => (
-                                    <div key={item.cartId} className="cart-item-card" style={{ animationDelay: `${index * 0.1}s` }}>
+                                    <div key={item.cartId || index} className="cart-item-card" style={{ animationDelay: `${index * 0.1}s` }}>
                                         <div className="item-image-box">
                                             <img src={item.image} alt={item.name} />
                                         </div>
                                         <div className="item-details">
                                             <div className="item-main-info">
                                                 <span className="item-cat">{item.category}</span>
-                                                <h3 className="item-name">{item.name || item.title}</h3>
+                                                <h3 className="item-name">{item.name}</h3>
                                                 <div className="item-meta">
-                                                    <span>Size: <strong>{Array.isArray(item.size) ? item.size[0] : (item.size || 'M')}</strong></span>
+                                                    <span>Size: <strong>{item.size || 'M'}</strong></span>
                                                     <span>Color: <strong>{item.color || 'Default'}</strong></span>
                                                 </div>
                                             </div>
@@ -110,10 +110,6 @@ const Cart = ({ cartItems = [], onRemoveItem, onUpdateQuantity }) => {
                                         <span>Estimated Shipping</span>
                                         <span className="shipping-tag">FREE</span>
                                     </div>
-                                    <div className="summary-row">
-                                        <span>Sales Tax (5%)</span>
-                                        <span>₹{tax.toFixed(2)}</span>
-                                    </div>
                                     <div className="promo-code-box">
                                         <input type="text" placeholder="Promo Code" />
                                         <button>Apply</button>
@@ -123,7 +119,7 @@ const Cart = ({ cartItems = [], onRemoveItem, onUpdateQuantity }) => {
                                         <span className="grand-total">₹{total.toFixed(2)}</span>
                                     </div>
                                 </div>
-                                <button className="checkout-btn">
+                                <button className="checkout-btn" onClick={() => navigate('/checkout')}>
                                     Proceed to Checkout <ArrowRight size={20} />
                                 </button>
                                 <div className="payment-icons">

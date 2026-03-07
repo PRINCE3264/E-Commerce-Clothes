@@ -1,13 +1,11 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { Heart, ShoppingBag, Trash2, ArrowLeft, Star, X, CheckCircle, AlertCircle, Eye } from 'lucide-react';
+import { Heart, ShoppingBag, Trash2, ArrowLeft, Star, X, CheckCircle, AlertCircle, Eye, Plus } from 'lucide-react';
 import './Wishlist.css';
 import './Wishlist_ProductCard.css';
 
-const Wishlist = ({ wishlistItems = [], onRemoveFromWishlist, onAddToCart }) => {
+const Wishlist = ({ wishlistItems = [], onRemoveFromWishlist, onToggleWishlist, onAddToCart }) => {
     const navigate = useNavigate();
-    const [addedProduct, setAddedProduct] = useState(null);
-    const [deletingProduct, setDeletingProduct] = useState(null);
     const [quickViewProduct, setQuickViewProduct] = useState(null);
     const [selectedSizes, setSelectedSizes] = useState({});
 
@@ -18,20 +16,15 @@ const Wishlist = ({ wishlistItems = [], onRemoveFromWishlist, onAddToCart }) => 
     const handleMoveToCart = (item) => {
         if (onAddToCart) {
             onAddToCart(item);
-            onRemoveFromWishlist(item); // Move means remove from wishlist
-            setAddedProduct(item);
-            setTimeout(() => setAddedProduct(null), 4000);
+            onRemoveFromWishlist(item); // This will now correctly trigger the global confirmation OR direct removal via App.jsx logic
         }
     };
 
     const confirmDelete = (item) => {
-        setDeletingProduct(item);
-    };
-
-    const handleDelete = () => {
-        if (deletingProduct) {
-            onRemoveFromWishlist(deletingProduct);
-            setDeletingProduct(null);
+        if (onToggleWishlist) {
+            onToggleWishlist(item);
+        } else {
+            onRemoveFromWishlist(item);
         }
     };
 
@@ -62,7 +55,7 @@ const Wishlist = ({ wishlistItems = [], onRemoveFromWishlist, onAddToCart }) => 
                 {wishlistItems.length > 0 ? (
                     <div className="wishlist-grid-premium">
                         {wishlistItems.map((item) => (
-                            <div key={item.id} className="product-card">
+                            <div key={item._id} className="product-card">
                                 <div className="product-image" style={{ backgroundImage: `url(${item.image})` }}>
                                     <div className="product-actions">
                                         <button
@@ -76,7 +69,15 @@ const Wishlist = ({ wishlistItems = [], onRemoveFromWishlist, onAddToCart }) => 
                                             <Eye size={18} />
                                         </button>
                                     </div>
-                                    {item.price > 100 && <span className="premium-tag">ESSENTIAL</span>}
+                                    {item.stock <= 0 ? (
+                                        <span className={`product-badge out-of-stock`}>Sold Out</span>
+                                    ) : item.isBestSeller ? (
+                                        <span className="product-badge best-seller">BEST SELLER</span>
+                                    ) : item.isNewArrival ? (
+                                        <span className="product-badge new-arrival">NEW ARRIVAL</span>
+                                    ) : item.badge ? (
+                                        <span className={`product-badge ${item.badge.toLowerCase()}`}>{item.badge}</span>
+                                    ) : null}
                                 </div>
 
                                 <div className="product-info">
@@ -84,30 +85,30 @@ const Wishlist = ({ wishlistItems = [], onRemoveFromWishlist, onAddToCart }) => 
                                         <span className="product-category-label">{item.category}</span>
                                         <div className="product-rating-compact">
                                             <Star size={14} fill="#f59e0b" color="#f59e0b" />
-                                            <span className="rating-value">{item.rating || 4.5}</span>
+                                            <span className="rating-value">{item.rating}</span>
                                         </div>
                                     </div>
 
                                     <h4 className="product-title">{item.name}</h4>
 
                                     <div className="product-price">
-                                        ₹{item.price.toFixed(2)}
+                                        ₹{Number(item.price).toLocaleString('en-IN')}
                                     </div>
 
-                                    {(item.size || item.sizes) && (
+                                    {item.size && (
                                         <div className="product-sizes-selector" style={{ marginTop: '10px', marginBottom: '15px', display: 'flex', alignItems: 'center', flexWrap: 'wrap' }}>
                                             <span style={{ fontSize: '0.8rem', fontWeight: '600', color: '#64748b', marginRight: '8px' }}>Sizes:</span>
                                             <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px' }}>
-                                                {(item.size || item.sizes).map(size => (
+                                                {item.size.map(size => (
                                                     <button
                                                         key={size}
-                                                        onClick={(e) => { e.preventDefault(); handleSizeSelect(item.id, size); }}
+                                                        onClick={(e) => { e.preventDefault(); handleSizeSelect(item._id, size); }}
                                                         style={{
                                                             padding: '4px 8px',
-                                                            border: `1px solid ${selectedSizes[item.id] === size ? '#1e3a5f' : '#e2e8f0'}`,
+                                                            border: `1px solid ${selectedSizes[item._id] === size ? '#1e3a5f' : '#e2e8f0'}`,
                                                             borderRadius: '4px',
-                                                            background: selectedSizes[item.id] === size ? '#1e3a5f' : 'white',
-                                                            color: selectedSizes[item.id] === size ? 'white' : '#64748b',
+                                                            background: selectedSizes[item._id] === size ? '#1e3a5f' : 'white',
+                                                            color: selectedSizes[item._id] === size ? 'white' : '#64748b',
                                                             cursor: 'pointer',
                                                             fontSize: '0.75rem',
                                                             fontWeight: '600',
@@ -125,12 +126,13 @@ const Wishlist = ({ wishlistItems = [], onRemoveFromWishlist, onAddToCart }) => 
                                     <button
                                         className="btn-add-to-cart"
                                         onClick={() => {
-                                            const sizeToAdd = selectedSizes[item.id] || (item.size || item.sizes ? (item.size || item.sizes)[0] : null);
+                                            const sizeToAdd = selectedSizes[item._id] || (item.size ? item.size[0] : null);
                                             handleMoveToCart({ ...item, size: sizeToAdd });
                                         }}
                                     >
-                                        <ShoppingBag size={18} />
-                                        <span>MOVE TO BAG</span>
+                                        <Plus size={18} className="btn-plus-icon" />
+                                        <ShoppingBag size={20} />
+                                        <span>ADD TO CART</span>
                                     </button>
                                 </div>
                             </div>
@@ -153,52 +155,6 @@ const Wishlist = ({ wishlistItems = [], onRemoveFromWishlist, onAddToCart }) => 
                 )}
             </div>
 
-            {/* Ultra-Premium Advanced Level Success Modal */}
-            {addedProduct && (
-                <div className="luxury-popup-container-advance">
-                    <div className="advance-success-modal animate-wow">
-                        <div className="modal-glass-base"></div>
-                        <button className="advance-close" onClick={() => setAddedProduct(null)}>
-                            <X size={20} />
-                        </button>
-
-                        <div className="advance-modal-body">
-                            <div className="vibrant-success-zone">
-                                <div className="success-lottie-emulation">
-                                    <svg viewBox="0 0 52 52" className="checkmark-svg">
-                                        <circle className="checkmark-circle" cx="26" cy="26" r="25" fill="none" />
-                                        <path className="checkmark-check" fill="none" d="M14.1 27.2l7.1 7.2 16.7-16.8" />
-                                    </svg>
-                                </div>
-                                <h2 className="glam-title">Excellent Choice!</h2>
-                                <p className="glam-subtitle">Your selection has been moved to the shopping bag.</p>
-                            </div>
-
-                            <div className="added-item-display">
-                                <div className="item-glow-back"></div>
-                                <div className="item-image-premium">
-                                    <img src={addedProduct.image} alt={addedProduct.name} />
-                                </div>
-                                <div className="item-brief-info">
-                                    <span className="ib-category">{addedProduct.category}</span>
-                                    <h4 className="ib-name">{addedProduct.name}</h4>
-                                    <p className="ib-price">₹{addedProduct.price.toFixed(2)}</p>
-                                </div>
-                            </div>
-
-                            <div className="advance-actions">
-                                <button className="btn-checkout-luxury" onClick={() => navigate('/cart')}>
-                                    CHECKOUT NOW
-                                </button>
-                                <button className="btn-continue-styling" onClick={() => setAddedProduct(null)}>
-                                    CONTINUE STYLING
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            )}
-
             {/* Advance Level Quick View Modal */}
             {quickViewProduct && (
                 <div className="quickview-advance-overlay" onClick={() => setQuickViewProduct(null)}>
@@ -218,7 +174,7 @@ const Wishlist = ({ wishlistItems = [], onRemoveFromWishlist, onAddToCart }) => 
                                     <span className="qv-tag-premium">{quickViewProduct.category}</span>
                                     <div className="qv-rating-stars">
                                         <Star size={14} fill="#f59e0b" color="#f59e0b" />
-                                        <span>{quickViewProduct.rating || '4.8'}</span>
+                                        <span>{quickViewProduct.rating}</span>
                                     </div>
                                 </div>
 
@@ -226,7 +182,7 @@ const Wishlist = ({ wishlistItems = [], onRemoveFromWishlist, onAddToCart }) => 
                                 <div className="qv-price-advance">₹{quickViewProduct.price.toFixed(2)}</div>
 
                                 <div className="qv-description-premium">
-                                    <p>Experience unparalleled quality with our curated selection. This piece represents the pinnacle of modern design and artisanal craftsmanship.</p>
+                                    <p>{quickViewProduct.description}</p>
                                 </div>
 
                                 <div className="qv-feature-list">
@@ -253,29 +209,12 @@ const Wishlist = ({ wishlistItems = [], onRemoveFromWishlist, onAddToCart }) => 
                                     </button>
                                     <button
                                         className="btn-qv-details"
-                                        onClick={() => navigate(`/product/${quickViewProduct.id}`)}
+                                        onClick={() => navigate(`/products?category=${quickViewProduct.category}`)}
                                     >
-                                        FULL DETAILS
+                                        BROWSE CATEGORY
                                     </button>
                                 </div>
                             </div>
-                        </div>
-                    </div>
-                </div>
-            )}
-
-            {/* Delete Confirmation Modal */}
-            {deletingProduct && (
-                <div className="confirm-modal-overlay" onClick={() => setDeletingProduct(null)}>
-                    <div className="confirm-modal-box scale-up" onClick={e => e.stopPropagation()}>
-                        <div className="confirm-header">
-                            <AlertCircle size={32} color="#ef4444" />
-                            <h3>Remove from Wishlist?</h3>
-                        </div>
-                        <p>Are you sure you want to remove <strong>{deletingProduct.name}</strong> from your favorites?</p>
-                        <div className="confirm-actions">
-                            <button className="btn-cancel-modal" onClick={() => setDeletingProduct(null)}>CANCEL</button>
-                            <button className="btn-confirm-delete" onClick={handleDelete}>REMOVE ITEM</button>
                         </div>
                     </div>
                 </div>

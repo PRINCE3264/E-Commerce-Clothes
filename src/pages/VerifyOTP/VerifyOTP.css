@@ -1,0 +1,59 @@
+.verify-otp-page {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+}
+
+.verify-card {
+    max-width: 460px !important;
+    text-align: center;
+    padding: 40px !important;
+}
+
+.otp-logo-box {
+    background: linear-gradient(135deg, #10b981, #059669) !important;
+}
+
+/* 6 OTP boxes row */
+.otp-boxes-row {
+    display: flex;
+    justify-content: center;
+    gap: 12px;
+    margin: 28px 0 32px;
+}
+
+.otp-box {
+    width: 52px;
+    height: 60px;
+    text-align: center;
+    font-size: 1.6rem;
+    font-weight: 800;
+    color: #1e293b;
+    border: 2px solid #e2e8f0;
+    border-radius: 14px;
+    background: #f8fafc;
+    outline: none;
+    transition: all 0.2s ease;
+    caret-color: #3b82f6;
+    letter-spacing: 0;
+}
+
+.otp-box:focus {
+    border-color: #3b82f6;
+    background: #ffffff;
+    box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.12);
+    transform: translateY(-2px);
+}
+
+.otp-box-filled {
+    border-color: #10b981;
+    background: #f0fdf4;
+    color: #065f46;
+}
+
+/* Remove default number arrows */
+.otp-box::-webkit-inner-spin-button,
+.otp-box::-webkit-outer-spin-button {
+    -webkit-appearance: none;
+}

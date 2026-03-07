@@ -1,65 +1,107 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import {
-    X,
-    User,
-    Heart,
-    ShoppingBag,
-    CreditCard,
-    CheckSquare,
-    Truck,
-    Star,
-    Power,
-    ChevronRight,
-    Crown
+    X, User, Heart, ShoppingBag, CreditCard,
+    CheckSquare, Truck, Star, Power, ChevronRight,
+    Crown, Home, Info, LayoutList, BookOpen, Phone, LogIn
 } from 'lucide-react';
 import './Sidebar.css';
 
-const Sidebar = ({ isOpen, toggleSidebar, wishlistItems = [], onToggleWishlist }) => {
+const DEFAULT_AVATAR = 'https://ui-avatars.com/api/?background=c0392b&color=fff&size=120&bold=true&name=';
+
+const Sidebar = ({ isOpen, toggleSidebar, userData, handleLogout }) => {
+    
+    const handleSignOut = () => {
+        handleLogout();
+        toggleSidebar();
+    };
+
+    const getAvatarSrc = () => {
+        if (userData?.avatar) return userData.avatar;
+        const nameForAvatar = userData?.name || 'User';
+        return `${DEFAULT_AVATAR}${encodeURIComponent(nameForAvatar)}`;
+    };
+
     return (
         <>
             <div className={`sidebar-overlay ${isOpen ? 'open' : ''}`} onClick={toggleSidebar}></div>
             <aside className={`sidebar ${isOpen ? 'open' : ''}`}>
-                {/* User Profile Header */}
+
+                {/* ── User Profile Header ── */}
                 <div className="sidebar-user-header">
                     <div className="user-info-wrapper">
-                        <div className="user-avatar">
-                            <img src="https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?q=80&w=200&auto=format&fit=crop" alt="User" />
-                        </div>
-                        <div className="user-details">
-                            <h3>Prince</h3>
-                            <p>admin45@.com</p>
-                            <div className="premium-badge">
-                                <Crown size={12} fill="currentColor" />
-                                <span>PREMIUM MEMBER</span>
+                        {userData ? (
+                            <>
+                                <div className="user-avatar">
+                                    <img src={getAvatarSrc()} alt={userData.name} />
+                                </div>
+                                <div className="user-details">
+                                    <h3>{userData.name}</h3>
+                                    <p>{userData.email}</p>
+                                    <div className="premium-badge">
+                                        <Crown size={12} fill="currentColor" />
+                                        <span>PREMIUM MEMBER</span>
+                                    </div>
+                                </div>
+                            </>
+                        ) : (
+                            <div className="sidebar-guest">
+                                <div className="user-avatar guest-avatar">
+                                    <User size={32} color="#94a3b8" />
+                                </div>
+                                <div className="user-details">
+                                    <h3>Welcome!</h3>
+                                    <p>Please login to access your profile</p>
+                                    <Link to="/login" className="sidebar-login-btn" onClick={toggleSidebar}>
+                                        <LogIn size={14} /> Sign In
+                                    </Link>
+                                </div>
                             </div>
-                        </div>
+                        )}
                     </div>
                     <button className="sidebar-close-btn" onClick={toggleSidebar}>
-
                         <X size={20} />
                     </button>
                 </div>
 
-                {/* Scrollable Content */}
+                {/* ── Scrollable Content ── */}
                 <div className="sidebar-scroll-content">
+
+                    {/* Main Navigation (mobile) */}
+                    <div className="sidebar-section mobile-only-nav">
+                        <h4 className="section-label">MAIN NAVIGATION</h4>
+                        <ul className="sidebar-links">
+                            {[
+                                { to: '/', icon: <Home size={20} />, label: 'Home' },
+                                { to: '/about', icon: <Info size={20} />, label: 'About' },
+                                { to: '/products', icon: <LayoutList size={20} />, label: 'Products' },
+                                { to: '/blog', icon: <BookOpen size={20} />, label: 'Blog' },
+                                { to: '/contact', icon: <Phone size={20} />, label: 'Contact' },
+                            ].map(({ to, icon, label }) => (
+                                <li key={to}>
+                                    <Link to={to} className="sidebar-link" onClick={toggleSidebar}>
+                                        <div className="link-icon-bg">{icon}</div>
+                                        <span className="link-text">{label}</span>
+                                    </Link>
+                                </li>
+                            ))}
+                        </ul>
+                    </div>
+
+                    {/* Personal */}
                     <div className="sidebar-section">
                         <h4 className="section-label">PERSONAL SELECTION</h4>
                         <ul className="sidebar-links">
                             <li>
                                 <Link to="/profile" className="sidebar-link" onClick={toggleSidebar}>
-                                    <div className="link-icon-bg">
-                                        <User size={20} />
-                                    </div>
+                                    <div className="link-icon-bg"><User size={20} /></div>
                                     <span className="link-text">My Profile</span>
                                     <ChevronRight size={16} className="chevron" />
                                 </Link>
                             </li>
                             <li>
                                 <Link to="/wishlist" className="sidebar-link" onClick={toggleSidebar}>
-                                    <div className="link-icon-bg">
-                                        <Heart size={20} />
-                                    </div>
+                                    <div className="link-icon-bg"><Heart size={20} /></div>
                                     <span className="link-text">My Wishlist</span>
                                     <span className="new-badge">NEW</span>
                                 </Link>
@@ -67,60 +109,44 @@ const Sidebar = ({ isOpen, toggleSidebar, wishlistItems = [], onToggleWishlist }
                         </ul>
                     </div>
 
+                    {/* Shopping */}
                     <div className="sidebar-section">
                         <h4 className="section-label">SHOPPING ACTIVITY</h4>
                         <ul className="sidebar-links">
-                            <li>
-                                <Link to="/orders" className="sidebar-link" onClick={toggleSidebar}>
-                                    <div className="link-icon-bg">
-                                        <ShoppingBag size={20} />
-                                    </div>
-                                    <span className="link-text">My Orders</span>
-                                </Link>
-                            </li>
-                            <li>
-                                <Link to="/checkout" className="sidebar-link" onClick={toggleSidebar}>
-                                    <div className="link-icon-bg">
-                                        <CheckSquare size={20} />
-                                    </div>
-                                    <span className="link-text">Checkout</span>
-                                </Link>
-                            </li>
-                            <li>
-                                <Link to="/payment" className="sidebar-link" onClick={toggleSidebar}>
-                                    <div className="link-icon-bg">
-                                        <CreditCard size={20} />
-                                    </div>
-                                    <span className="link-text">Payment Details</span>
-                                </Link>
-                            </li>
-                            <li>
-                                <Link to="/arrivals" className="sidebar-link" onClick={toggleSidebar}>
-                                    <div className="link-icon-bg">
-                                        <Truck size={20} />
-                                    </div>
-                                    <span className="link-text">Arrivals</span>
-                                </Link>
-                            </li>
-                            <li>
-                                <Link to="/best-products" className="sidebar-link" onClick={toggleSidebar}>
-                                    <div className="link-icon-bg">
-                                        <Star size={20} />
-                                    </div>
-                                    <span className="link-text">Best Products</span>
-                                </Link>
-                            </li>
+                            {[
+                                { to: '/my-orders',       icon: <ShoppingBag size={20} />, label: 'My Orders' },
+                                { to: '/payment?orderId=69ac07c5cbf16865b7e979a5', icon: <CreditCard size={20} />, label: 'Confirm Payment' },
+                                { to: '/checkout',     icon: <CheckSquare size={20} />, label: 'Checkout' },
+                                { to: '/mypayments',   icon: <CreditCard size={20} />,  label: 'Transaction Details' },
+                                { to: '/arrivals',     icon: <Truck size={20} />,       label: 'Arrivals' },
+                                { to: '/best-products',icon: <Star size={20} />,        label: 'Best Products' },
+                            ].map(({ to, icon, label }) => (
+                                <li key={to}>
+                                    <Link to={to} className="sidebar-link" onClick={toggleSidebar}>
+                                        <div className="link-icon-bg">{icon}</div>
+                                        <span className="link-text">{label}</span>
+                                    </Link>
+                                </li>
+                            ))}
                         </ul>
                     </div>
                 </div>
 
-                {/* Sidebar Footer */}
+                {/* ── Footer: Sign Out ── */}
                 <div className="sidebar-footer">
-                    <button className="sign-out-btn">
-                        <Power size={18} />
-                        <span>SIGN OUT</span>
-                    </button>
+                    {userData ? (
+                        <button className="sign-out-btn" onClick={handleSignOut}>
+                            <Power size={18} />
+                            <span>SIGN OUT</span>
+                        </button>
+                    ) : (
+                        <Link to="/login" className="sign-out-btn sign-in-btn" onClick={toggleSidebar}>
+                            <LogIn size={18} />
+                            <span>SIGN IN</span>
+                        </Link>
+                    )}
                 </div>
+
             </aside>
         </>
     );

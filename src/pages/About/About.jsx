@@ -70,10 +70,11 @@ const About = () => {
 
     const team = [
         {
-            name: "Alex Johnson",
+            name: "PRINCE VIDYARTHI",
             role: "CEO & Founder",
             desc: "15+ years in fashion retail, passionate about making quality clothing accessible.",
-            img: "https://images.unsplash.com/photo-1529626455594-4ff0802cfb7e?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80"
+            //img: "https://images.unsplash.com/photo-1529626455594-4ff0802cfb7e?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80"
+            img: "/image/IMG-20241224-WA0130.jpg"
         },
         {
             name: "David Chen",

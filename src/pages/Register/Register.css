@@ -1,0 +1,88 @@
+/* Register Specific Architectural Adjustments */
+
+.phone-wrapper {
+    display: flex;
+    gap: 12px;
+}
+
+.country-code {
+    flex: 0 0 100px;
+    padding: 16px 12px;
+    background: #fdfdfd;
+    border: 1px solid #f1f5f9;
+    border-radius: 16px;
+    font-size: 0.95rem;
+    font-weight: 700;
+    color: #0f172a;
+    cursor: pointer;
+    transition: all 0.3s;
+}
+
+.country-code:focus {
+    border-color: #2b5a91;
+    outline: none;
+}
+
+.phone-wrapper input {
+    flex: 1;
+}
+
+.strength-text {
+    display: block;
+    margin-top: 8px;
+    color: #94a3b8;
+    font-weight: 600;
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.custom-checkbox {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+}
+
+.custom-checkbox input[type="checkbox"] {
+    width: 18px;
+    height: 18px;
+    margin-top: 2px;
+    accent-color: #2b5a91;
+    cursor: pointer;
+}
+
+.custom-checkbox label {
+    margin-bottom: 0;
+    text-transform: none;
+    letter-spacing: normal;
+    font-size: 0.85rem;
+    line-height: 1.5;
+    cursor: pointer;
+    color: #64748b;
+    font-weight: 600;
+}
+
+.custom-checkbox label a {
+    color: #2b5a91;
+    text-decoration: none;
+    font-weight: 700;
+}
+
+.custom-checkbox label a:hover {
+    text-decoration: underline;
+}
+
+.strength-fill {
+    transition: width 0.6s cubic-bezier(0.19, 1, 0.22, 1), background-color 0.4s;
+}
+
+/* Ensure consistent spacing in the grid */
+@media (min-width: 901px) {
+    .register-grid {
+        align-items: start;
+    }
+}
+
+.anim-f-8 {
+    animation-delay: 0.9s;
+}

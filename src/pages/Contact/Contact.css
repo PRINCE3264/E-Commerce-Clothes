@@ -88,6 +88,10 @@
     padding-bottom: 10px;
 }
 
+.centered {
+    text-align: center;
+}
+
 /* Method Cards */
 .method-card {
     display: flex;
@@ -96,16 +100,29 @@
     transition: all 0.3s ease;
 }
 
+.method-card:hover {
+    transform: translateX(10px);
+}
+
 .method-icon {
-    width: 50px;
-    height: 50px;
+    width: 60px;
+    height: 60px;
     background: #f0f7ff;
     color: #1e3a5f;
-    border-radius: 14px;
+    border-radius: 18px;
     display: flex;
     align-items: center;
     justify-content: center;
     flex-shrink: 0;
+    transition: all 0.4s ease;
+    box-shadow: 0 5px 15px rgba(30, 58, 95, 0.05);
+}
+
+.method-card:hover .method-icon {
+    background: #1e3a5f;
+    color: white;
+    transform: scale(1.1) rotate(-5deg);
+    box-shadow: 0 10px 20px rgba(30, 58, 95, 0.2);
 }
 
 .method-info h3 {
@@ -167,37 +184,60 @@
 .social-btn {
     width: 40px;
     height: 40px;
-    border-radius: 10px;
+    border-radius: 50%;
     display: flex;
     align-items: center;
     justify-content: center;
     color: white;
-    transition: all 0.3s ease;
+    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+    position: relative;
+    overflow: hidden;
+    border: 1px solid rgba(0, 0, 0, 0.05);
 }
 
 .social-btn.fb {
-    background: #3b5998;
+    background: #1877F2;
 }
 
 .social-btn.ig {
-    background: #e1306c;
+    background: linear-gradient(45deg, #f09433 0%, #e6683c 25%, #dc2743 50%, #cc2366 75%, #bc1888 100%);
 }
 
 .social-btn.tw {
-    background: #1da1f2;
+    background: #1DA1F2;
 }
 
 .social-btn.li {
-    background: #0077b5;
+    background: #0077B5;
 }
 
 .social-btn.yt {
-    background: #ff0000;
+    background: #FF0000;
 }
 
 .social-btn:hover {
-    transform: translateY(-5px) rotate(8deg);
-    filter: brightness(1.1);
+    transform: translateY(-5px) scale(1.1);
+    box-shadow: 0 12px 25px rgba(0, 0, 0, 0.15);
+    filter: brightness(1.05);
+}
+
+.social-btn::after {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: rgba(255, 255, 255, 0.2);
+    transform: rotate(45deg);
+    transition: 0.5s;
+    opacity: 0;
+}
+
+.social-btn:hover::after {
+    left: 100%;
+    opacity: 1;
 }
 
 /* Form Container */
@@ -375,6 +415,13 @@
 }
 
 /* Help Cards */
+.quick-help h2 {
+    font-size: 3rem;
+    color: #1e3a5f;
+    font-weight: 900;
+    margin-bottom: 4rem;
+}
+
 .help-grid {
     display: grid;
     grid-template-columns: repeat(4, 1fr);
@@ -404,30 +451,119 @@
 }
 
 .help-icon {
-    width: 70px;
-    height: 70px;
+    width: 80px;
+    height: 80px;
     margin: 0 auto 1.5rem;
     display: flex;
     align-items: center;
     justify-content: center;
-    background: #f0f7ff;
+    background: #f8fafc;
     color: #1e3a5f;
     border-radius: 50%;
+    transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    border: 1px solid #e2e8f0;
 }
 
 .help-card.active .help-icon {
-    background: rgba(255, 255, 255, 0.1);
+    background: rgba(255, 255, 255, 0.15);
     color: white;
+    border-color: rgba(255, 255, 255, 0.3);
+    animation: floatIcon 3s ease-in-out infinite;
+}
+
+.help-card:hover .help-icon {
+    transform: scale(1.1) rotate(10deg);
+    background: #1e3a5f;
+    color: white;
+    border-color: #1e3a5f;
+}
+
+.help-card.active:hover .help-icon {
+    background: white;
+    color: #1e3a5f;
+}
+
+@keyframes floatIcon {
+
+    0%,
+    100% {
+        transform: translateY(0);
+    }
+
+    50% {
+        transform: translateY(-10px);
+    }
 }
 
 .help-card h3 {
-    font-size: 1.2rem;
-    margin-bottom: 0.5rem;
+    font-size: 1.4rem;
+    font-weight: 800;
+    margin-bottom: 0.8rem;
+    color: #1e3a5f;
+}
+
+.help-card.active h3 {
+    color: white;
 }
 
 .help-card p {
-    font-size: 0.9rem;
-    opacity: 0.7;
+    font-size: 1rem;
+    color: #475569;
+    font-weight: 500;
+    line-height: 1.5;
+}
+
+.help-card.active p {
+    color: rgba(255, 255, 255, 0.9);
+}
+
+/* Staggered Animations for Help Cards */
+.help-card:nth-child(1) {
+    animation: fadeInUp 0.8s 0.2s both;
+}
+
+.help-card:nth-child(2) {
+    animation: fadeInUp 0.8s 0.3s both;
+}
+
+.help-card:nth-child(3) {
+    animation: fadeInUp 0.8s 0.4s both;
+}
+
+.help-card:nth-child(4) {
+    animation: fadeInUp 0.8s 0.5s both;
+}
+
+.contact-sidebar {
+    animation: fadeInLeft 0.8s ease both;
+}
+
+.contact-form-wrapper {
+    animation: fadeInRight 0.8s ease both;
+}
+
+@keyframes fadeInLeft {
+    from {
+        opacity: 0;
+        transform: translateX(-50px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+@keyframes fadeInRight {
+    from {
+        opacity: 0;
+        transform: translateX(50px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
 }
 
 /* Animations */

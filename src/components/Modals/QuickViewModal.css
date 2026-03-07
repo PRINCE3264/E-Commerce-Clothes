@@ -1,0 +1,330 @@
+.qv-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(15, 23, 42, 0.7);
+    backdrop-filter: blur(8px);
+    z-index: 99999;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+}
+
+.qv-modal {
+    background: white;
+    width: 900px;
+    max-width: 95%;
+    border-radius: 20px;
+    position: relative;
+    overflow: hidden;
+    box-shadow: 0 40px 100px -20px rgba(0, 0, 0, 0.4);
+}
+
+.qv-close-btn {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    background: rgba(255, 255, 255, 0.9);
+    border: none;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+    box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+    z-index: 10;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.qv-close-btn:hover {
+    transform: rotate(90deg) scale(1.1);
+    background: #1e293b;
+    color: white;
+}
+
+.qv-content-layout {
+    display: flex;
+    min-height: 500px;
+}
+
+.qv-image-side {
+    flex: 1;
+    background: #f8fafc;
+    position: relative;
+    display: flex;
+    align-items: stretch;
+}
+
+.qv-main-img {
+    width: 100%;
+    background-size: cover;
+    background-position: center;
+    position: relative;
+}
+
+.qv-img-badge {
+    position: absolute;
+    bottom: 20px;
+    left: 20px;
+    background: rgba(255, 255, 255, 0.9);
+    padding: 8px 16px;
+    border-radius: 10px;
+    font-size: 0.8rem;
+    font-weight: 700;
+    color: #1a365d;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+}
+
+.qv-details-side {
+    flex: 1;
+    padding: 50px;
+    display: flex;
+    flex-direction: column;
+}
+
+.qv-header {
+    margin-bottom: 20px;
+}
+
+.qv-title {
+    font-size: 2rem;
+    font-weight: 800;
+    color: #0f172a;
+    line-height: 1.2;
+    margin-bottom: 12px;
+}
+
+.qv-rating-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.rating-text {
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: #64748b;
+}
+
+.qv-price-block {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 25px;
+}
+
+.qv-current-price {
+    font-size: 1.8rem;
+    font-weight: 800;
+    color: #1e40af;
+}
+
+.qv-old-price {
+    font-size: 1.2rem;
+    color: #94a3b8;
+    text-decoration: line-through;
+    font-weight: 500;
+}
+
+.qv-stock-badge {
+    padding: 4px 12px;
+    border-radius: 50px;
+    font-size: 0.75rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.qv-stock-badge.in-stock {
+    background: #ecfdf5;
+    color: #10b981;
+    border: 1px solid #10b981;
+}
+
+.qv-stock-badge.out-of-stock {
+    background: #fef2f2;
+    color: #ef4444;
+    border: 1px solid #ef4444;
+}
+
+.qv-description-short {
+    font-size: 1rem;
+    line-height: 1.6;
+    color: #475569;
+    margin-bottom: 30px;
+}
+
+.qv-selectors {
+    display: flex;
+    gap: 30px;
+    margin-bottom: 35px;
+}
+
+.selector-item {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.selector-item label {
+    font-size: 0.85rem;
+    text-transform: uppercase;
+    font-weight: 700;
+    letter-spacing: 1px;
+    color: #94a3b8;
+}
+
+.qv-size-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.qv-size-chip {
+    width: 44px;
+    height: 44px;
+    border: 2px solid #e2e8f0;
+    background: white;
+    border-radius: 12px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    color: #1e293b;
+}
+
+.qv-size-chip:hover {
+    border-color: #3b82f6;
+    color: #3b82f6;
+}
+
+.qv-size-chip.active {
+    background: #1e293b;
+    border-color: #1e293b;
+    color: white;
+    transform: scale(1.05);
+    box-shadow: 0 4px 12px rgba(30, 41, 59, 0.2);
+}
+
+.qv-color-dots {
+    display: flex;
+    gap: 12px;
+}
+
+.qv-color-dot {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    border: 2px solid #ffffff;
+    box-shadow: 0 0 0 1px #e2e8f0;
+    cursor: pointer;
+    transition: all 0.3s;
+}
+
+.qv-color-dot:hover {
+    transform: scale(1.05);
+}
+
+.qv-color-dot.active {
+    box-shadow: 0 0 0 2px #1e293b;
+    transform: scale(1.1);
+}
+
+.qv-actions {
+    display: flex;
+    gap: 15px;
+    margin-bottom: 25px;
+}
+
+.qv-btn-cart {
+    flex: 1;
+    background: #1e293b;
+    color: white;
+    border: none;
+    height: 56px;
+    border-radius: 16px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 12px;
+    font-weight: 700;
+    font-size: 1rem;
+    cursor: pointer;
+    box-shadow: 0 10px 25px -5px rgba(30, 41, 59, 0.3);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.qv-btn-cart:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 15px 35px -5px rgba(30, 41, 59, 0.4);
+    background: #0f172a;
+}
+
+.qv-btn-wish {
+    width: 56px;
+    height: 56px;
+    border: 2px solid #e2e8f0;
+    background: white;
+    border-radius: 16px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    color: #ef4444;
+}
+
+.qv-btn-wish:hover {
+    border-color: #ef4444;
+    background: #fef2f2;
+}
+
+.qv-btn-wish.active {
+    background: #ef4444;
+    color: white;
+    border-color: #ef4444;
+}
+
+.qv-full-page-link {
+    background: none;
+    border: none;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 0.9rem;
+    color: #64748b;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    width: fit-content;
+}
+
+.qv-full-page-link:hover {
+    color: #1e293b;
+    gap: 12px;
+}
+
+@media (max-width: 768px) {
+    .qv-content-layout {
+        flex-direction: column;
+    }
+    
+    .qv-image-side {
+        height: 250px;
+    }
+    
+    .qv-details-side {
+        padding: 30px;
+    }
+
+    .qv-modal {
+        max-height: 90vh;
+        overflow-y: auto;
+    }
+}

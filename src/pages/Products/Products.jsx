@@ -5,66 +5,96 @@ import {
     ChevronDown,
     LayoutGrid,
     List,
-    ShoppingBag,
     Heart,
     Eye,
     Star,
+    ArrowRight,
+    Search,
     X,
     ShoppingCart,
-    Search
+    Plus,
+    RefreshCcw
 } from 'lucide-react';
-import productsData from '../../data/products.json';
+import QuickViewModal from '../../components/Modals/QuickViewModal';
+import API from '../../utils/api';
 import './Products.css';
 import '../Home/Home_CartModal.css';
 
 const Products = ({ onAddToCart, onToggleWishlist, wishlist }) => {
     const navigate = useNavigate();
-    const [searchParams, setSearchParams] = useSearchParams();
+    const [searchParams] = useSearchParams();
     const urlCategory = searchParams.get('category');
+    const urlSearch = searchParams.get('search');
 
     const [activeCategory, setActiveCategory] = useState('All');
-    const [priceRange, setPriceRange] = useState(300);
+    const [priceRange, setPriceRange] = useState(10000); // Default to high value to show all
     const [searchQuery, setSearchQuery] = useState('');
-    const [selectedProduct, setSelectedProduct] = useState(null);
-    const [isCartModalOpen, setIsCartModalOpen] = useState(false);
-    const [cartProduct, setCartProduct] = useState(null);
+    const [searchPreview, setSearchPreview] = useState([]);
+
+    useEffect(() => {
+        if (urlSearch) {
+            setSearchQuery(urlSearch);
+        }
+    }, [urlSearch]);
     const [isWishlistModalOpen, setIsWishlistModalOpen] = useState(false);
     const [wishlistProduct, setWishlistProduct] = useState(null);
-    const [selectedSizes, setSelectedSizes] = useState({}); // New: Store selected sizes for each product card
-
-    const categories = ['All', 'Men\'s Wear', 'Women\'s Wear', 'Kids Wear', 'Accessories', 'Footwear'];
+    const [products, setProducts] = useState([]);
+    const [loading, setLoading] = useState(true);
+    const [quickView, setQuickView] = useState(null);
 
     useEffect(() => {
         if (urlCategory) {
+            const lowCaseUrl = urlCategory.toLowerCase();
             const mapped = {
                 'men': 'Men\'s Wear',
                 'women': 'Women\'s Wear',
                 'kids': 'Kids Wear',
                 'accessories': 'Accessories',
-                'footwear': 'Footwear'
+                'footwear': 'Footwear',
+                'shoes': 'Footwear'
             };
-            setActiveCategory(mapped[urlCategory.toLowerCase()] || 'All');
+
+            // 1. Check if it's a short handle from the map
+            // 2. OR use the urlCategory directly (useful if Header sends "Men's Wear")
+            const resolved = mapped[lowCaseUrl] || urlCategory;
+            
+            // Try to find a casing match in our current products list if possible
+            // but for now setting it directly is better than 'All'
+            setActiveCategory(resolved);
         } else {
             setActiveCategory('All');
         }
-    }, [urlCategory]);
+    }, [urlCategory, products]);
 
-    const filteredProducts = productsData.filter(product => {
-        const categoryMatch = activeCategory === 'All' || product.category === activeCategory;
+    // Fetch Products from DB
+    useEffect(() => {
+        const fetchProducts = async () => {
+            setLoading(true);
+            try {
+                const res = await API.get('/products');
+                if (res.data.success) {
+                    setProducts(res.data.data);
+                }
+            } catch (err) {
+                console.error("Products: Error fetching data", err);
+            } finally {
+                setLoading(false);
+            }
+        };
+        fetchProducts();
+    }, []);
+
+    const filteredProducts = products.filter(product => {
+        const categoryMatch = activeCategory === 'All' || 
+            (product.category && product.category.toLowerCase() === activeCategory.toLowerCase());
         const priceMatch = product.price <= priceRange;
-        const searchMatch = product.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        // Check both p.name (mongo) and p.title (legacy)
+        const nameToSearch = product.name || '';
+        const searchMatch = nameToSearch.toLowerCase().includes(searchQuery.toLowerCase()) ||
             product.category.toLowerCase().includes(searchQuery.toLowerCase());
         return categoryMatch && priceMatch && searchMatch;
     });
 
-
-    const handleAddToCart = (e, product) => {
-        e.stopPropagation();
-        setCartProduct(product);
-        setIsCartModalOpen(true);
-        if (onAddToCart) onAddToCart(product);
-        setTimeout(() => setIsCartModalOpen(false), 3000);
-    };
 
     const handleAddToWishlist = (e, product) => {
         e.stopPropagation();
@@ -72,10 +102,6 @@ const Products = ({ onAddToCart, onToggleWishlist, wishlist }) => {
         setIsWishlistModalOpen(true);
         if (onToggleWishlist) onToggleWishlist(product);
         setTimeout(() => setIsWishlistModalOpen(false), 3000);
-    };
-
-    const handleSizeSelect = (productId, size) => {
-        setSelectedSizes(prev => ({ ...prev, [productId]: size }));
     };
 
     return (
@@ -90,17 +116,56 @@ const Products = ({ onAddToCart, onToggleWishlist, wishlist }) => {
 
                     <div className="amazing-search-container">
                         <div className="luxury-search-box">
-                            <Search className="search-icon-anim" size={20} />
                             <input
                                 type="text"
                                 placeholder="Search for your favorite styles..."
                                 value={searchQuery}
-                                onChange={(e) => setSearchQuery(e.target.value)}
+                                autoComplete="off"
+                                onChange={async (e) => {
+                                    const val = e.target.value;
+                                    setSearchQuery(val);
+                                    if (val.length > 2) {
+                                        try {
+                                            const res = await API.get(`/products?search=${val}`);
+                                            if (res.data.success) {
+                                                setSearchPreview(res.data.data.slice(0, 5));
+                                                // If we had a direct search preview state here
+                                            }
+                                        } catch (err) { console.error(err); }
+                                    } else {
+                                        setSearchPreview([]);
+                                    }
+                                }}
                             />
                             {searchQuery && (
-                                <button className="clear-search" onClick={() => setSearchQuery('')}>
+                                <button className="clear-search" onClick={() => { setSearchQuery(''); setSearchPreview([]); }}>
                                     <X size={16} />
                                 </button>
+                            )}
+                            <button className="luxury-search-btn">
+                                <Search size={20} />
+                            </button>
+
+                            {/* Reuse Search Preview Dropdown on Products Page */}
+                            {searchPreview.length > 0 && (
+                                <div className="search-preview-dropdown pdp-search-preview">
+                                    {searchPreview.map(p => (
+                                        <div 
+                                            key={p._id} 
+                                            className="preview-item"
+                                            onClick={() => {
+                                                navigate(`/product/${p._id}`);
+                                                setSearchPreview([]);
+                                            }}
+                                        >
+                                            <img src={p.image} alt={p.name} />
+                                            <div className="preview-details">
+                                                <p className="preview-name">{p.name}</p>
+                                                <p className="preview-price">₹{p.price.toFixed(2)}</p>
+                                            </div>
+                                        </div>
+                                    ))}
+                                </div>
                             )}
                         </div>
                         <div className="search-hints">
@@ -111,34 +176,47 @@ const Products = ({ onAddToCart, onToggleWishlist, wishlist }) => {
             </div>
 
             <div className="container product-layout-wrapper no-sidebar">
-
                 <div className="products-main">
-
-
                     <div className="products-listing-grid">
-                        {filteredProducts.length > 0 ? (
+                        {loading ? (
+                            <div className="loading-state">
+                                <Plus className="animate-spin" size={40} />
+                                <p>Syncing with Fashion Core...</p>
+                            </div>
+                        ) : filteredProducts.length > 0 ? (
                             filteredProducts.map((product) => (
-                                <div key={product.id} className="product-card">
-                                    <div className="product-image" style={{ backgroundImage: `url(${product.image})` }}>
+                                <div key={product._id} className="product-card">
+                                    <div 
+                                        className="product-image" 
+                                        style={{ backgroundImage: `url(${product.image})`, cursor: 'pointer' }}
+                                        onClick={() => navigate(`/product/${product._id}`)}
+                                    >
                                         <div className="product-actions">
                                             <button className="action-btn" onClick={(e) => handleAddToWishlist(e, product)} title="Add to Wishlist">
                                                 <Heart
                                                     size={18}
-                                                    fill={wishlist.find(item => item.id === product.id) ? "#ef4444" : "none"}
-                                                    color={wishlist.find(item => item.id === product.id) ? "#ef4444" : "currentColor"}
+                                                    fill={wishlist.find(item => item._id === product._id) ? "#ef4444" : "none"}
+                                                    color={wishlist.find(item => item._id === product._id) ? "#ef4444" : "currentColor"}
                                                 />
                                             </button>
-                                            <button className="action-btn" onClick={() => setSelectedProduct(product)} title="Quick View"><Eye size={18} /></button>
+                                            <button className="action-btn" onClick={(e) => { e.stopPropagation(); setQuickView(product); }} title="Quick View"><Eye size={18} /></button>
                                         </div>
-                                        {product.id % 5 === 0 && <span className="product-badge sale">Sale</span>}
-                                        {product.id % 7 === 0 && <span className="product-badge hot">Hot</span>}
+                                        {product.stock <= 0 ? (
+                                            <span className={`product-badge out-of-stock`}>Sold Out</span>
+                                        ) : product.isBestSeller ? (
+                                            <span className="product-badge best-seller">BEST SELLER</span>
+                                        ) : product.isNewArrival ? (
+                                            <span className="product-badge new-arrival">NEW ARRIVAL</span>
+                                        ) : product.badge ? (
+                                            <span className={`product-badge ${product.badge.toLowerCase()}`}>{product.badge}</span>
+                                        ) : null}
                                     </div>
                                     <div className="product-info">
                                         <span className="product-category-label">{product.category}</span>
                                         <h4 className="product-title">{product.name}</h4>
                                         <div className="product-price">
-                                            <span className="current-price">₹{product.price.toFixed(2)}</span>
-                                            {product.id % 5 === 0 && <span className="old-price">₹{(product.price * 1.3).toFixed(2)}</span>}
+                                            <span className="current-price">₹{Number(product.price).toLocaleString('en-IN')}</span>
+                                            {product.oldPrice && <span className="old-price">₹{Number(product.oldPrice).toLocaleString('en-IN')}</span>}
                                         </div>
                                         <div className="product-rating">
                                             {[...Array(5)].map((_, i) => (
@@ -151,40 +229,13 @@ const Products = ({ onAddToCart, onToggleWishlist, wishlist }) => {
                                             ))}
                                             <span className="rating-count">({product.rating})</span>
                                         </div>
-                                        <div className="product-sizes-selector" style={{ marginTop: '10px', marginBottom: '15px', display: 'flex', alignItems: 'center', flexWrap: 'wrap' }}>
-                                            <span style={{ fontSize: '0.8rem', fontWeight: '600', color: '#64748b', marginRight: '8px' }}>Sizes:</span>
-                                            <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px' }}>
-                                                {product.size.map(size => (
-                                                    <button
-                                                        key={size}
-                                                        onClick={(e) => { e.preventDefault(); handleSizeSelect(product.id, size); }}
-                                                        style={{
-                                                            padding: '4px 8px',
-                                                            border: `1px solid ${selectedSizes[product.id] === size ? '#1e3a5f' : '#e2e8f0'}`,
-                                                            borderRadius: '4px',
-                                                            background: selectedSizes[product.id] === size ? '#1e3a5f' : 'white',
-                                                            color: selectedSizes[product.id] === size ? 'white' : '#64748b',
-                                                            cursor: 'pointer',
-                                                            fontSize: '0.75rem',
-                                                            fontWeight: '600',
-                                                            transition: 'all 0.2s ease',
-                                                            minWidth: '32px'
-                                                        }}
-                                                    >
-                                                        {size}
-                                                    </button>
-                                                ))}
-                                            </div>
-                                        </div>
+
                                         <button
                                             className="add-to-cart-btn"
-                                            onClick={(e) => {
-                                                const sizeToAdd = selectedSizes[product.id] || (product.size ? product.size[0] : null);
-                                                handleAddToCart(e, { ...product, size: sizeToAdd });
-                                            }}
+                                            onClick={() => navigate(`/product/${product._id}`)}
                                         >
-                                            <ShoppingBag size={18} />
-                                            <span>Add to Bag</span>
+                                            <Eye size={20} />
+                                            <span>VIEW DETAILS</span>
                                         </button>
                                     </div>
                                 </div>
@@ -197,118 +248,23 @@ const Products = ({ onAddToCart, onToggleWishlist, wishlist }) => {
                                 <button className="clear-filters-btn" onClick={() => {
                                     setSearchQuery('');
                                     setActiveCategory('All');
-                                    setPriceRange(200);
+                                    setPriceRange(10000);
                                 }}>Clear All Filters</button>
                             </div>
                         )}
                     </div>
-
-
+                    
+                    {quickView && (
+                        <QuickViewModal 
+                            product={quickView}
+                            onClose={() => setQuickView(null)}
+                            onAddToCart={onAddToCart}
+                            onToggleWishlist={onToggleWishlist}
+                            isWishlisted={wishlist.some(item => item._id === quickView._id)}
+                        />
+                    )}
                 </div>
             </div>
-
-            {/* Quick View Modal */}
-            {selectedProduct && (
-                <div className="modal-overlay" onClick={() => setSelectedProduct(null)}>
-                    <div className="modal-content product-detail-modal" onClick={e => e.stopPropagation()}>
-                        <button className="modal-close" onClick={() => setSelectedProduct(null)}><X /></button>
-                        <div className="modal-grid">
-                            <div className="modal-image">
-                                <img src={selectedProduct.image} alt={selectedProduct.name} />
-                            </div>
-                            <div className="modal-info">
-                                <span className="modal-category">{selectedProduct.category}</span>
-                                <h2 className="modal-title">{selectedProduct.name}</h2>
-                                <div className="modal-price">
-                                    <span className="price-tag">₹{selectedProduct.price.toFixed(2)}</span>
-                                    <span className="stock-status">In Stock</span>
-                                </div>
-                                <div className="modal-rating">
-                                    {[...Array(5)].map((_, i) => (
-                                        <Star key={i} size={16} fill={i < Math.floor(selectedProduct.rating) ? "#f59e0b" : "none"} color="#f59e0b" />
-                                    ))}
-                                    <span>({selectedProduct.rating} Rating)</span>
-                                </div>
-                                <p className="modal-desc">
-                                    Experience premium quality with our {selectedProduct.name}. Crafted from high-grade materials,
-                                    this piece offers both style and unparalleled comfort for everyday luxury.
-                                </p>
-                                <div className="modal-options">
-                                    <div className="option-group">
-                                        <label>Available Sizes</label>
-                                        <div className="size-btns">
-                                            {selectedProduct.size.map(s => <button key={s} className="size-btn">{s}</button>)}
-                                        </div>
-                                    </div>
-                                </div>
-                                <div className="modal-actions">
-                                    <button className="modal-add-btn" onClick={(e) => handleAddToCart(e, selectedProduct)}>
-                                        <ShoppingBag size={20} />
-                                        Add to Shopping Bag
-                                    </button>
-                                    <button className="modal-wish-btn" onClick={(e) => handleAddToWishlist(e, selectedProduct)}>
-                                        <Heart
-                                            size={20}
-                                            fill={wishlist.find(item => item.id === selectedProduct.id) ? "#ef4444" : "none"}
-                                            color={wishlist.find(item => item.id === selectedProduct.id) ? "#ef4444" : "currentColor"}
-                                        />
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            )}
-
-
-            {/* Ultra-Premium Advanced Level Success Modal */}
-            {isCartModalOpen && (
-                <div className="luxury-popup-container-advance">
-                    <div className="advance-success-modal animate-wow">
-                        <div className="modal-glass-base"></div>
-                        <button className="advance-close" onClick={() => setIsCartModalOpen(false)}>
-                            <X size={20} />
-                        </button>
-
-                        <div className="advance-modal-body">
-                            <div className="vibrant-success-zone">
-                                <div className="success-lottie-emulation">
-                                    <svg viewBox="0 0 52 52" className="checkmark-svg">
-                                        <circle className="checkmark-circle" cx="26" cy="26" r="25" fill="none" />
-                                        <path className="checkmark-check" fill="none" d="M14.1 27.2l7.1 7.2 16.7-16.8" />
-                                    </svg>
-                                </div>
-                                <h2 className="glam-title">Excellent Choice!</h2>
-                                <p className="glam-subtitle">Your selection has been moved to your shopping bag.</p>
-                            </div>
-
-                            {cartProduct && (
-                                <div className="added-item-display">
-                                    <div className="item-glow-back"></div>
-                                    <div className="item-image-premium">
-                                        <img src={cartProduct.image} alt={cartProduct.name} />
-                                    </div>
-                                    <div className="item-brief-info">
-                                        <span className="ib-category">{cartProduct.category}</span>
-                                        <h4 className="ib-name">{cartProduct.name}</h4>
-                                        <p className="ib-price">₹{cartProduct.price.toFixed(2)}</p>
-                                    </div>
-                                </div>
-                            )}
-
-                            <div className="advance-actions">
-                                <button className="btn-checkout-luxury" onClick={() => navigate('/cart')}>
-                                    CHECKOUT NOW
-                                </button>
-                                <button className="btn-continue-styling" onClick={() => setIsCartModalOpen(false)}>
-                                    CONTINUE SHOPPING
-                                </button>
-                            </div>
-                        </div>
-                        <div className="cart-progress-bar"></div>
-                    </div>
-                </div>
-            )}
 
             {/* Premium Red Wishlist Modal */}
             {isWishlistModalOpen && (
@@ -349,3 +305,4 @@ const Products = ({ onAddToCart, onToggleWishlist, wishlist }) => {
 };
 
 export default Products;
+

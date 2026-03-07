@@ -22,6 +22,7 @@ import {
     ArrowRight,
     MapPinned
 } from 'lucide-react';
+import API from '../../utils/api';
 import './Contact.css';
 
 const Contact = () => {
@@ -36,12 +37,21 @@ const Contact = () => {
         subscribe: true
     });
 
-    const handleSubmit = (e) => {
+    const handleChange = (e) => {
+        setFormData({ ...formData, [e.target.name]: e.target.value });
+    };
+
+    const handleSubmit = async (e) => {
         e.preventDefault();
-        setShowSuccess(true);
-        setTimeout(() => setShowSuccess(false), 4000);
-        // Clear form
-        e.target.reset();
+        try {
+            await API.post('/contact', formData);
+            setShowSuccess(true);
+            setTimeout(() => setShowSuccess(false), 4000);
+            setFormData({ name: '', email: '', phone: '', subject: '', message: '' });
+        } catch (err) {
+            console.error(err);
+            alert("There was an error sending your message. Please try again.");
+        }
     };
 
     return (
@@ -150,22 +160,22 @@ const Contact = () => {
                                 <div className="form-row anim-row-1">
                                     <div className="form-group">
                                         <label><User size={16} /> Full Name *</label>
-                                        <input type="text" placeholder="Enter your full name" required />
+                                        <input type="text" name="name" value={formData.name} onChange={handleChange} placeholder="Enter your full name" required />
                                     </div>
                                     <div className="form-group">
                                         <label><Mail size={16} /> Email Address *</label>
-                                        <input type="email" placeholder="Enter your email address" required />
+                                        <input type="email" name="email" value={formData.email} onChange={handleChange} placeholder="Enter your email address" required />
                                     </div>
                                 </div>
 
                                 <div className="form-row anim-row-2">
                                     <div className="form-group">
                                         <label><PhoneCall size={16} /> Phone Number</label>
-                                        <input type="tel" placeholder="Enter your phone number" />
+                                        <input type="tel" name="phone" value={formData.phone} onChange={handleChange} placeholder="Enter your phone number" />
                                     </div>
                                     <div className="form-group">
                                         <label><Tag size={16} /> Subject *</label>
-                                        <select required>
+                                        <select name="subject" value={formData.subject} onChange={handleChange} required>
                                             <option value="">Select a subject</option>
                                             <option value="General Inquiry">General Inquiry</option>
                                             <option value="Order Support">Order Support</option>
@@ -176,7 +186,7 @@ const Contact = () => {
 
                                 <div className="form-group anim-row-3">
                                     <label><MessageSquare size={16} /> Your Message *</label>
-                                    <textarea rows="6" placeholder="Please describe your inquiry in detail..." required></textarea>
+                                    <textarea rows="6" name="message" value={formData.message} onChange={handleChange} placeholder="Please describe your inquiry in detail..." required></textarea>
                                 </div>
 
                                 <div className="form-footer anim-row-4">

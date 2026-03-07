@@ -1,0 +1,471 @@
+.order-details-page {
+    padding-top: 165px;
+    padding-bottom: 80px;
+    background: radial-gradient(circle at 10% 20%, rgba(216, 241, 230, 0.46) 0%, rgba(233, 226, 226, 0.28) 90%);
+    min-height: 100vh;
+}
+
+.order-details-header {
+    margin-bottom: 50px;
+}
+
+.btn-back {
+    background: none;
+    border: none;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: #64748b;
+    font-weight: 700;
+    font-size: 0.85rem;
+    cursor: pointer;
+    margin-bottom: 20px;
+}
+
+.order-details-header h1 {
+    font-size: 2.8rem;
+    font-family: 'Playfair Display', serif;
+    font-weight: 900;
+    color: #1e293b;
+    margin-bottom: 15px;
+}
+
+.order-meta-summary {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+    color: #64748b;
+    font-size: 1rem;
+    font-weight: 500;
+    margin-top: 10px;
+}
+
+.order-actions-wrap {
+    display: flex;
+    gap: 12px;
+}
+
+.print-action, 
+.download-action {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-weight: 700;
+    cursor: pointer;
+    background: rgba(43, 90, 145, 0.05);
+    padding: 8px 18px;
+    border-radius: 50px;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    font-size: 0.9rem;
+    border: 1px solid transparent;
+}
+
+.print-action { color: #64748b; }
+.download-action { 
+    color: #2b5a91;
+    background: rgba(43, 90, 145, 0.08);
+}
+
+.print-action:hover,
+.download-action:hover {
+    transform: translateY(-2px);
+    background: #ffffff;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+    border-color: rgba(43, 90, 145, 0.2);
+}
+
+.print-action:hover { color: #1e293b; }
+.download-action:hover { color: #2b5a91; }
+
+.whatsapp-action {
+    color: #25D366;
+    background: rgba(37, 211, 102, 0.08);
+}
+
+.whatsapp-action:hover {
+    color: #25D366;
+    background: #ffffff;
+    border-color: rgba(37, 211, 102, 0.2);
+}
+
+.whatsapp-card {
+    border: 1px solid rgba(37, 211, 102, 0.2) !important;
+}
+
+.whatsapp-card .card-header {
+    border-bottom: 1.5px solid rgba(37, 211, 102, 0.1);
+}
+
+.v-whatsapp-hint {
+    font-size: 0.85rem;
+    color: #64748b;
+    line-height: 1.6;
+    margin-bottom: 20px;
+    font-weight: 500;
+}
+
+.v-whatsapp-btn {
+    width: 100%;
+    background: #25D366;
+    color: white;
+    border: none;
+    padding: 14px;
+    border-radius: 12px;
+    font-weight: 800;
+    font-size: 0.85rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    cursor: pointer;
+    transition: all 0.3s;
+    box-shadow: 0 10px 20px rgba(37, 211, 102, 0.2);
+}
+
+.v-whatsapp-btn:hover {
+    background: #128C7E;
+    transform: translateY(-2px);
+    box-shadow: 0 15px 30px rgba(37, 211, 102, 0.3);
+}
+
+.order-details-layout {
+    display: grid;
+    grid-template-columns: 1fr 380px;
+    gap: 40px;
+    align-items: start;
+}
+
+.order-main-view {
+    display: flex;
+    flex-direction: column;
+    gap: 30px;
+}
+
+.order-sidebar-view {
+    display: flex;
+    flex-direction: column;
+    gap: 30px;
+}
+
+.glass-panel {
+    background: rgba(255, 255, 255, 0.7);
+    backdrop-filter: blur(15px);
+    border: 1px solid rgba(255, 255, 255, 0.4);
+    border-radius: 24px;
+}
+
+.shadow-premium {
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.05);
+}
+
+.track-status-advanced {
+    padding: 60px 40px;
+    display: flex;
+    justify-content: space-between;
+    position: relative;
+    background: #ffffff;
+    border: 1px solid #f1f5f9;
+}
+
+.track-status-line {
+    position: absolute;
+    top: 73px;
+    left: 80px;
+    right: 80px;
+    height: 6px;
+    background: #f1f5f9;
+    border-radius: 10px;
+    z-index: 1;
+}
+
+.line-fill {
+    height: 100%;
+    border-radius: 10px;
+    transition: width 1s ease-in-out;
+}
+
+.track-step {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 15px;
+    z-index: 5;
+    text-align: center;
+    position: relative;
+}
+
+.step-point-with-icon {
+    width: 54px;
+    height: 54px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 4px solid #f8fafc;
+    box-shadow: 0 0 0 2px #e2e8f0;
+    transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    z-index: 10;
+    position: relative;
+    background: #fff;
+    flex-shrink: 0;
+}
+
+.track-step.active .step-point-with-icon {
+    box-shadow: 0 0 0 2px currentColor, 0 12px 25px rgba(0,0,0,0.15);
+    transform: scale(1.1);
+}
+
+.s-label {
+    display: block;
+    font-size: 1rem;
+    font-weight: 800;
+    color: #1e293b;
+}
+
+.s-time {
+    display: block;
+    font-size: 0.8rem;
+    color: #94a3b8;
+    margin-top: 4px;
+}
+
+.order-items-card {
+    padding: 0;
+}
+
+.card-header {
+    padding: 25px 35px;
+    border-bottom: 1.5px solid #f1f5f9;
+    font-size: 1.25rem;
+    font-weight: 800;
+    color: #1e293b;
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    font-family: 'Playfair Display', serif;
+}
+
+.card-header svg { color: #2b5a91; }
+
+.items-list {
+    padding: 15px 35px;
+}
+
+.order-item-row {
+    padding: 25px 0;
+    display: flex;
+    align-items: center;
+    gap: 25px;
+    border-bottom: 1px dashed #f1f5f9;
+}
+
+.order-item-row:last-child {
+    border: none;
+}
+
+.oi-img {
+    width: 90px;
+    height: 110px;
+    border-radius: 12px;
+    overflow: hidden;
+    flex-shrink: 0;
+}
+
+.oi-img img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.oi-info {
+    flex: 1;
+}
+
+.oi-info h3 {
+    font-size: 1.15rem;
+    color: #1e293b;
+    margin-bottom: 6px;
+    font-weight: 800;
+}
+
+.oi-info p {
+    font-size: 0.9rem;
+    color: #64748b;
+    margin: 3px 0;
+}
+
+.oi-qty {
+    display: inline-block;
+    background: #f1f5f9;
+    padding: 4px 12px;
+    border-radius: 50px;
+    font-size: 0.8rem;
+    font-weight: 700;
+    color: #475569;
+    margin-top: 10px;
+}
+
+.oi-price {
+    font-size: 1.2rem;
+    font-weight: 900;
+    color: #1e293b;
+}
+
+.order-info-card {
+    padding: 0;
+}
+
+.card-body {
+    padding: 25px 35px;
+}
+
+.info-item {
+    margin-bottom: 15px;
+}
+
+.info-label {
+    display: block;
+    font-size: 0.7rem;
+    font-weight: 800;
+    color: #94a3b8;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: 5px;
+}
+
+.info-val {
+    font-size: 1rem;
+    color: #1e293b;
+    font-weight: 700;
+}
+
+.address-content p {
+    margin: 5px 0;
+    color: #1e293b;
+    font-weight: 600;
+    line-height: 1.6;
+}
+
+.kyc-badge {
+    display: inline-block;
+    background: #f0fdf4;
+    color: #10b981;
+    padding: 4px 10px;
+    border-radius: 6px;
+    font-size: 0.75rem;
+    font-weight: 800;
+    margin-top: 15px;
+}
+
+.payment-method-badge {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: #f8fafc;
+    padding: 15px 20px;
+    border-radius: 12px;
+    font-weight: 800;
+    color: #2b5a91;
+    margin-bottom: 15px;
+}
+
+.payment-txn-id {
+    background: rgba(43, 90, 145, 0.05);
+    padding: 12px 15px;
+    border-radius: 10px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 25px;
+    border: 1px dashed #cbd5e1;
+}
+
+.payment-txn-id span {
+    font-size: 0.75rem;
+    font-weight: 800;
+    color: #64748b;
+    text-transform: uppercase;
+}
+
+.payment-txn-id small {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.85rem;
+    font-weight: 700;
+    color: #1e293b;
+    word-break: break-all;
+    text-align: right;
+    max-width: 65%;
+}
+
+.status {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 0.8rem;
+    padding: 2px 10px;
+    border-radius: 50px;
+}
+
+.status.paid { background: #10b98120; color: #10b981; }
+.status.pending { background: #f59e0b20; color: #f59e0b; }
+
+.calc-group {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.calc-row span:last-child {
+    display: flex;
+    align-items: center;
+    gap: 2px;
+}
+
+.calc-row {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.95rem;
+    color: #64748b;
+    font-weight: 600;
+}
+
+.calc-divider {
+    height: 1px;
+    background: #f1f5f9;
+    margin: 10px 0;
+}
+
+.total {
+    font-size: 1.4rem;
+    font-weight: 900;
+    color: #1e293b;
+}
+
+.order-details-loading {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 60vh;
+}
+
+@media print {
+    .order-details-header .btn-back,
+    .order-details-header .print-action,
+    .order-details-page {
+        padding-top: 20px;
+    }
+}
+
+@media (max-width: 1024px) {
+    .order-details-layout { grid-template-columns: 1fr; }
+    .order-sidebar-view { order: -1; }
+}
+
+@media (max-width: 768px) {
+    .order-details-header h1 { font-size: 2.2rem; }
+    .track-status-advanced { padding: 30px 10px; }
+    .track-status-advanced::before { left: 40px; right: 40px; }
+}

@@ -1,0 +1,11 @@
+{
+  "name": "Vintage Denim Jacket",
+  "description": "Classic wash denim jacket with reinforced stitching, dual chest pockets, and comfortable internal lining. A timeless staple for any wardrobe, crafted from premium heavyweight denim that gets better with every wash.",
+  "price": 2499,
+  "category": "Men's Wear",
+  "stock": 45,
+  "image": "https://images.unsplash.com/photo-1576905307837-3134c6639935?auto=format",
+  "size": ["S", "M", "L", "XL"],
+  "color": ["Indigo", "Light Wash", "Black Denim"],
+  "rating": 4.9
+}

@@ -1,217 +1,189 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import {
     Mail,
     Lock,
-    User,
     ArrowRight,
     Eye,
-    EyeOff,
-    UserPlus,
-    MapPin,
-    Smartphone,
-    Home,
-    Globe,
-    Zap,
-    ShieldCheck
+    EyeOff
 } from 'lucide-react';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
 import './Login.css';
 
-const Login = () => {
-    const [isLogin, setIsLogin] = useState(true);
-    const [showPassword, setShowPassword] = useState(false);
-    const [passwordStrength, setPasswordStrength] = useState('');
+import API from '../../utils/api';
+import Swal from 'sweetalert2';
 
-    const handlePasswordChange = (e) => {
-        const val = e.target.value;
-        if (val.length === 0) setPasswordStrength('');
-        else if (val.length < 6) setPasswordStrength('weak');
-        else if (val.length < 10) setPasswordStrength('medium');
-        else setPasswordStrength('strong');
+const Login = () => {
+    const navigate = useNavigate();
+    const location = useLocation();
+    const [showPassword, setShowPassword] = useState(false);
+    const [credentials, setCredentials] = useState({ email: '', password: '' });
+
+    React.useEffect(() => {
+        const queryParams = new URLSearchParams(location.search);
+        const token = queryParams.get('token');
+        if (token) {
+            localStorage.setItem('auth_token', token);
+            API.get('/auth/me')
+                .then(res => {
+                    localStorage.setItem('user_data', JSON.stringify(res.data.data));
+                    window.dispatchEvent(new Event('user_data_updated'));
+                    navigate('/');
+                }).catch(() => {
+                    Swal.fire({ icon: 'error', title: 'Google Login Error' });
+                });
+        }
+    }, [location, navigate]);
+
+    const handleChange = (e) => {
+        setCredentials({ ...credentials, [e.target.name]: e.target.value });
+    };
+
+    const handleLogin = async (e) => {
+        e.preventDefault();
+        
+        try {
+            const res = await API.post('/auth/login', credentials);
+            
+            if (res.data.success) {
+                localStorage.setItem('auth_token', res.data.token);
+                localStorage.setItem('user_data', JSON.stringify(res.data.user));
+                window.dispatchEvent(new Event('user_data_updated'));
+                
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Welcome Back',
+                    text: `Logged in as ${res.data.user.name}`,
+                    timer: 1500,
+                    showConfirmButton: false
+                });
+
+                if (res.data.user.role === 'admin') {
+                    localStorage.setItem('admin_auth', 'true');
+                    localStorage.setItem('admin_token', res.data.token);
+                    localStorage.setItem('admin_user', JSON.stringify(res.data.user));
+                    navigate('/admin/dashboard');
+                } else {
+                    navigate('/');
+                }
+            }
+        } catch (err) {
+            Swal.fire({
+                icon: 'error',
+                title: 'Auth Failure',
+                text: err.response?.data?.message || 'Invalid session credentials'
+            });
+        }
+    };
+
+    const handleGoogleLogin = async () => {
+        try {
+            const res = await API.get('/auth/google/url');
+            if (res.data.success) {
+                window.location.href = res.data.url;
+            }
+        } catch (err) {
+            console.error(err);
+            Swal.fire({
+                icon: 'error',
+                title: 'Google OAuth failed',
+                text: 'Could not contact identity provider'
+            });
+        }
     };
 
     return (
         <div className="login-page">
-            <div className={`auth-card ${!isLogin ? 'register-wide' : ''}`}>
+            {/* Architectural Background Elements */}
+            <div className="glass-orb orb-1"></div>
+            <div className="glass-orb orb-2"></div>
+
+            <div className="auth-card">
                 <div className="auth-header">
                     <div className="auth-logo-box">
-                        {isLogin ? <Lock size={32} /> : <UserPlus size={32} />}
+                        <Lock size={28} />
                     </div>
-                    <h2>{isLogin ? 'Welcome Back' : 'Join Pandit Shop'}</h2>
-                    <p>{isLogin ? 'Login to your account to continue shopping.' : 'Create your account to start shopping premium items.'}</p>
+                    <h2>Welcome Back</h2>
+                    <p className="auth-subtitle">Step into your curated fashion world.</p>
                 </div>
 
-                <form className="auth-body" onSubmit={(e) => e.preventDefault()}>
-                    {isLogin ? (
-                        <div className="login-form-container">
-                            <div className="form-floating">
-                                <input type="email" id="email" placeholder=" " required />
-                                <label htmlFor="email"><Mail size={18} /> Email Address</label>
-                            </div>
-                            <div className="form-floating">
+                <form className="auth-body" onSubmit={handleLogin}>
+                    <div className="login-form-container staggered-container">
+                        <div className="form-group anim-f-1">
+                            <label><Mail size={16} /> Email Address</label>
+                            <input 
+                                type="email" 
+                                name="email"
+                                placeholder="email@example.com" 
+                                value={credentials.email}
+                                onChange={handleChange}
+                                required 
+                            />
+                        </div>
+
+                        <div className="form-group anim-f-2">
+                            <label><Lock size={16} /> Password</label>
+                            <div className="pass-wrapper">
                                 <input
                                     type={showPassword ? "text" : "password"}
-                                    id="password"
-                                    placeholder=" "
+                                    name="password"
+                                    placeholder="Enter password"
+                                    value={credentials.password}
+                                    onChange={handleChange}
                                     required
                                 />
-                                <label htmlFor="password"><Lock size={18} /> Password</label>
                                 <button
                                     type="button"
                                     className="password-toggle"
                                     onClick={() => setShowPassword(!showPassword)}
                                 >
-                                    {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
+                                    {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
                                 </button>
                             </div>
-
-                            <div className="form-options">
-                                <label className="remember-check">
-                                    <input type="checkbox" id="rememberMe" />
-                                    <span>Remember me</span>
-                                </label>
-                                <a href="#" className="forgot-link">Forgot password?</a>
-                            </div>
-
-                            <button className="auth-btn-primary">
-                                <span>Login Securely</span>
-                                <ArrowRight size={20} className="animate-arrow" />
-                            </button>
                         </div>
-                    ) : (
-                        <div className="register-form-container">
-                            <div className="register-row">
-                                {/* Personal Info Section */}
-                                <div className="register-section">
-                                    <h5 className="section-title"><User size={18} /> Personal Information</h5>
 
-                                    <div className="form-floating">
-                                        <input type="text" id="regName" placeholder=" " required />
-                                        <label htmlFor="regName">Full Name</label>
-                                    </div>
-
-                                    <div className="form-floating">
-                                        <input type="email" id="regEmail" placeholder=" " required />
-                                        <label htmlFor="regEmail">Email address</label>
-                                    </div>
-
-                                    <div className="phone-input-group">
-                                        <div className="country-select">
-                                            <select>
-                                                <option value="+91">🇮🇳 +91</option>
-                                                <option value="+1">🇺🇸 +1</option>
-                                                <option value="+44">🇬🇧 +44</option>
-                                            </select>
-                                        </div>
-                                        <div className="form-floating-select">
-                                            <div className="form-floating">
-                                                <input type="tel" id="regPhone" placeholder=" " required />
-                                                <label htmlFor="regPhone">Phone Number</label>
-                                            </div>
-                                        </div>
-                                    </div>
-
-                                    <div className="form-floating">
-                                        <input
-                                            type={showPassword ? "text" : "password"}
-                                            id="regPass"
-                                            placeholder=" "
-                                            required
-                                            onChange={handlePasswordChange}
-                                        />
-                                        <label htmlFor="regPass">Password</label>
-                                        <button
-                                            type="button"
-                                            className="password-toggle"
-                                            onClick={() => setShowPassword(!showPassword)}
-                                        >
-                                            {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
-                                        </button>
-                                    </div>
-
-                                    <div className="strength-container">
-                                        <div className="strength-bar">
-                                            <div className={`strength-fill ${passwordStrength}`}></div>
-                                        </div>
-                                        <small className="text-muted">Security Level: {passwordStrength || 'Enter password'}</small>
-                                    </div>
-                                </div>
-
-                                {/* Address Section */}
-                                <div className="register-section">
-                                    <h5 className="section-title"><MapPin size={18} /> Shipping Address</h5>
-
-                                    <div className="form-floating">
-                                        <input type="text" id="address" placeholder=" " />
-                                        <label htmlFor="address">Street Address</label>
-                                    </div>
-
-                                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '15px' }}>
-                                        <div className="form-floating">
-                                            <input type="text" id="city" placeholder=" " />
-                                            <label htmlFor="city">City</label>
-                                        </div>
-                                        <div className="form-floating">
-                                            <input type="text" id="state" placeholder=" " />
-                                            <label htmlFor="state">State</label>
-                                        </div>
-                                    </div>
-
-                                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '15px' }}>
-                                        <div className="form-floating">
-                                            <input type="text" id="postal" placeholder=" " />
-                                            <label htmlFor="postal">Postal Code</label>
-                                        </div>
-                                        <div className="form-floating">
-                                            <select id="country" style={{ width: '100%', height: '100%', border: 'none', background: 'transparent', outline: 'none', padding: '1.5rem 1rem 0.5rem', fontWeight: '700' }}>
-                                                <option selected>India</option>
-                                                <option>USA</option>
-                                                <option>UK</option>
-                                            </select>
-                                            <label htmlFor="country" style={{ top: '1.2rem', fontSize: '0.75rem', fontWeight: '700' }}>Country</label>
-                                        </div>
-                                    </div>
-
-                                    <div className="form-check" style={{ marginTop: '1.5rem', display: 'flex', gap: '10px', alignItems: 'flex-start' }}>
-                                        <input type="checkbox" id="terms" required style={{ marginTop: '4px' }} />
-                                        <label htmlFor="terms" className="text-muted" style={{ fontSize: '0.85rem' }}>
-                                            I agree to the <a href="#" style={{ color: '#1e3a5f', fontWeight: '800' }}>Terms of Service</a> and <a href="#" style={{ color: '#1e3a5f', fontWeight: '800' }}>Privacy Policy</a>
-                                        </label>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <button className="auth-btn-primary">
-                                <span>Create My Account</span>
-                                <ArrowRight size={20} className="animate-arrow" />
-                            </button>
+                        <div className="form-utils anim-f-3">
+                            <label className="check-box">
+                                <input type="checkbox" />
+                                <span>Keep me signed in</span>
+                            </label>
+                            <Link to="/forgot-password" title="Recover Account" className="forgot-link">Forgot password?</Link>
                         </div>
-                    )}
 
-                    <div className="auth-divider">
-                        <span>Social {isLogin ? 'Login' : 'Signup'}</span>
-                    </div>
-
-                    <div className="social-flex">
-                        <button className="social-btn">
-                            <img src="https://www.gstatic.com/images/branding/product/1x/googleg_48dp.png" alt="Google" />
-                            <span>Google</span>
+                        <button type="submit" className="auth-btn-submit anim-f-4">
+                            <span>LOGIN NOW</span>
+                            <ArrowRight size={18} />
                         </button>
-                        <button className="social-btn">
-                            <img src="https://upload.wikimedia.org/wikipedia/commons/0/05/Facebook_Logo_(2019).png" alt="Facebook" />
-                            <span>Facebook</span>
+
+                        <div className="auth-separator anim-f-5" style={{ display: 'flex', alignItems: 'center', margin: '20px 0' }}>
+                            <div style={{ flex: 1, height: '1px', background: '#e2e8f0' }}></div>
+                            <span style={{ margin: '0 10px', color: '#94a3b8', fontSize: '0.9rem' }}>OR</span>
+                            <div style={{ flex: 1, height: '1px', background: '#e2e8f0' }}></div>
+                        </div>
+
+                        <button type="button" onClick={handleGoogleLogin} className="auth-btn-google anim-f-5" style={{ width: '100%', padding: '15px', background: '#fff', border: '1px solid #cbd5e1', borderRadius: '8px', display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '10px', fontSize: '1rem', fontWeight: 'bold', color: '#334155', cursor: 'pointer', transition: '0.3s' }}>
+                            <svg xmlns="http://www.w3.org/2000/svg" height="20" viewBox="0 0 24 24" width="20">
+                                <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/>
+                                <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/>
+                                <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/>
+                                <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/>
+                                <path d="M1 1h22v22H1z" fill="none"/>
+                            </svg>
+                            <span>Continue with Google</span>
                         </button>
                     </div>
 
-                    <p className="auth-footer">
-                        {isLogin ? "Don't have an account?" : "Already have an account?"}
-                        <button
-                            type="button"
-                            className="toggle-link"
-                            onClick={() => setIsLogin(!isLogin)}
-                        >
-                            {isLogin ? 'Register now' : 'Login here'}
-                        </button>
+                    <p className="auth-switch anim-f-6">
+                        New to Pandit Shop?
+                        <Link to="/register" className="switch-btn">
+                            Register Here
+                        </Link>
                     </p>
+                    {/* <p className="auth-switch anim-f-5" style={{ marginTop: '10px' }}>
+                        Admin Account?
+                        <Link to="/admin-login" className="switch-btn">
+                            Admin Login
+                        </Link>
+                    </p> */}
                 </form>
             </div>
         </div>
