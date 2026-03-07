@@ -1,6 +1,7 @@
 const express = require('express');
 const dotenv = require('dotenv');
 const cors = require('cors');
+const path = require('path');
 const connectDB = require('./config/db');
 
 // Load environment variables
@@ -33,6 +34,7 @@ const blogRoutes = require('./routes/blogRoutes');
 const variantRoutes = require('./routes/variantRoutes');
 const orderRoutes = require('./routes/orderRoutes');
 const paymentRoutes = require('./routes/paymentRoutes');
+const uploadRoutes = require('./routes/uploadRoutes');
 
 // Registry mounting
 app.use('/api/auth', authRoutes);
@@ -47,6 +49,10 @@ app.use('/api/blogs', blogRoutes);
 app.use('/api/variants', variantRoutes);
 app.use('/api/orders', orderRoutes);
 app.use('/api/payments', paymentRoutes);
+app.use('/api/upload', uploadRoutes);
+
+// Static assets (Uploads folder)
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 // Health-check endpoint
 app.get('/', (req, res) => {

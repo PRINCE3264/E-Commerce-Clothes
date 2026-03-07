@@ -11,7 +11,9 @@ import {
     CheckCircle,
     Clock,
     Image as ImageIcon,
-    ExternalLink
+    ExternalLink,
+    Upload,
+    Loader2
 } from 'lucide-react';
 import Swal from 'sweetalert2';
 import withReactContent from 'sweetalert2-react-content';
@@ -118,6 +120,51 @@ const AdminBlog = () => {
                                     const previewImg = document.getElementById('swal-b-preview');
                                     if(previewImg) previewImg.src = e.target.value || 'https://via.placeholder.com/150?text=No+Cover';
                                 }} />
+                            </div>
+                            <div className="swal-input-group b-upload-zone-mini">
+                                <label>Or Upload Featured Image</label>
+                                <div className="b-file-selector-wrapper">
+                                    <input 
+                                        type="file" 
+                                        id="swal-blog-file" 
+                                        accept="image/*" 
+                                        style={{ display: 'none' }} 
+                                        onChange={async (e) => {
+                                            const file = e.target.files[0];
+                                            if (!file) return;
+
+                                            const formData = new FormData();
+                                            formData.append('image', file);
+                                            
+                                            const previewImg = document.getElementById('swal-b-preview');
+                                            const statusText = document.getElementById('swal-upload-status');
+                                            if(statusText) statusText.innerText = "Processing upload...";
+
+                                            try {
+                                                const res = await API.post('/upload', formData, {
+                                                    headers: { 'Content-Type': 'multipart/form-data' }
+                                                });
+                                                if(res.data.success) {
+                                                    const imgPath = `http://127.0.0.1:8000${res.data.path}`;
+                                                    document.getElementById('swal-blog-image').value = imgPath;
+                                                    if(previewImg) previewImg.src = imgPath;
+                                                    if(statusText) statusText.innerText = "Upload Complete!";
+                                                }
+                                            } catch (err) {
+                                                console.error("Upload failed", err);
+                                                if(statusText) statusText.innerText = "Upload Failed: " + (err.response?.data?.message || err.message);
+                                            }
+                                        }}
+                                    />
+                                    <button 
+                                        type="button" 
+                                        className="b-btn-upload-trigger"
+                                        onClick={() => document.getElementById('swal-blog-file').click()}
+                                    >
+                                        <Upload size={16} /> Choose File
+                                    </button>
+                                    <span id="swal-upload-status" className="b-upload-status">No file chosen</span>
+                                </div>
                             </div>
                             <div className="b-iris-viewport mt-10">
                                 <img id="swal-b-preview" src={post?.image || 'https://via.placeholder.com/150?text=No+Cover'} alt="Cover Preview" />
@@ -433,6 +480,12 @@ const AdminBlog = () => {
 
                 .b-swal-confirm-btn-blue { padding: 10px 25px !important; font-size: 0.9rem !important; font-weight: 800 !important; border-radius: 10px !important; background: #3b82f6 !important; box-shadow: 0 4px 10px rgba(59, 130, 246, 0.2) !important; }
                 .b-swal-cancel-btn-blue { padding: 10px 25px !important; font-size: 0.85rem !important; font-weight: 700 !important; border-radius: 10px !important; color: #64748b !important; }
+
+                .b-upload-zone-mini { margin-top: 15px; background: #fdfdfd; padding: 12px; border: 1px dashed #e2e8f0; border-radius: 10px; }
+                .b-file-selector-wrapper { display: flex; align-items: center; gap: 12px; margin-top: 8px; }
+                .b-btn-upload-trigger { display: flex; align-items: center; gap: 8px; background: #eff6ff; color: #1e40af; border: 1px solid #bfdbfe; padding: 6px 14px; border-radius: 6px; font-weight: 800; font-size: 0.75rem; cursor: pointer; transition: all 0.2s; }
+                .b-btn-upload-trigger:hover { background: #dbeafe; }
+                .b-upload-status { font-size: 0.7rem; color: #94a3b8; font-weight: 600; }
             `}</style>
         </div>
     );

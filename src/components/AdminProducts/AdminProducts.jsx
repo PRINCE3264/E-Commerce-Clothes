@@ -12,7 +12,8 @@ import {
     IndianRupee,
     Flame,
     Zap,
-    Tag
+    Tag,
+    Upload
 } from 'lucide-react';
 import API from '../../utils/api';
 import Swal from 'sweetalert2';
@@ -186,6 +187,51 @@ const AdminProducts = () => {
                                         const previewImg = document.getElementById('swal-p-preview');
                                         if(previewImg) previewImg.src = e.target.value || 'https://via.placeholder.com/150?text=No+Preview';
                                     }} />
+                                </div>
+                            </div>
+                            <div className="swal-input-group b-upload-zone-mini">
+                                <label>Or Upload Product Image</label>
+                                <div className="b-file-selector-wrapper">
+                                    <input 
+                                        type="file" 
+                                        id="swal-product-file" 
+                                        accept="image/*" 
+                                        style={{ display: 'none' }} 
+                                        onChange={async (e) => {
+                                            const file = e.target.files[0];
+                                            if (!file) return;
+
+                                            const formData = new FormData();
+                                            formData.append('image', file);
+                                            
+                                            const previewImg = document.getElementById('swal-p-preview');
+                                            const statusText = document.getElementById('swal-upload-status');
+                                            if(statusText) statusText.innerText = "Processing upload...";
+
+                                            try {
+                                                const res = await API.post('/upload', formData, {
+                                                    headers: { 'Content-Type': 'multipart/form-data' }
+                                                });
+                                                if(res.data.success) {
+                                                    const imgPath = `http://127.0.0.1:8000${res.data.path}`;
+                                                    document.getElementById('swal-image').value = imgPath;
+                                                    if(previewImg) previewImg.src = imgPath;
+                                                    if(statusText) statusText.innerText = "Upload Complete!";
+                                                }
+                                            } catch (err) {
+                                                console.error("Upload failed", err);
+                                                if(statusText) statusText.innerText = "Upload Failed: " + (err.response?.data?.message || err.message);
+                                            }
+                                        }}
+                                    />
+                                    <button 
+                                        type="button" 
+                                        className="b-btn-upload-trigger"
+                                        onClick={() => document.getElementById('swal-product-file').click()}
+                                    >
+                                        <Upload size={16} /> Choose File
+                                    </button>
+                                    <span id="swal-upload-status" className="b-upload-status">No file chosen</span>
                                 </div>
                             </div>
                             <div className="b-iris-viewport mt-10" style={{ height: '160px', borderRadius: '20px', overflow: 'hidden', border: '2px dashed #e2e8f0' }}>
@@ -638,6 +684,13 @@ const AdminProducts = () => {
                 .p-badge.arrival { background: #eff6ff; color: #3b82f6; border: 1px solid #dbeafe; }
                 .p-badge.seller { background: #fee2e2; color: #ef4444; border: 1px solid #fecaca; }
                 .mt-20 { margin-top: 20px; }
+
+                /* Advance Upload Styles */
+                .b-upload-zone-mini { margin-top: 15px; background: #fdfdfd; padding: 12px; border: 1px dashed #e2e8f0; border-radius: 10px; }
+                .b-file-selector-wrapper { display: flex; align-items: center; gap: 12px; margin-top: 8px; }
+                .b-btn-upload-trigger { display: flex; align-items: center; gap: 8px; background: #eff6ff; color: #1e40af; border: 1px solid #bfdbfe; padding: 6px 14px; border-radius: 6px; font-weight: 800; font-size: 0.75rem; cursor: pointer; transition: all 0.2s; }
+                .b-btn-upload-trigger:hover { background: #dbeafe; }
+                .b-upload-status { font-size: 0.7rem; color: #94a3b8; font-weight: 600; }
             `}</style>
         </div>
     );
