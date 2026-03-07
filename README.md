@@ -43,3 +43,7 @@ Frontend practice project for learning React UI development.
 
 ## ⭐ Author
 Prince Vidyarthi
+
+##All DB Data show 
+mongodump --db PanditFashion --out backup
+
