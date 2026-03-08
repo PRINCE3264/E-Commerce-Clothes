@@ -355,25 +355,17 @@ const ProductDetails = ({ onAddToCart, onToggleWishlist, wishlist }) => {
                                             <div className="label-row">
                                                 <label>Select Style: <span style={{fontWeight: '700', color: '#10b981'}}>{['Color'].includes(selectedVariant?.type) || isHex(getColorCode(selectedVariant?.value)) ? getColorName(selectedVariant?.value) : ''}</span></label>
                                             </div>
-                                            <div className="size-grid">
+                                            <div className="color-dots">
                                                 {variants.filter(v => v.type === 'Color' || isHex(getColorCode(v.value)) || v.value.includes(':') || ['black','white','red','blue','green','yellow','grey','gray','orange','purple','pink','brown'].includes(v.value.toLowerCase().trim())).map(v => (
                                                     <button
                                                         key={v._id}
-                                                        className={`size-btn variant-btn-flex ${selectedVariant?._id === v._id ? 'active' : ''} ${checkVariantSoldOut(v) ? 'sold-out' : ''}`}
+                                                        className={`color-dot-btn ${selectedVariant?._id === v._id ? 'active' : ''} ${checkVariantSoldOut(v) ? 'sold-out' : ''}`}
+                                                        style={{ background: getColorCode(v.value) }}
+                                                        title={`${getColorName(v.value)}${checkVariantSoldOut(v) ? ' - Sold Out' : ''}`}
                                                         onClick={() => {
                                                             handleVariantSelect(v);
                                                         }}
                                                     >
-                                                        <span className="var-color-dot" style={{ background: getColorCode(v.value) }}></span>
-                                                        <div className="var-btn-content">
-                                                            {checkVariantSoldOut(v) && <span className="sold-out-badge mini">SOLD OUT</span>}
-                                                        </div>
-                                                        {v.priceMod > 0 && (
-                                                            <div className="var-price-tag">
-                                                                <span className="price-plus">+</span>
-                                                                <span className="price-val">₹{v.priceMod}</span>
-                                                            </div>
-                                                        )}
                                                     </button>
                                                 ))}
                                             </div>
@@ -441,7 +433,7 @@ const ProductDetails = ({ onAddToCart, onToggleWishlist, wishlist }) => {
                                     <div className="label-row">
                                         <label>Select Color: <span style={{color: '#3b82f6'}}>{getColorName(selectedColor)}</span></label>
                                     </div>
-                                    <div className="size-grid">
+                                    <div className="color-dots">
                                         {product.color.map(c => {
                                             const cName = getColorName(c);
                                             const cCode = getColorCode(c);
@@ -450,17 +442,14 @@ const ProductDetails = ({ onAddToCart, onToggleWishlist, wishlist }) => {
                                             return (
                                                 <button 
                                                     key={c}
-                                                    className={`size-btn variant-btn-flex ${selectedColor === c ? 'active' : ''} ${isColorSoldOut ? 'sold-out' : ''}`}
+                                                    className={`color-dot-btn ${selectedColor === c ? 'active' : ''} ${isColorSoldOut ? 'sold-out' : ''}`}
+                                                    style={{ background: cCode }}
                                                     onClick={() => { 
                                                         setSelectedColor(c); 
                                                         setSelectionError('');
                                                     }}
                                                     title={isColorSoldOut ? `${cName} - Out of Stock` : cName}
                                                 >
-                                                    <span className="var-color-dot" style={{ background: cCode }}></span>
-                                                    <div className="var-btn-content">
-                                                        {isColorSoldOut && <span className="sold-out-badge mini">SOLD OUT</span>}
-                                                    </div>
                                                 </button>
                                             );
                                         })}

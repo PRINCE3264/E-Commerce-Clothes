@@ -1418,23 +1418,16 @@
     }
 
     .luxury-search-box {
-        gap: 8px;
-        padding: 8px 15px;
-        flex-wrap: wrap;
+        padding: 0;
     }
 
     .luxury-search-box input {
-        width: 100%;
-        order: 2;
-        margin-top: 5px;
+        padding: 0 20px;
+        font-size: 0.95rem;
     }
 
-    .search-icon-anim {
-        order: 1;
-    }
-
-    .clear-search {
-        order: 1;
+    .luxury-search-btn {
+        padding: 0 1.2rem;
     }
 
     .search-hints {

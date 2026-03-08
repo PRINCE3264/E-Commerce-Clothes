@@ -207,8 +207,8 @@ const AdminDashboard = () => {
                             <Menu size={24} />
                         </button>
                         {/* Header details and search */}
-                        <h3 className="desktop-only">Dashboard {getPageTitle()}</h3>
-                        <div className="admin-search-box">
+                        <h3 className="admin-page-title">Dashboard {getPageTitle()}</h3>
+                        <div className="admin-search-box desktop-only">
                             <Search size={18} className="search-icon" />
                             <input type="text" placeholder="Search anything..." />
                         </div>

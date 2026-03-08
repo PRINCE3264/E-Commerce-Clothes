@@ -442,7 +442,7 @@ const AdminProducts = () => {
     };
 
     const handleView = (product) => {
-        MySwal.fire({
+        Swal.fire({
             title: product.name || product.title,
             width: '800px',
             padding: '2rem',
@@ -452,54 +452,54 @@ const AdminProducts = () => {
                 confirmButton: 'b-swal-confirm-btn-blue'
             },
             confirmButtonText: 'Understood',
-            html: (
-                <div className="view-product-details">
-                    <div className="view-grid">
-                        <div className="view-img">
-                            <img src={product.image} alt={product.name} />
+            html: `
+                <div class="view-product-details">
+                    <div class="view-grid">
+                        <div class="view-img">
+                            <img src="${product.image || 'https://via.placeholder.com/150'}" alt="${product.name}" />
                         </div>
-                        <div className="view-info">
-                            <div className="v-label">CATEGORY</div>
-                            <div className="v-val">{product.category}</div>
+                        <div class="view-info">
+                            <div class="v-label">CATEGORY</div>
+                            <div class="v-val">${product.category}</div>
                             
-                            <div className="v-label">VALUATION</div>
-                            <div className="v-val">₹{product.price.toLocaleString()}</div>
+                            <div class="v-label">VALUATION</div>
+                            <div class="v-val">₹${product.price ? parseFloat(product.price).toLocaleString() : '0'}</div>
                             
-                             <div className="v-label">AVAILABILITY</div>
-                            <div className="v-val">{product.stock || 50} Units in Core</div>
+                             <div class="v-label">AVAILABILITY</div>
+                            <div class="v-val">${product.stock || 50} Units in Core</div>
 
-                            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '15px', marginBottom: '15px' }}>
+                            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 15px;">
                                 <div>
-                                    <div className="v-label" style={{color: '#ef4444'}}>OUT OF STOCK SIZES</div>
-                                    <div className="v-val" style={{fontSize: '0.9rem'}}>{product.outOfStockSizes?.length > 0 ? product.outOfStockSizes.join(', ') : 'None'}</div>
+                                    <div class="v-label" style="color: #ef4444;">OUT OF STOCK SIZES</div>
+                                    <div class="v-val" style="font-size: 0.9rem;">${product.outOfStockSizes?.length > 0 ? product.outOfStockSizes.join(', ') : 'None'}</div>
                                 </div>
                                 <div>
-                                    <div className="v-label" style={{color: '#ef4444'}}>OUT OF STOCK COLORS</div>
-                                    <div className="v-val" style={{fontSize: '0.9rem'}}>{product.outOfStockColors?.length > 0 ? product.outOfStockColors.join(', ') : 'None'}</div>
+                                    <div class="v-label" style="color: #ef4444;">OUT OF STOCK COLORS</div>
+                                    <div class="v-val" style="font-size: 0.9rem;">${product.outOfStockColors?.length > 0 ? product.outOfStockColors.join(', ') : 'None'}</div>
                                 </div>
                             </div>
 
-                            <div className="v-label">AVAILABILITY MATRIX</div>
-                            <div style={{ display: 'flex', flexWrap: 'wrap', gap: '10px', marginBottom: '15px' }}>
-                                {product.color?.map(c => (
-                                    <div key={c} style={{ display: 'flex', alignItems: 'center', gap: '6px', background: '#f8fafc', padding: '4px 10px', borderRadius: '50px', border: '1px solid #e2e8f0' }}>
-                                        <span style={{ width: '12px', height: '12px', borderRadius: '50%', background: getColorCode(c), border: '1px solid #ddd' }}></span>
-                                        <span style={{ fontSize: '0.75rem', fontWeight: '700', color: '#475569' }}>{getColorName(c)}</span>
+                            <div class="v-label">AVAILABILITY MATRIX</div>
+                            <div style="display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 15px;">
+                                ${product.color?.map(c => `
+                                    <div style="display: flex; align-items: center; gap: 6px; background: #f8fafc; padding: 4px 10px; border-radius: 50px; border: 1px solid #e2e8f0;">
+                                        <span style="width: 12px; height: 12px; border-radius: 50%; background: ${getColorCode(c)}; border: 1px solid #ddd;"></span>
+                                        <span style="font-size: 0.75rem; font-weight: 700; color: #475569;">${getColorName(c)}</span>
                                     </div>
-                                ))}
+                                `).join('') || '<span class="v-val" style="font-size: 0.9rem;">None</span>'}
                             </div>
                             
-                            <div className="v-label">ABSTRACT</div>
-                            <div className="v-val desc">{product.description || 'No detailed blueprint available.'}</div>
+                            <div class="v-label">ABSTRACT</div>
+                            <div class="v-val desc" style="font-size: 0.85rem;">${product.description || 'No detailed blueprint available.'}</div>
                             
-                            <div className="v-badges" style={{ display: 'flex', gap: '10px', marginTop: '10px' }}>
-                                {product.isNewArrival && <span className="p-badge arrival">NEW ARRIVAL</span>}
-                                {product.isBestSeller && <span className="p-badge arrival" style={{background: '#fee2e2', color: '#ef4444', borderColor: '#fecaca'}}>BEST SELLER</span>}
+                            <div class="v-badges" style="display: flex; gap: 10px; margin-top: 10px;">
+                                ${product.isNewArrival ? '<span class="p-badge arrival">NEW ARRIVAL</span>' : ''}
+                                ${product.isBestSeller ? '<span class="p-badge arrival" style="background: #fee2e2; color: #ef4444; border-color: #fecaca;">BEST SELLER</span>' : ''}
                             </div>
                         </div>
                     </div>
                 </div>
-            )
+            `
         });
     };
 
@@ -527,7 +527,7 @@ const AdminProducts = () => {
 
                 {/* Filters Row */}
                 <div className="admin-filters-bar mt-20">
-                    <div className="search-wrapper">
+                    <div className="admin-product-search-wrapper">
                         <Search size={18} className="search-icon" />
                         <input 
                             type="text" 
@@ -646,7 +646,8 @@ const AdminProducts = () => {
 
             <style>{`
                 /* Advanced Blue Product Swal Pop CSS */
-                .v-extreme-swal-blue { border-radius: 20px !important; overflow: hidden !important; animation: b-slide-up 0.4s cubic-bezier(0.16, 1, 0.3, 1); }
+                .v-extreme-swal-blue { border-radius: 20px !important; overflow: hidden !important; }
+                .swal2-show.v-extreme-swal-blue { animation: b-slide-up 0.4s cubic-bezier(0.16, 1, 0.3, 1) !important; }
                 @keyframes b-slide-up { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
 
                 .b-advanced-layout-blue { text-align: left; padding: 25px; }
@@ -677,14 +678,14 @@ const AdminProducts = () => {
                 .count-badge { background: #eff6ff; color: #3b82f6; padding: 4px 12px; border-radius: 50px; font-size: 0.75rem; font-weight: 800; margin-left: 10px; border: 1px solid #dbeafe; }
 
                 .admin-filters-bar { display: flex; gap: 15px; background: white; padding: 15px; border-radius: 20px; border: 1px solid #f1f5f9; box-shadow: 0 4px 15px rgba(0,0,0,0.02); }
-                .search-wrapper { position: relative; flex: 1; }
+                .admin-product-search-wrapper { position: relative; flex: 1; }
                 .search-icon { position: absolute; left: 15px; top: 50%; transform: translateY(-50%); color: #94a3b8; }
-                .search-wrapper input { width: 100%; padding: 12px 15px 12px 45px; border: 1px solid #f1f5f9; border-radius: 14px; background: #f8fafc; font-weight: 600; outline: none; transition: 0.3s; }
-                .search-wrapper input:focus { background: white; border-color: #3b82f6; box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.05); }
+                .admin-product-search-wrapper input { box-sizing: border-box; width: 100%; padding: 12px 15px 12px 45px; border: 1px solid #f1f5f9; border-radius: 14px; background: #f8fafc; font-weight: 600; outline: none; transition: 0.3s; }
+                .admin-product-search-wrapper input:focus { background: white; border-color: #3b82f6; box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.05); }
 
                 .select-wrapper { position: relative; min-width: 220px; }
                 .filter-icon { position: absolute; left: 15px; top: 50%; transform: translateY(-50%); color: #3b82f6; z-index: 10; }
-                .select-wrapper select { width: 100%; padding: 12px 15px 12px 45px; border: 1px solid #f1f5f9; border-radius: 14px; background: #f8fafc; font-weight: 700; color: #475569; appearance: none; cursor: pointer; }
+                .select-wrapper select { box-sizing: border-box; width: 100%; padding: 12px 15px 12px 45px; border: 1px solid #f1f5f9; border-radius: 14px; background: #f8fafc; font-weight: 700; color: #475569; appearance: none; cursor: pointer; }
 
                 /* High Fidelity Table */
                 .product-cell { display: flex; align-items: center; gap: 15px; }
@@ -762,6 +763,17 @@ const AdminProducts = () => {
                 .b-btn-upload-trigger { display: flex; align-items: center; gap: 8px; background: #eff6ff; color: #1e40af; border: 1px solid #bfdbfe; padding: 6px 14px; border-radius: 6px; font-weight: 800; font-size: 0.75rem; cursor: pointer; transition: all 0.2s; }
                 .b-btn-upload-trigger:hover { background: #dbeafe; }
                 .b-upload-status { font-size: 0.7rem; color: #94a3b8; font-weight: 600; }
+
+                /* Responsive Admin Popups */
+                @media (max-width: 768px) {
+                    .b-form-grid-2 { grid-template-columns: 1fr !important; gap: 15px !important; }
+                    .v-stat-row { grid-template-columns: 1fr !important; gap: 10px !important; }
+                    .b-swal-sec { border-right: none !important; padding: 0 !important; }
+                    .b-advanced-layout-blue { padding: 10px !important; }
+                    .view-grid { grid-template-columns: 1fr !important; gap: 15px !important; }
+                    .view-img { height: 200px !important; }
+                    .admin-filters-bar { flex-direction: column; }
+                }
             `}</style>
         </div>
     );

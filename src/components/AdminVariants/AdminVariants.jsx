@@ -574,7 +574,8 @@ const AdminVariants = () => {
                 .v-empty-msg p { margin-top: 15px; font-weight: 600; }
 
                 /* Advance Blue Swal Pop CSS */
-                .v-extreme-swal-blue { border-radius: 20px !important; overflow: hidden !important; animation: v-slide-up 0.4s cubic-bezier(0.16, 1, 0.3, 1); }
+                .v-extreme-swal-blue { border-radius: 20px !important; overflow: hidden !important; }
+                .swal2-show.v-extreme-swal-blue { animation: v-slide-up 0.4s cubic-bezier(0.16, 1, 0.3, 1) !important; }
                 @keyframes v-slide-up { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
 
                 .v-advanced-layout-blue { text-align: left; }

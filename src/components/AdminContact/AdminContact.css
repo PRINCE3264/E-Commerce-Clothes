@@ -321,9 +321,16 @@
 .no-padding-swal { padding: 25px !important; border-radius: 18px !important; }
 
 @media (max-width: 768px) {
-    .ac-header-premium { flex-direction: column; align-items: flex-start; gap: 20px; }
+    .ac-header-premium { flex-direction: column; align-items: flex-start; gap: 20px; padding: 20px; }
     .ach-right, .ac-search-box { width: 100%; }
     .ac-grid-layout { grid-template-columns: 1fr; }
     .scv-meta-grid { grid-template-columns: 1fr; gap: 15px; }
     .scv-status-badge { position: relative; margin-top: 15px; width: fit-content; }
+}
+
+@media (max-width: 576px) {
+    .ach-left { flex-direction: column; align-items: flex-start; gap: 15px; }
+    .ach-left h2 { font-size: 1.5rem; }
+    .contact-card-premium .cc-top { flex-direction: column; gap: 15px; align-items: flex-start; }
+    .luxury-admin-swal { width: 95% !important; }
 }
