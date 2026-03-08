@@ -185,7 +185,7 @@ const ProductDetails = ({ onAddToCart, onToggleWishlist, wishlist }) => {
                 if (updatedProd.data.success) setProduct(updatedProd.data.data);
                 
                 // Alert success
-                alert('Thank you for your review!');
+                alert(res.data.message || 'Thank you for your review! It will be visible after approval.');
             }
         } catch (err) {
             setReviewError(err.response?.data?.message || 'Error submitting review');
@@ -573,9 +573,9 @@ const ProductDetails = ({ onAddToCart, onToggleWishlist, wishlist }) => {
 
                         {/* List Column */}
                         <div className="rev-list-col">
-                            {product.reviews && product.reviews.length > 0 ? (
+                            {product.reviews && product.reviews.filter(r => r.isApproved).length > 0 ? (
                                 <div className="rev-scroll-area">
-                                    {product.reviews.map((rev, idx) => (
+                                    {product.reviews.filter(r => r.isApproved).map((rev, idx) => (
                                         <div key={rev._id || idx} className="rev-card-elite">
                                             <div className="rev-card-header">
                                                 <div className="rev-user-profile">

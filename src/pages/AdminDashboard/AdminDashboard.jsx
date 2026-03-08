@@ -39,6 +39,10 @@ import AdminProfile from '../../components/AdminProfile/AdminProfile';
 import AdminReviews from '../../components/AdminReviews/AdminReviews';
 import './AdminDashboard.css';
 
+
+
+
+
 const DEFAULT_ADMIN_AVATAR = 'https://ui-avatars.com/api/?background=1e3a5f&color=fff&size=100&bold=true&name=';
 
 const AdminDashboard = () => {
@@ -194,7 +198,7 @@ const AdminDashboard = () => {
                 <div className="admin-sidebar-footer">
                     <button className="admin-logout-btn" onClick={handleLogout}>
                         <LogOut size={18} />
-                        <span>Terminte Session</span>
+                        <span>Logout</span>
                     </button>
                 </div>
             </aside>

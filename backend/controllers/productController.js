@@ -24,7 +24,19 @@ const getProductById = async (req, res) => {
     try {
         const product = await Product.findById(req.params.id);
         if (!product) return res.status(404).json({ success: false, message: 'Product not found' });
-        res.status(200).json({ success: true, data: product });
+        
+        // Filter reviews to only show approved ones for public
+        const isApproveOnly = req.query.view !== 'admin';
+        
+        const reviewList = isApproveOnly 
+            ? product.reviews.filter(r => r.isApproved) 
+            : product.reviews;
+
+        // Create a copy to avoid mongoose internal issues when modifying array for response
+        const productData = product.toObject();
+        productData.reviews = reviewList;
+
+        res.status(200).json({ success: true, data: productData });
     } catch (err) {
         res.status(500).json({ success: false, message: "Invalid Product ID or Error" });
     }
@@ -113,11 +125,10 @@ const createProductReview = async (req, res) => {
         };
 
         product.reviews.push(review);
-        product.numReviews = product.reviews.length;
-        product.rating = product.reviews.reduce((acc, item) => item.rating + acc, 0) / product.reviews.length;
-
+        // Do not update numReviews and rating until approved
+        
         await product.save();
-        res.status(201).json({ success: true, message: 'Review added' });
+        res.status(201).json({ success: true, message: 'Review added and is pending approval' });
     } catch (err) {
         res.status(500).json({ success: false, message: err.message });
     }
@@ -143,16 +154,50 @@ const deleteProductReview = async (req, res) => {
         }
 
         product.reviews.splice(reviewIndex, 1);
-        product.numReviews = product.reviews.length;
+        
+        const approvedReviews = product.reviews.filter(r => r.isApproved);
+        product.numReviews = approvedReviews.length;
         
         if (product.numReviews > 0) {
-            product.rating = product.reviews.reduce((acc, item) => item.rating + acc, 0) / product.reviews.length;
+            product.rating = approvedReviews.reduce((acc, item) => item.rating + acc, 0) / product.numReviews;
         } else {
             product.rating = 0;
         }
 
         await product.save();
         res.status(200).json({ success: true, message: 'Review deleted' });
+    } catch (err) {
+        res.status(500).json({ success: false, message: err.message });
+    }
+};
+
+// @desc    Approve product review
+// @route   PUT /api/products/:id/reviews/:reviewId/approve
+// @access  Private/Admin
+const approveProductReview = async (req, res) => {
+    try {
+        const product = await Product.findById(req.params.id);
+
+        if (!product) {
+            return res.status(404).json({ success: false, message: 'Product not found' });
+        }
+
+        const review = product.reviews.find(
+            (r) => r._id.toString() === req.params.reviewId
+        );
+
+        if (!review) {
+            return res.status(404).json({ success: false, message: 'Review not found' });
+        }
+
+        review.isApproved = true;
+
+        const approvedReviews = product.reviews.filter(r => r.isApproved);
+        product.numReviews = approvedReviews.length;
+        product.rating = approvedReviews.reduce((acc, item) => item.rating + acc, 0) / product.numReviews;
+
+        await product.save();
+        res.status(200).json({ success: true, message: 'Review approved' });
     } catch (err) {
         res.status(500).json({ success: false, message: err.message });
     }
@@ -166,5 +211,6 @@ module.exports = {
     updateProduct,
     deleteProduct,
     createProductReview,
-    deleteProductReview
+    deleteProductReview,
+    approveProductReview
 };

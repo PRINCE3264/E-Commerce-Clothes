@@ -295,8 +295,8 @@ const AdminCategories = () => {
                                                     <button className="btn-action edit" onClick={() => handleOpenForm(cat)} title="Edit Node">
                                                         <Edit size={16} />
                                                     </button>
-                                                    <button className="btn-action delete" onClick={() => handleDelete(cat)}>
-                                                        <Trash2 size={16} /> Delete
+                                                    <button className="btn-action delete" onClick={() => handleDelete(cat)} title="Delete Category">
+                                                        <Trash2 size={16} />
                                                     </button>
                                                 </div>
                                             </td>

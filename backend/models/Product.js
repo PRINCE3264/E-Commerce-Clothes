@@ -50,6 +50,7 @@ const productSchema = new mongoose.Schema({
             avatar: { type: String, default: '' },
             rating: { type: Number, required: true },
             comment: { type: String, required: true },
+            isApproved: { type: Boolean, default: false },
             createdAt: { type: Date, default: Date.now }
         }
     ],

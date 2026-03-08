@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Star, Search, Trash2, MessageSquare, Filter, Package, User, Calendar, ExternalLink } from 'lucide-react';
+import { Star, Search, Trash2, MessageSquare, Filter, Package, User, Calendar, ExternalLink, Check, AlertCircle } from 'lucide-react';
 import API from '../../utils/api';
 import './AdminReviews.css';
 
@@ -37,7 +37,7 @@ const AdminReviews = () => {
             if (res.data.success) {
                 // Refresh data
                 if (selectedProduct && selectedProduct._id === productId) {
-                    const updatedProd = await API.get(`/products/${productId}`);
+                    const updatedProd = await API.get(`/products/${productId}?view=admin`);
                     if (updatedProd.data.success) {
                         setSelectedProduct(updatedProd.data.data);
                     }
@@ -49,10 +49,28 @@ const AdminReviews = () => {
         }
     };
 
+    const handleApproveReview = async (productId, reviewId) => {
+        try {
+            const res = await API.put(`/products/${productId}/reviews/${reviewId}/approve`);
+            if (res.data.success) {
+                // Refresh data
+                if (selectedProduct && selectedProduct._id === productId) {
+                    const updatedProd = await API.get(`/products/${productId}?view=admin`);
+                    if (updatedProd.data.success) {
+                        setSelectedProduct(updatedProd.data.data);
+                    }
+                }
+                fetchProducts();
+            }
+        } catch (err) {
+            alert(err.response?.data?.message || "Error approving review");
+        }
+    };
+
     const filteredProducts = products.filter(p => 
         p.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
         p.category.toLowerCase().includes(searchTerm.toLowerCase())
-    ).filter(p => p.numReviews > 0);
+    ).filter(p => p.reviews && p.reviews.length > 0);
 
     const openProductReviews = (product) => {
         setSelectedProduct(product);
@@ -112,8 +130,14 @@ const AdminReviews = () => {
                                             </div>
                                             <div className="stat-item">
                                                 <MessageSquare size={14} />
-                                                <span>{product.numReviews} Reviews</span>
+                                                <span>{product.reviews.length} Total</span>
                                             </div>
+                                            {product.numReviews < product.reviews.length && (
+                                                <div className="stat-item pending">
+                                                    <AlertCircle size={14} color="#ef4444" />
+                                                    <span style={{color: '#ef4444'}}>{product.reviews.length - product.numReviews} Pending</span>
+                                                </div>
+                                            )}
                                         </div>
                                     </div>
                                     <div className="view-arrow">
@@ -154,6 +178,7 @@ const AdminReviews = () => {
                                     <th>Rating</th>
                                     <th>Comment</th>
                                     <th>Date</th>
+                                    <th>Status</th>
                                     <th>Action</th>
                                 </tr>
                             </thead>
@@ -182,9 +207,21 @@ const AdminReviews = () => {
                                         </td>
                                         <td>{new Date(rev.createdAt).toLocaleDateString()}</td>
                                         <td>
-                                            <button className="del-btn" onClick={() => handleDeleteReview(selectedProduct._id, rev._id)}>
-                                                <Trash2 size={18} />
-                                            </button>
+                                            <span className={`status-badge ${rev.isApproved ? 'approved' : 'pending'}`}>
+                                                {rev.isApproved ? 'Approved' : 'Pending'}
+                                            </span>
+                                        </td>
+                                        <td>
+                                            <div className="action-btns">
+                                                {!rev.isApproved && (
+                                                    <button className="approve-btn" title="Approve Review" onClick={() => handleApproveReview(selectedProduct._id, rev._id)}>
+                                                        <Check size={18} />
+                                                    </button>
+                                                )}
+                                                <button className="del-btn" title="Delete Review" onClick={() => handleDeleteReview(selectedProduct._id, rev._id)}>
+                                                    <Trash2 size={18} />
+                                                </button>
+                                            </div>
                                         </td>
                                     </tr>
                                 ))}
