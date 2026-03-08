@@ -7,6 +7,7 @@ export default defineConfig({
   server: {
     host: '0.0.0.0',
     port: 5173,
-    strictPort: true
+    strictPort: true,
+    allowedHosts: ['e-commerce-clothes-xlzx.onrender.com']
   }
 })
