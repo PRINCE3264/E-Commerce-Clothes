@@ -14,6 +14,9 @@ A modern React-based clothing e-commerce website UI where users can browse produ
 ## 🛠 Tech Stack
 
 - React.js
+- Node.js
+- Mongodb
+- express js 
 - CSS / Tailwind / Bootstrap
 - JavaScript
 
