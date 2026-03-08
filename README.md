@@ -3,6 +3,7 @@
 A modern React-based clothing e-commerce website UI where users can browse products, view categories, and manage cart visually.
 
 ## ✨ Features
+
 - Men, Women, Kids sections
 - Product cards with price & images
 - Add to cart UI
@@ -11,6 +12,7 @@ A modern React-based clothing e-commerce website UI where users can browse produ
 - Clean modern layout
 
 ## 🛠 Tech Stack
+
 - React.js
 - CSS / Tailwind / Bootstrap
 - JavaScript
@@ -21,6 +23,7 @@ npm install
 npm run dev
 
 ## 📸 Screenshots
+
 (Add UI screenshots here)
 <img width="1919" height="982" alt="Screenshot 2026-03-02 131153" src="https://github.com/user-attachments/assets/20ff5688-2588-4208-b801-79d6a0bf741c" />
 <img width="1919" height="1017" alt="Screenshot 2026-03-02 131212" src="https://github.com/user-attachments/assets/8535bda9-e2fb-4a0d-8244-abf59971be7f" />
@@ -36,14 +39,34 @@ npm run dev
 <img width="1919" height="992" alt="Screenshot 2026-03-02 131459" src="https://github.com/user-attachments/assets/9f375475-f4f1-41de-9b3e-0f014d1db4a8" />
 <img width="1919" height="998" alt="Screenshot 2026-03-02 131513" src="https://github.com/user-attachments/assets/948e668e-8ed0-4dce-9f87-9d52ff07c75d" />
 
+## 🚀 Deployment (Render)
 
+This project is configured for deployment on **Render**. Follow these settings for both services:
 
-## 📄 Purpose
+### 🌐 1. Backend (Node.js)
+
+- **Root Directory:** `backend`
+- **Build Command:** `npm install`
+- **Start Command:** `npm start`
+- **Environment Variables:**
+  - `MONGO_URI`: (Your MongoDB Atlas connection string)
+  - `JWT_SECRET`: (Your secret key)
+  - `FRONTEND_URL`: `https://e-commerce-clothes-xlzx.onrender.com`
+
+### 🎨 2. Frontend (Static Site / Web Service)
+
+- **Root Directory:** `./`
+- **Build Command:** `npm install && npm run build`
+- **Start Command:** `npm start`
+- **Environment Variables:**
+  - `VITE_API_URL`: `https://your-backend.onrender.com/api`
+
+---
+
+## 🎨 Purpose
+
 Frontend practice project for learning React UI development.
 
 ## ⭐ Author
+
 Prince Vidyarthi
-
-##All DB Data show 
-mongodump --db PanditFashion --out backup
-
