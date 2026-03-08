@@ -244,7 +244,9 @@ const AdminProducts = () => {
                                                     headers: { 'Content-Type': 'multipart/form-data' }
                                                 });
                                                 if(res.data.success) {
-                                                    const imgPath = `http://127.0.0.1:8000${res.data.path}`;
+                                                    const apiBase = import.meta.env.VITE_API_URL || 'http://127.0.0.1:8000/api';
+                                                    const serverBase = apiBase.split('/api')[0];
+                                                    const imgPath = `${serverBase}${res.data.path}`;
                                                     document.getElementById('swal-image').value = imgPath;
                                                     if(previewImg) previewImg.src = imgPath;
                                                     if(statusText) statusText.innerText = "Upload Complete!";
