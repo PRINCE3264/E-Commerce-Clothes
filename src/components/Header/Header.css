@@ -19,12 +19,38 @@
     #5dade2 100%
   );
   color: white;
-  font-size: 0.85rem;
+  font-size: 0.8rem;
   font-weight: 700;
-  padding: 8px 0;
-  text-align: center;
-  letter-spacing: 0.8px;
+  padding: 10px 0;
+  overflow: hidden;
+  white-space: nowrap;
+  letter-spacing: 1.2px;
   text-transform: uppercase;
+  border-bottom: 1px solid rgba(255,255,255,0.1);
+}
+
+.ticker-wrapper {
+  display: flex;
+  width: max-content;
+  animation: tickerMove 30s linear infinite;
+}
+
+.ticker-item {
+  padding-right: 50px;
+  display: inline-block;
+}
+
+@keyframes tickerMove {
+  0% {
+    transform: translateX(0);
+  }
+  100% {
+    transform: translateX(-50%);
+  }
+}
+
+.promotion-bar:hover .ticker-wrapper {
+  animation-play-state: paused;
 }
 
 .header-top {

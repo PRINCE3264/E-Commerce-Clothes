@@ -75,8 +75,10 @@ const Payment = ({ setCart }) => {
                 if (res.data.success) {
                     setOrder(res.data.data);
                     if (setCart) {
-                        setCart([]);
-                        localStorage.removeItem('khushi_cart');
+                        setTimeout(() => {
+                            setCart([]);
+                            localStorage.removeItem('khushi_cart');
+                        }, 0);
                     }
                 } else {
                     setError("Could not retrieve order details.");

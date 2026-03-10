@@ -3,7 +3,7 @@
  * Sends professional order confirmation messages to customers and admin.
  */
 
-const sendOrderWhatsApp = async (order, customerName) => {
+const sendOrderWhatsApp = async (order, customerName, mediaUrl = null) => {
     try {
         // Guard: skip if Twilio credentials are not configured
         if (!process.env.TWILIO_SID || !process.env.TWILIO_AUTH_TOKEN || !process.env.TWILIO_WHATSAPP_NUMBER) {
@@ -48,6 +48,7 @@ Hi *${customerName}*! Your order has been placed successfully. ✅
 
 ━━━━━━━━━━━━━━━━━━
 🔖 *Order ID:* #${orderId}
+📅 *Date:* ${new Date(order.createdAt).toLocaleDateString()}
 💳 *Payment:* ${paymentMethod}
 💰 *Total Paid:* ₹${totalAmount}
 ━━━━━━━━━━━━━━━━━━
@@ -56,7 +57,7 @@ Hi *${customerName}*! Your order has been placed successfully. ✅
 ${itemLines}${moreItems}
 
 📍 *Delivery To:*
-${city} - ${postalCode}
+${order.shippingAddress?.address}, ${city}, ${order.shippingAddress?.country} - ${postalCode}
 
 ━━━━━━━━━━━━━━━━━━
 We'll notify you once your order is shipped! 🚚
@@ -79,20 +80,21 @@ Thank you for shopping with *Pandit Fashion* 🙏`;
 📦 *Items:*
 ${itemLines}${moreItems}
 
-📍 *Ship To:* ${city} - ${postalCode}
+📍 *Ship To:* ${order.shippingAddress?.address}, ${city}, ${order.shippingAddress?.country} - ${postalCode}
 ━━━━━━━━━━━━━━━━━━
 ⚡ Action required: Process & dispatch.`;
 
         // Send to Customer (WhatsApp)
-        await client.messages.create({
+        const customerPayload = {
             body: customerMsg,
             from: process.env.TWILIO_WHATSAPP_NUMBER,
             to: `whatsapp:${phone}`
-        });
+        };
+        if (mediaUrl) customerPayload.mediaUrl = [mediaUrl];
+        
+        await client.messages.create(customerPayload);
 
         // Send to Customer (Regular SMS fallback/additional)
-        // We use the same SID/Token but removing 'whatsapp:' prefix
-        // Note: This requires a standard SMS-enabled Twilio number or alphanumeric sender ID
         try {
             await client.messages.create({
                 body: `Order Confirmed! Your Order #${orderId} for ₹${totalAmount} has been placed. Thank you for shopping with Pandit Fashion!`,
@@ -105,11 +107,14 @@ ${itemLines}${moreItems}
 
         // Send to Admin (if configured)
         if (process.env.ADMIN_WHATSAPP_NUMBER) {
-            await client.messages.create({
+            const adminPayload = {
                 body: adminMsg,
                 from: process.env.TWILIO_WHATSAPP_NUMBER,
                 to: process.env.ADMIN_WHATSAPP_NUMBER
-            });
+            };
+            if (mediaUrl) adminPayload.mediaUrl = [mediaUrl];
+            
+            await client.messages.create(adminPayload);
         }
 
         console.log(`[Twilio] ✅ Notifications sent for order #${orderId}`);
@@ -119,4 +124,75 @@ ${itemLines}${moreItems}
     }
 };
 
-module.exports = { sendOrderWhatsApp };
+const sendOrderUpdateWhatsApp = async (order, customerName, status, updateInfo = null) => {
+    try {
+        if (!process.env.TWILIO_SID || !process.env.TWILIO_AUTH_TOKEN || !process.env.TWILIO_WHATSAPP_NUMBER) return;
+
+        const twilio = require('twilio');
+        const client = twilio(process.env.TWILIO_SID, process.env.TWILIO_AUTH_TOKEN);
+
+        let phone = (order.shippingAddress?.phone || '').toString().replace(/\D/g, '');
+        if (phone.length === 10) phone = `+91${phone}`;
+        else if (!phone.startsWith('+')) phone = `+${phone}`;
+
+        const orderId = order._id.toString().slice(-8).toUpperCase();
+        const totalAmount = order.totalPrice?.toLocaleString('en-IN') || '0';
+        
+        let statusEmoji = '📦';
+        if (status === 'Shipped') statusEmoji = '🚚';
+        if (status === 'Out for Delivery') statusEmoji = '🛵';
+        if (status === 'Delivered') statusEmoji = '✅';
+        if (status === 'Cancelled') statusEmoji = '❌';
+
+        // CUSTOMER UPDATE MESSAGE
+        const customerMsg = 
+`${statusEmoji} *Order Update — Pandit Fashion*
+
+Hi *${customerName}*, your order *#${orderId}* status has been updated to: *${status}*.
+
+━━━━━━━━━━━━━━━━━━
+📍 *Current Status:* ${status}
+🏢 *Location:* ${updateInfo?.location || 'Processing Center'}
+✉️ *Note:* ${updateInfo?.message || 'We are making progress on your order!'}
+━━━━━━━━━━━━━━━━━━
+
+Order Total: ₹${totalAmount}
+Thank you for your patience! 🙏`;
+
+        // ADMIN UPDATE MESSAGE
+        const adminMsg = 
+`🔔 *Order Status Modified*
+
+🔖 *Order:* #${orderId}
+👤 *User:* ${customerName}
+🔄 *New Status:* ${status}
+━━━━━━━━━━━━━━━━━━
+Message: ${updateInfo?.message || 'N/A'}
+Financials: ₹${totalAmount}`;
+
+        // Send to Customer
+        await client.messages.create({
+            body: customerMsg,
+            from: process.env.TWILIO_WHATSAPP_NUMBER,
+            to: `whatsapp:${phone}`
+        });
+
+        // Send to Admin
+        if (process.env.ADMIN_WHATSAPP_NUMBER) {
+            await client.messages.create({
+                body: adminMsg,
+                from: process.env.TWILIO_WHATSAPP_NUMBER,
+                to: process.env.ADMIN_WHATSAPP_NUMBER
+            });
+        }
+
+        console.log(`[Twilio] ✅ Update notification sent for #${orderId} - ${status}`);
+    } catch (err) {
+        console.error('[Twilio] ❌ Update notification failed:', err.message);
+    }
+};
+
+module.exports = { 
+    sendOrderWhatsApp,
+    sendOrderUpdateWhatsApp 
+};

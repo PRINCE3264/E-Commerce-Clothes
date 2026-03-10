@@ -76,6 +76,14 @@ const AdminOrders = () => {
                             <div class="sov-items-list">
                                 ${productsHtml}
                             </div>
+                            ${order.status === 'Cancelled' ? `
+                                <div class="sov-cancellation-notice" style="margin-top:20px; padding:15px; background:#fff1f2; border:1px solid #fee2e2; border-radius:12px;">
+                                    <div style="font-size:0.7rem; font-weight:800; color:#e11d48; text-transform:uppercase; margin-bottom:5px;">Cancellation Context</div>
+                                    <p style="margin:0; font-size:0.85rem; color:#be123b; font-weight:600;">
+                                        ${order.trackingLog?.filter(l => l.status === 'Cancelled').pop()?.message || 'Order was cancelled.'}
+                                    </p>
+                                </div>
+                            ` : ''}
                             <div class="sov-price-summary">
                                 <div class="sov-price-row"><span>Subtotal</span><span>₹${order.itemsPrice.toLocaleString()}</span></div>
                                 <div class="sov-price-row"><span>Shipping</span><span>₹${order.shippingPrice}</span></div>
@@ -95,6 +103,7 @@ const AdminOrders = () => {
                                 <div class="sov-info-title">PAYMENT</div>
                                 <div class="sov-info-line">Method: <b>${order.paymentMethod}</b></div>
                                 <div class="sov-info-line">Status: <span class="${order.isPaid ? 'sov-val-paid' : 'sov-val-due'}">${order.isPaid ? 'Paid' : 'Unpaid'}</span></div>
+                                ${order.isRefunded ? `<div class="sov-info-line">Refund: <span class="sov-val-paid">YES (Processed)</span></div>` : ''}
                                 ${order.isPaid ? `<div class="sov-txn">TXN: ${order.razorpayPaymentId || order.stripePaymentIntentId || order.paymentResult?.id || 'N/A'}</div>` : ''}
                             </div>
                         </div>
@@ -139,6 +148,12 @@ const AdminOrders = () => {
                         <label>Geographic Node Override (Optional)</label>
                         <input id="swal-transit-loc" type="text" class="su-input" placeholder="e.g. Distribution Center, Mumbai" />
                     </div>
+                    ${(order.status === 'Cancelled' && order.isPaid && !order.isRefunded) ? `
+                        <div class="su-input-group" style="flex-direction: row; align-items: center; gap: 10px; background: #fff1f2; padding: 12px; border-radius: 10px; border: 1px dashed #fecaca;">
+                            <input type="checkbox" id="swal-is-refunded" style="width: 18px; height: 18px; cursor: pointer;" />
+                            <label style="margin: 0; color: #e11d48; cursor: pointer;" for="swal-is-refunded">Mark Payment as Refunded</label>
+                        </div>
+                    ` : ''}
                 </div>
             `,
             showCancelButton: true,
@@ -152,11 +167,16 @@ const AdminOrders = () => {
                 cancelButton: 'b-swal-cancel-btn-blue'
             },
             preConfirm: () => {
-                return {
+                const payload = {
                     status: document.getElementById('swal-transit-status').value,
                     message: document.getElementById('swal-transit-msg').value,
                     location: document.getElementById('swal-transit-loc').value
                 };
+                const refundCheck = document.getElementById('swal-is-refunded');
+                if (refundCheck) {
+                    payload.isRefunded = refundCheck.checked;
+                }
+                return payload;
             }
         }).then(async (result) => {
             if (result.isConfirmed) {
@@ -259,10 +279,17 @@ const AdminOrders = () => {
                                         </div>
                                     </td>
                                     <td>
-                                        <span className={`status-badge ao-status ${order.status.replace(/\s+/g, '-').toLowerCase()}`}>
-                                            <div className="s-indicator"></div>
-                                            {order.status}
-                                        </span>
+                                        <div style={{ display: 'flex', flexDirection: 'column', gap: '5px' }}>
+                                            <span className={`status-badge ao-status ${order.status.replace(/\s+/g, '-').toLowerCase()}`}>
+                                                <div className="s-indicator"></div>
+                                                {order.status}
+                                            </span>
+                                            {order.isRefunded && (
+                                                <span className="method-badge paid" style={{ fontSize: '0.65rem', padding: '2px 8px' }}>
+                                                    REFUNDED
+                                                </span>
+                                            )}
+                                        </div>
                                     </td>
                                     <td>
                                         <div className="ao-action-set">

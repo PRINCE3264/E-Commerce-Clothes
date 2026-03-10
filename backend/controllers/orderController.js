@@ -5,6 +5,7 @@ const crypto = require('crypto');
 const Cart = require('../models/Cart');
 const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
 const { sendOrderWhatsApp } = require('../utils/twilioService');
+const { sendAllOrderNotifications, sendUpdateNotifications } = require('../utils/orderNotifications');
 const sendEmail = require('../utils/sendEmail');
 
 // Initialize Razorpay
@@ -106,70 +107,23 @@ exports.createOrder = async (req, res) => {
         }
 
         // Clear cart if it's COD (order finalized immediately)
-        if (paymentMethod === 'COD') {
+        if (paymentMethod === 'COD' || paymentMethod === 'UPI') {
             try {
                 await Payment.create({
                     user: req.user._id,
                     order: createdOrder._id,
-                    gateway: 'COD',
-                    transactionId: `COD_TXN_${Date.now()}`,
+                    gateway: paymentMethod,
+                    transactionId: `${paymentMethod}_TXN_${Date.now()}`,
                     amount: createdOrder.totalPrice,
-                    status: 'Completed',
-                    paidAt: null
+                    status: paymentMethod === 'COD' ? 'Completed' : 'Pending',
+                    paidAt: paymentMethod === 'COD' ? Date.now() : null
                 });
                 await Cart.findOneAndUpdate({ user: req.user._id }, { items: [] });
 
-                // Send WhatsApp Notification for COD
-                await sendOrderWhatsApp(
-                    createdOrder,
-                    req.user ? req.user.name : 'Customer'
-                );
+                await Cart.findOneAndUpdate({ user: req.user._id }, { items: [] });
 
-                // Send Email Notification for COD
-                const orderSummary = createdOrder.orderItems.map(item => `${item.name} (x${item.quantity}) - ₹${item.price * item.quantity}`).join('<br>');
-                const emailHtml = `
-                    <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; color: #333; border: 1px solid #e2e8f0; border-top: 6px solid #1e3a5f; padding: 20px; border-radius: 8px;">
-                        <h2 style="color: #1e3a5f; margin-top: 0;">Order Confirmed! 🛍️</h2>
-                        <p>Hi <strong>${req.user.name}</strong>,</p>
-                        <p>Thank you for shopping with Pandit Fashion. Your order has been placed successfully.</p>
-                        <hr style="border: 0; border-top: 1px solid #eee;">
-                        <p><strong>Order ID:</strong> #${createdOrder._id.toString().slice(-8).toUpperCase()}</p>
-                        <p><strong>Payment Method:</strong> ${createdOrder.paymentMethod}</p>
-                        <p><strong>Order Total:</strong> ₹${createdOrder.totalPrice.toLocaleString()}</p>
-                        <hr style="border: 0; border-top: 1px solid #eee;">
-                        <h3>Items Ordered:</h3>
-                        <div style="background: #f8fafc; padding: 15px; border-radius: 6px;">
-                            ${orderSummary}
-                        </div>
-                        <p style="margin-top: 20px;">We'll notify you once your order is shipped!</p>
-                        <p style="color: #64748b; font-size: 0.9rem;">&copy; ${new Date().getFullYear()} Pandit Fashion. All rights reserved.</p>
-                    </div>
-                `;
-
-                await sendEmail({
-                    email: req.user.email,
-                    subject: `Order Confirmed - #${createdOrder._id.toString().slice(-8).toUpperCase()}`,
-                    message: `Order Confirmed! Your Order ID is #${createdOrder._id.toString().slice(-8).toUpperCase()}`,
-                    html: emailHtml
-                });
-
-                // ALSO SEND TO ADMIN
-                await sendEmail({
-                    email: process.env.SMTP_EMAIL,
-                    subject: `🚨 New Order Received! #${createdOrder._id.toString().slice(-8).toUpperCase()}`,
-                    message: `New Order Received! Customer: ${req.user.name}`,
-                    html: `
-                    <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; color: #333; border: 1px solid #e2e8f0; border-top: 6px solid #ef4444; padding: 20px; border-radius: 8px;">
-                        <h2 style="color: #ef4444; margin-top: 0;">New Order Alert! 🔔</h2>
-                        <p>A new order has been placed by <strong>${req.user.name}</strong>.</p>
-                        <hr style="border: 0; border-top: 1px solid #eee;">
-                        <p><strong>Order ID:</strong> #${createdOrder._id.toString().slice(-8).toUpperCase()}</p>
-                        <p><strong>Payment:</strong> ${createdOrder.paymentMethod}</p>
-                        <p><strong>Total Amount:</strong> ₹${createdOrder.totalPrice.toLocaleString()}</p>
-                        <hr style="border: 0; border-top: 1px solid #eee;">
-                        <p>Please check the admin dashboard for fulfillment.</p>
-                    </div>`
-                });
+                // Trigger Centralized Notifications (Email + WhatsApp for both sides)
+                await sendAllOrderNotifications(createdOrder, req.user);
 
             } catch (err) {
                 console.error("COD Post-Processing Error:", err);
@@ -278,10 +232,10 @@ exports.getAllOrders = async (req, res) => {
 // @access  Private/Admin
 exports.updateOrderStatus = async (req, res) => {
     try {
-        const { status, message, location } = req.body;
+        const { status, message, location, isRefunded } = req.body;
         const validStatuses = ['Processing', 'Shipped', 'Out for Delivery', 'Delivered', 'Cancelled'];
 
-        if (!validStatuses.includes(status)) {
+        if (status && !validStatuses.includes(status)) {
             return res.status(400).json({ success: false, message: 'Invalid status' });
         }
 
@@ -291,31 +245,102 @@ exports.updateOrderStatus = async (req, res) => {
             return res.status(404).json({ success: false, message: 'Order not found' });
         }
 
-        order.status = status;
+        if (status) {
+            order.status = status;
+            if (status === 'Delivered') {
+                order.isDelivered = true;
+                order.deliveredAt = Date.now();
+            }
+        }
         
-        if (status === 'Delivered') {
-            order.isDelivered = true;
-            order.deliveredAt = Date.now();
+        if (isRefunded !== undefined && isRefunded !== order.isRefunded) {
+            order.isRefunded = isRefunded;
+            if (isRefunded) {
+                order.refundedAt = Date.now();
+            }
         }
 
-        // Add to tracking log
-        order.trackingLog.push({
-            status,
-            message: message || `Order marked as ${status}`,
-            location: location || 'Warehouse',
-            timestamp: Date.now()
-        });
+        // Add to tracking log if there's a status change or message
+        if (status || message || isRefunded) {
+            order.trackingLog.push({
+                status: status || order.status,
+                message: message || (isRefunded ? 'Payment successfully refunded.' : `Order marked as ${status || order.status}`),
+                location: location || 'Warehouse',
+                timestamp: Date.now()
+            });
+        }
 
         const updatedOrder = await order.save();
+        
+        // Trigger Notifications for Status/Refund Update
+        await sendUpdateNotifications(updatedOrder, updatedOrder.user, status || updatedOrder.status, { message, location });
 
         res.status(200).json({
             success: true,
             data: updatedOrder,
-            message: `Order status updated to ${status}`
+            message: 'Order updated successfully'
         });
 
     } catch (err) {
         console.error("ADMIN_STATUS_UPDATE_ERROR:", err);
+        res.status(500).json({ success: false, message: err.message });
+    }
+};
+// @desc    Cancel order
+// @route   PUT /api/orders/:id/cancel
+// @access  Private
+exports.cancelOrder = async (req, res) => {
+    try {
+        const order = await Order.findById(req.params.id);
+
+        if (!order) {
+            return res.status(404).json({ success: false, message: 'Order not found' });
+        }
+
+        // Check ownership
+        if (order.user.toString() !== req.user._id.toString() && req.user.role !== 'admin') {
+            return res.status(401).json({ success: false, message: 'Not authorized' });
+        }
+
+        // Check if cancellable (Consistent with frontend: Processing and Shipped are cancellable)
+        if (['Out for Delivery', 'Delivered', 'Cancelled'].includes(order.status)) {
+            return res.status(400).json({ 
+                success: false, 
+                message: `Order cannot be cancelled. Current status: ${order.status}` 
+            });
+        }
+
+        order.status = 'Cancelled';
+        
+        // Add to tracking log
+        order.trackingLog.push({
+            status: 'Cancelled',
+            message: order.isPaid 
+                ? 'Order cancelled by user. Refund will be processed into the original payment method within 24 hours.' 
+                : 'Order cancelled by user.',
+            location: 'System',
+            timestamp: Date.now()
+        });
+
+        const cancelledOrder = await order.save();
+        
+        // Trigger Notifications for Cancellation
+        await sendUpdateNotifications(cancelledOrder, req.user, 'Cancelled', { 
+            message: cancelledOrder.isPaid 
+                ? 'Order cancelled. Refund will be processed within 24 hours.' 
+                : 'Order cancelled by user.' 
+        });
+
+        res.status(200).json({
+            success: true,
+            data: cancelledOrder,
+            message: cancelledOrder.isPaid 
+                ? 'Order cancelled. Your payment will be refunded within 24 hours.' 
+                : 'Order cancelled successfully.'
+        });
+
+    } catch (err) {
+        console.error("ORDER_CANCEL_ERROR:", err);
         res.status(500).json({ success: false, message: err.message });
     }
 };

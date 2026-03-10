@@ -13,6 +13,7 @@ import {
     ShoppingBag
 } from 'lucide-react';
 import API from '../../utils/api';
+import Swal from 'sweetalert2';
 import './MyOrders.css';
 
 const MyOrders = () => {
@@ -21,21 +22,65 @@ const MyOrders = () => {
     const [loading, setLoading] = useState(true);
     const [searchTerm, setSearchTerm] = useState('');
 
-    useEffect(() => {
-        const fetchOrders = async () => {
-            try {
-                const res = await API.get('/orders/myorders');
-                if (res.data.success) {
-                    setOrders(res.data.data);
-                }
-            } catch (err) {
-                console.error("Error fetching orders:", err);
-            } finally {
-                setLoading(false);
+    const fetchOrders = async () => {
+        try {
+            const res = await API.get('/orders/myorders');
+            if (res.data.success) {
+                setOrders(res.data.data);
             }
-        };
+        } catch (err) {
+            console.error("Error fetching orders:", err);
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    useEffect(() => {
         fetchOrders();
     }, []);
+
+    const handleCancel = async (orderId, isPaid) => {
+        const text = isPaid 
+            ? "This order is prepaid. Your refund will be processed within 24 hours of cancellation." 
+            : "Are you sure you want to cancel this order?";
+
+        const result = await Swal.fire({
+            title: 'Cancel Order?',
+            text: text,
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#ef4444',
+            cancelButtonColor: '#64748b',
+            confirmButtonText: 'Yes, cancel it!',
+            cancelButtonText: 'No, keep it',
+            background: '#ffffff',
+            borderRadius: '15px'
+        });
+
+        if (result.isConfirmed) {
+            try {
+                const res = await API.put(`/orders/${orderId}/cancel`);
+                if (res.data.success) {
+                    Swal.fire({
+                        title: 'Cancelled!',
+                        text: res.data.message,
+                        icon: 'success',
+                        timer: 2000,
+                        showConfirmButton: false,
+                        borderRadius: '15px'
+                    });
+                    fetchOrders();
+                }
+            } catch (err) {
+                Swal.fire({
+                    title: 'Error!',
+                    text: err.response?.data?.message || 'Failed to cancel order',
+                    icon: 'error',
+                    borderRadius: '15px'
+                });
+            }
+        }
+    };
 
     const getStatusIcon = (status) => {
         switch (status) {
@@ -148,6 +193,15 @@ const MyOrders = () => {
                                     >
                                         Track Package <ChevronRight size={18} />
                                     </button>
+                                    
+                                    {(order.status === 'Processing' || order.status === 'Shipped') && (
+                                        <button 
+                                            className="cancel-order-btn-sm"
+                                            onClick={() => handleCancel(order._id, order.isPaid)}
+                                        >
+                                            Cancel Order
+                                        </button>
+                                    )}
                                 </div>
                             </div>
                         ))}

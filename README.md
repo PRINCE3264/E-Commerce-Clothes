@@ -4,11 +4,12 @@ A modern React-based clothing e-commerce website UI where users can browse produ
 
 ## ✨ Features
 
-- Men, Women, Kids sections
-- Product cards with price & images
-- Add to cart UI
-- Category filtering
-- Responsive design
+- 🔐 Advanced JWT Auth (Roles: Admin/User)
+- 🛒 High-Performance Cart & Wishlist (Sync with DB)
+- 💬 Real-time Live Chat Support (Socket.io)
+- 💳 Multi-Gateway Payment (Stripe & Razorpay)
+- 📦 Sophisticated Order Tracking System
+- 📱 Ultra-Responsive UX/UI with Framer Motion
 - Clean modern layout
 
 ## 🛠 Tech Stack
@@ -16,7 +17,7 @@ A modern React-based clothing e-commerce website UI where users can browse produ
 - React.js
 - Node.js
 - Mongodb
-- express js 
+- express js
 - CSS / Tailwind / Bootstrap
 - JavaScript
 

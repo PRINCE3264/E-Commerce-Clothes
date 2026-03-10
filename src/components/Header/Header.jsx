@@ -48,10 +48,15 @@ const Header = ({ toggleSidebar, cartCount, wishlistCount, userData, handleLogou
 
     return (
         <header className="main-header">
-            {/* Promotion Bar */}
+            {/* Promotion Bar with Ticker Effect */}
             <div className="promotion-bar">
-                <div className="container">
-                    Premium Boutique Collection | Global Shipping Available 🌐
+                <div className="ticker-wrapper">
+                    <div className="ticker-item">
+                        PREMIUM BOUTIQUE COLLECTION | GLOBAL SHIPPING AVAILABLE 📦 FREE DELIVERY ON ALL ORDERS ABOVE ₹999 🚚 24/7 CUSTOMER SUPPORT AVAILABLE ☎️ NEW ARRIVALS JUST LANDED! SHOP THE LOOK 💎
+                    </div>
+                    <div className="ticker-item">
+                        PREMIUM BOUTIQUE COLLECTION | GLOBAL SHIPPING AVAILABLE 📦 FREE DELIVERY ON ALL ORDERS ABOVE ₹999 🚚 24/7 CUSTOMER SUPPORT AVAILABLE ☎️ NEW ARRIVALS JUST LANDED! SHOP THE LOOK 💎
+                    </div>
                 </div>
             </div>
 

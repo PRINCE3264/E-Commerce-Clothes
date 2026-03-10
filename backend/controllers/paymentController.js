@@ -5,7 +5,9 @@ const Razorpay = require('razorpay');
 const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
 const crypto = require('crypto');
 const { sendOrderWhatsApp } = require('../utils/twilioService');
+const { sendAllOrderNotifications } = require('../utils/orderNotifications');
 const sendEmail = require('../utils/sendEmail');
+const OrderStatuses = ['Pending', 'Completed', 'Failed', 'Refunded'];
 
 const razorpay = new Razorpay({
     key_id: process.env.RAZORPAY_KEY_ID,
@@ -77,59 +79,10 @@ exports.verifyRazorpay = async (req, res) => {
                 // Clear Cart
                 await Cart.findOneAndUpdate({ user: req.user._id }, { items: [] });
                 
-                // Send WhatsApp Notification
-                await sendOrderWhatsApp(
-                    order,
-                    order.user ? order.user.name : 'Customer'
-                );
-
-                // Send Email Notification
-                if (order.user && order.user.email) {
-                    const orderSummary = order.orderItems.map(item => `${item.name} (x${item.quantity}) - ₹${item.price * item.quantity}`).join('<br>');
-                    const emailHtml = `
-                    <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; color: #333; border: 1px solid #e2e8f0; border-top: 6px solid #1e3a5f; padding: 20px; border-radius: 8px;">
-                        <h2 style="color: #1e3a5f; margin-top: 0;">Order Confirmed! 🛍️</h2>
-                        <p>Hi <strong>${order.user.name}</strong>,</p>
-                        <p>Thank you for shopping with Pandit Fashion. Your payment was successful and your order has been finalized.</p>
-                        <hr style="border: 0; border-top: 1px solid #eee;">
-                        <p><strong>Order ID:</strong> #${order._id.toString().slice(-8).toUpperCase()}</p>
-                        <p><strong>Payment Status:</strong> PAID (Razorpay)</p>
-                        <p><strong>Transaction ID:</strong> ${razorpay_payment_id}</p>
-                        <p><strong>Order Total:</strong> ₹${order.totalPrice.toLocaleString()}</p>
-                        <hr style="border: 0; border-top: 1px solid #eee;">
-                        <h3>Items Ordered:</h3>
-                        <div style="background: #f8fafc; padding: 15px; border-radius: 6px;">
-                            ${orderSummary}
-                        </div>
-                        <p style="margin-top: 20px;">We'll notify you once your order is shipped!</p>
-                        <p style="color: #64748b; font-size: 0.9rem;">&copy; ${new Date().getFullYear()} Pandit Fashion. All rights reserved.</p>
-                    </div>`;
-
-                    await sendEmail({
-                        email: order.user.email,
-                        subject: `Order Confirmation & Receipt - #${order._id.toString().slice(-8).toUpperCase()}`,
-                        message: `Order Confirmed! Your Order ID is #${order._id.toString().slice(-8).toUpperCase()}`,
-                        html: emailHtml
-                    });
-
-                    // ALSO SEND TO ADMIN
-                    await sendEmail({
-                        email: process.env.SMTP_EMAIL,
-                        subject: `🚨 New Order Received! #${order._id.toString().slice(-8).toUpperCase()}`,
-                        message: `New Order Received via RAZORPAY! Customer: ${order.user.name}`,
-                        html: `
-                        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; color: #333; border: 1px solid #e2e8f0; border-top: 6px solid #ef4444; padding: 20px; border-radius: 8px;">
-                            <h2 style="color: #ef4444; margin-top: 0;">Online Order Alert! 💰</h2>
-                            <p>A new order has been paid via <strong>Razorpay</strong> by <strong>${order.user.name}</strong>.</p>
-                            <hr style="border: 0; border-top: 1px solid #eee;">
-                            <p><strong>Order ID:</strong> #${order._id.toString().slice(-8).toUpperCase()}</p>
-                            <p><strong>Payment Status:</strong> PAID (Verified)</p>
-                            <p><strong>Total Amount:</strong> ₹${order.totalPrice.toLocaleString()}</p>
-                            <hr style="border: 0; border-top: 1px solid #eee;">
-                            <p>Please check the admin dashboard for fulfillment.</p>
-                        </div>`
-                    });
-                }
+                await Cart.findOneAndUpdate({ user: req.user._id }, { items: [] });
+                
+                // Trigger Centralized Notifications (Email + WhatsApp for both sides)
+                await sendAllOrderNotifications(order, order.user);
 
                 return res.status(200).json({ success: true, message: "Razorpay verified and recorded" });
             }
@@ -190,59 +143,11 @@ exports.verifyStripe = async (req, res) => {
             await Cart.findOneAndUpdate({ user: req.user._id }, { items: [] });
             console.log(`[STRIPE_VERIFY] Cart cleared for user ${req.user._id}`);
 
-            // Send WhatsApp Notification
-            await sendOrderWhatsApp(
-                order,
-                order.user ? order.user.name : 'Customer'
-            );
+            await Cart.findOneAndUpdate({ user: req.user._id }, { items: [] });
+            console.log(`[STRIPE_VERIFY] Cart cleared for user ${req.user._id}`);
 
-            // Send Email Notification
-            if (order.user && order.user.email) {
-                const orderSummary = order.orderItems.map(item => `${item.name} (x${item.quantity}) - ₹${item.price * item.quantity}`).join('<br>');
-                const emailHtml = `
-                <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; color: #333; border: 1px solid #e2e8f0; border-top: 6px solid #1e3a5f; padding: 20px; border-radius: 8px;">
-                    <h2 style="color: #1e3a5f; margin-top: 0;">Order Confirmed! 🛍️</h2>
-                    <p>Hi <strong>${order.user.name}</strong>,</p>
-                    <p>Thank you for shopping with Pandit Fashion. Your payment was successful and your order has been finalized.</p>
-                    <hr style="border: 0; border-top: 1px solid #eee;">
-                    <p><strong>Order ID:</strong> #${order._id.toString().slice(-8).toUpperCase()}</p>
-                    <p><strong>Payment Status:</strong> PAID (Stripe)</p>
-                    <p><strong>Session ID:</strong> ${sessionId}</p>
-                    <p><strong>Order Total:</strong> ₹${order.totalPrice.toLocaleString()}</p>
-                    <hr style="border: 0; border-top: 1px solid #eee;">
-                    <h3>Items Ordered:</h3>
-                    <div style="background: #f8fafc; padding: 15px; border-radius: 6px;">
-                        ${orderSummary}
-                    </div>
-                    <p style="margin-top: 20px;">We'll notify you once your order is shipped!</p>
-                    <p style="color: #64748b; font-size: 0.9rem;">&copy; ${new Date().getFullYear()} Pandit Fashion. All rights reserved.</p>
-                </div>`;
-
-                await sendEmail({
-                    email: order.user.email,
-                    subject: `Order Confirmation & Receipt - #${order._id.toString().slice(-8).toUpperCase()}`,
-                    message: `Order Confirmed! Your Order ID is #${order._id.toString().slice(-8).toUpperCase()}`,
-                    html: emailHtml
-                });
-
-                // ALSO SEND TO ADMIN
-                await sendEmail({
-                    email: process.env.SMTP_EMAIL,
-                    subject: `🚨 New Order Received! #${order._id.toString().slice(-8).toUpperCase()}`,
-                    message: `New Order Received via STRIPE! Customer: ${order.user.name}`,
-                    html: `
-                    <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; color: #333; border: 1px solid #e2e8f0; border-top: 6px solid #ef4444; padding: 20px; border-radius: 8px;">
-                        <h2 style="color: #ef4444; margin-top: 0;">Online Order Alert! 💰</h2>
-                        <p>A new order has been paid via <strong>Stripe (Global)</strong> by <strong>${order.user.name}</strong>.</p>
-                        <hr style="border: 0; border-top: 1px solid #eee;">
-                        <p><strong>Order ID:</strong> #${order._id.toString().slice(-8).toUpperCase()}</p>
-                        <p><strong>Payment Status:</strong> PAID (Verified)</p>
-                        <p><strong>Total Amount:</strong> ₹${order.totalPrice.toLocaleString()}</p>
-                        <hr style="border: 0; border-top: 1px solid #eee;">
-                        <p>Please check the admin dashboard for fulfillment.</p>
-                    </div>`
-                });
-            }
+            // Trigger Centralized Notifications (Email + WhatsApp for both sides)
+            await sendAllOrderNotifications(order, order.user);
 
             return res.status(200).json({ success: true, message: "Stripe verified and recorded" });
         }
@@ -251,6 +156,94 @@ exports.verifyStripe = async (req, res) => {
         res.status(400).json({ success: false, message: "Payment not completed" });
     } catch (err) {
         console.error("[STRIPE_VERIFY] FATAL ERROR:", err);
+        res.status(500).json({ success: false, message: err.message });
+    }
+};
+
+// @desc    Initiate Refund (Admin Only)
+// @route   POST /api/payments/:id/refund
+exports.refundPayment = async (req, res) => {
+    try {
+        const payment = await Payment.findById(req.params.id).populate('order');
+        if (!payment) {
+            return res.status(404).json({ success: false, message: "Payment record not found" });
+        }
+
+        if (payment.status === 'Refunded') {
+            return res.status(400).json({ success: false, message: "Payment already refunded" });
+        }
+
+        let refundResponse = null;
+
+        if (payment.gateway === 'RAZORPAY') {
+            // Razorpay Refund
+            refundResponse = await razorpay.payments.refund(payment.transactionId, {
+                amount: Math.round(payment.amount * 100), // Full refund
+                notes: { reason: req.body.reason || 'Admin Initiated Refund' }
+            });
+        } else if (payment.gateway === 'STRIPE') {
+            // Stripe Refund
+            refundResponse = await stripe.refunds.create({
+                payment_intent: payment.transactionId,
+                amount: Math.round(payment.amount * 100)
+            });
+        } else if (payment.gateway === 'COD') {
+            // Manual Refund for COD
+            refundResponse = { status: 'Manual Refund Completed', date: new Date() };
+        }
+
+        // Update Payment Record
+        payment.status = 'Refunded';
+        payment.paymentDetails = { ...payment.paymentDetails, refundInfo: refundResponse };
+        await payment.save();
+
+        // Update Order
+        if (payment.order) {
+            const order = await Order.findById(payment.order._id);
+            if (order) {
+                order.status = 'Cancelled';
+                order.trackingLog.push({
+                    status: 'Cancelled',
+                    message: `Refund Processed: ${req.body.reason || 'Admin action'}`,
+                    location: 'System',
+                    timestamp: Date.now()
+                });
+                await order.save();
+            }
+        }
+
+        res.status(200).json({ 
+            success: true, 
+            message: "Refund processed successfully", 
+            data: refundResponse 
+        });
+    } catch (err) {
+        console.error("REFUND_ERROR:", err);
+        res.status(500).json({ success: false, message: err.message });
+    }
+};
+
+// @desc    Simulate UPI Intent for direct UPI payments
+// @route   POST /api/payments/upi-intent
+exports.initiateUPIPay = async (req, res) => {
+    try {
+        const { amount, orderId } = req.body;
+        
+        // This simulates a UPI deep link or QR generation
+        // In reality, Razorpay handles this, but we can provide a direct UPI ID flow
+        const upiId = process.env.BUSINESS_UPI_ID || "paytmqr28100505010115l99p6o7z01@paytm";
+        const businessName = "Pandit Fashion";
+        
+        // standard UPI deep link format: upi://pay?pa=ID&pn=NAME&am=AMOUNT&cu=INR
+        const upiLink = `upi://pay?pa=${upiId}&pn=${encodeURIComponent(businessName)}&am=${amount}&cu=INR&tn=${encodeURIComponent('Order ' + orderId)}`;
+
+        res.status(200).json({
+            success: true,
+            upiId: upiId,
+            upiLink: upiLink,
+            message: "Direct UPI payment intent generated"
+        });
+    } catch (err) {
         res.status(500).json({ success: false, message: err.message });
     }
 };

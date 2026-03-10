@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 import {
     X, User, Heart, ShoppingBag, CreditCard,
     CheckSquare, Truck, Star, Power, ChevronRight,
-    Crown, Home, Info, LayoutList, BookOpen, Phone, LogIn
+    Crown, Home, Info, LayoutList, BookOpen, Phone, LogIn, MessageSquare
 } from 'lucide-react';
 import './Sidebar.css';
 
@@ -130,6 +130,20 @@ const Sidebar = ({ isOpen, toggleSidebar, userData, handleLogout }) => {
                                     </Link>
                                 </li>
                             ))}
+                        </ul>
+                    </div>
+
+                    {/* Support */}
+                    <div className="sidebar-section">
+                        <h4 className="section-label">SUPPORT & HELP</h4>
+                        <ul className="sidebar-links">
+                            <li>
+                                <Link to="/support" className="sidebar-link" onClick={toggleSidebar}>
+                                    <div className="link-icon-bg"><MessageSquare size={20} /></div>
+                                    <span className="link-text">Live Support</span>
+                                    <span className="live-status-dot"></span>
+                                </Link>
+                            </li>
                         </ul>
                     </div>
                 </div>

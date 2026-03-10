@@ -26,6 +26,8 @@ import MyPayments from './pages/MyPayments/MyPayments';
 import VerifyOTP from './pages/VerifyOTP/VerifyOTP';
 import Arrivals from './pages/Arrivals/Arrivals';
 import BestProducts from './pages/BestProducts/BestProducts';
+import Support from './pages/Support/Support';
+import LiveChat from './components/Chat/LiveChat';
 import { X, CheckCircle, ShoppingBag, AlertCircle } from 'lucide-react';
 import API from './utils/api';
 import './pages/Home/Home_CartModal.css';
@@ -137,6 +139,7 @@ const AppContent = ({
           <Route path="/payment" element={<Payment setCart={setCart} />} />
           <Route path="/arrivals" element={<Arrivals onAddToCart={addToCart} onToggleWishlist={toggleWishlist} wishlist={wishlist} />} />
           <Route path="/best-products" element={<BestProducts onAddToCart={addToCart} onToggleWishlist={toggleWishlist} wishlist={wishlist} />} />
+          <Route path="/support" element={<Support />} />
           <Route path="/admin/*" element={<AdminDashboard />} />
         </Routes>
       </main>
@@ -222,6 +225,8 @@ const AppContent = ({
           </div>
         </div>
       )}
+
+      <LiveChat userData={userData} />
     </div>
   );
 };

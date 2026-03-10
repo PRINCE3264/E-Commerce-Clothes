@@ -208,6 +208,7 @@
     border-top: 1px solid #f1f5f9;
     display: flex;
     justify-content: flex-end;
+    gap: 15px;
 }
 
 .track-pkg-btn {
@@ -227,7 +228,26 @@
 
 .track-pkg-btn:hover {
     background: #1e4575;
-    transform: translateX(5px);
+    transform: translateY(-2px);
+}
+
+.cancel-order-btn-sm {
+    padding: 10px 25px;
+    background: #fef2f2;
+    color: #ef4444;
+    border: 1px solid #fee2e2;
+    border-radius: 12px;
+    font-weight: 800;
+    cursor: pointer;
+    transition: all 0.3s;
+    font-size: 0.9rem;
+}
+
+.cancel-order-btn-sm:hover {
+    background: #ef4444;
+    color: white;
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(239, 68, 68, 0.2);
 }
 
 .empty-orders-card {

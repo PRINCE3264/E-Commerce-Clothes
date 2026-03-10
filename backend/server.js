@@ -26,7 +26,6 @@ const allowedOrigins = [
 
 app.use(cors({
     origin: (origin, callback) => {
-        // Allow requests with no origin (like mobile apps or curl requests)
         if (!origin) return callback(null, true);
         if (allowedOrigins.indexOf(origin) !== -1 || allowedOrigins.includes('*')) {
             callback(null, true);
@@ -36,8 +35,15 @@ app.use(cors({
         }
     },
     credentials: true,
-    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS']
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+    exposedHeaders: ['set-cookie', 'x-rtb-fingerprint-id', 'x-razorpay-signature']
 }));
+
+// Added to resolve Permissions Policy and Accelerator warnings
+app.use((req, res, next) => {
+    res.setHeader('Permissions-Policy', 'accelerometer=(self), payment=(self), camera=(), microphone=()');
+    next();
+});
 
 // Internal Routes
 const authRoutes = require('./routes/authRoutes');
@@ -53,6 +59,8 @@ const variantRoutes = require('./routes/variantRoutes');
 const orderRoutes = require('./routes/orderRoutes');
 const paymentRoutes = require('./routes/paymentRoutes');
 const uploadRoutes = require('./routes/uploadRoutes');
+const chatRoutes = require('./routes/chatRoutes');
+const socketHandler = require('./utils/socketHandler');
 
 // Registry mounting
 app.use('/api/auth', authRoutes);
@@ -68,6 +76,7 @@ app.use('/api/variants', variantRoutes);
 app.use('/api/orders', orderRoutes);
 app.use('/api/payments', paymentRoutes);
 app.use('/api/upload', uploadRoutes);
+app.use('/api/chat', chatRoutes);
 
 // Static assets (Uploads folder)
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
@@ -82,6 +91,9 @@ const PORT = process.env.PORT || 8000;
 const server = app.listen(PORT, '0.0.0.0', () => {
     console.log(`Backend Engine running in ${process.env.NODE_ENV} mode on Port ${PORT}`);
 });
+
+// Initialize Socket.io
+socketHandler(server);
 
 // Global Error Handler
 app.use((err, req, res, next) => {

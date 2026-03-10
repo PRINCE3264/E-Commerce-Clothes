@@ -67,53 +67,52 @@ const AdminCustomers = () => {
         const isEdit = !!user;
         
         const result = await MySwal.fire({
-            title: isEdit ? 'Edit User Identity' : 'Register New User',
-            width: '700px',
-            padding: '2.5rem',
+            title: null,
+            width: '480px',
+            padding: '1.5rem',
             showCancelButton: true,
             confirmButtonText: isEdit ? 'Update Identity' : 'Initialize User',
             confirmButtonColor: '#3b82f6',
             cancelButtonColor: '#f8fafc',
             cancelButtonText: 'Discard',
             customClass: {
-                popup: 'v-extreme-swal-blue',
-                confirmButton: 'b-swal-confirm-btn-blue',
-                cancelButton: 'b-swal-cancel-btn-blue'
+                popup: 'v-standard-modal',
+                confirmButton: 'v-btn-confirm',
+                cancelButton: 'v-btn-cancel'
             },
             html: (
-                <div className="swal-custom-form user-form">
-                    <div className="swal-row">
-                        <div className="swal-input-group">
-                            <label>Full Name</label>
-                            <input id="swal-user-name" className="swal2-input" defaultValue={user?.name || ''} placeholder="John Doe" />
-                        </div>
-                        <div className="swal-input-group">
-                            <label>Email Address</label>
-                            <input id="swal-user-email" className="swal2-input" defaultValue={user?.email || ''} placeholder="john@example.com" />
-                        </div>
+                <div className="v-standard-form">
+                    <h3 className="v-modal-title">{isEdit ? 'Edit User Identity' : 'Register New User'}</h3>
+                    <div className="v-form-group">
+                        <label>Full Name</label>
+                        <input id="swal-user-name" className="swal2-input v-input" defaultValue={user?.name || ''} placeholder="Full Name" />
+                    </div>
+                    <div className="v-form-group">
+                        <label>Email Address</label>
+                        <input id="swal-user-email" className="swal2-input v-input" defaultValue={user?.email || ''} placeholder="Email" />
                     </div>
                     {!isEdit && (
-                        <div className="swal-input-group">
+                        <div className="v-form-group">
                             <label>Password</label>
-                            <input id="swal-user-pass" type="password" className="swal2-input" placeholder="Create secure password" />
+                            <input id="swal-user-pass" type="password" className="swal2-input v-input" placeholder="Create Password" />
                         </div>
                     )}
-                    <div className="swal-row">
-                        <div className="swal-input-group">
-                            <label>Access Role</label>
-                            <select id="swal-user-role" className="swal2-select" defaultValue={user?.role || 'user'}>
-                                <option value="user">Store Participant</option>
-                                <option value="admin">Admin Node</option>
+                    <div className="v-form-row">
+                        <div className="v-form-group">
+                            <label>Role</label>
+                            <select id="swal-user-role" className="swal2-select v-input" defaultValue={user?.role || 'user'}>
+                                <option value="user">Participant</option>
+                                <option value="admin">Admin</option>
                             </select>
                         </div>
-                        <div className="swal-input-group">
-                            <label>Phone Number</label>
-                            <input id="swal-user-phone" className="swal2-input" defaultValue={user?.phone || ''} placeholder="+91 ..." />
+                        <div className="v-form-group">
+                            <label>Phone</label>
+                            <input id="swal-user-phone" className="swal2-input v-input" defaultValue={user?.phone || ''} placeholder="+91..." />
                         </div>
                     </div>
-                    <div className="swal-input-group">
-                        <label>Shipping / Base Address</label>
-                        <textarea id="swal-user-address" className="swal2-textarea" defaultValue={user?.address || ''} placeholder="Street details..."></textarea>
+                    <div className="v-form-group">
+                        <label>Address</label>
+                        <textarea id="swal-user-address" className="swal2-textarea v-input" defaultValue={user?.address || ''} placeholder="Residential address details..."></textarea>
                     </div>
                 </div>
             ),
@@ -175,46 +174,51 @@ const AdminCustomers = () => {
 
     const handleView = (user) => {
         MySwal.fire({
-            title: user.name + ' - Profile Data',
-            width: '600px',
-            padding: '2rem',
+            title: null,
+            width: '480px',
+            padding: '1.5rem',
             background: '#ffffff',
-            customClass: {
-                popup: 'v-extreme-swal-blue',
-                confirmButton: 'b-swal-confirm-btn-blue'
-            },
+            showConfirmButton: true,
             confirmButtonText: 'Registration Safe',
+            customClass: {
+                popup: 'v-standard-modal',
+                confirmButton: 'v-btn-confirm'
+            },
             html: (
-                <div className="view-user-details" style={{ textAlign: 'left' }}>
-                    <div className="user-profile-header" style={{ display: 'flex', gap: '20px', marginBottom: '30px', alignItems: 'center' }}>
-                        <div className="v-ring" style={{ width: '80px', height: '80px', borderRadius: '50%', background: '#f0f9ff', color: '#0369a1', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '2rem', fontWeight: '800' }}>
+                <div className="v-standard-form">
+                    <h3 className="v-modal-title">User Intelligence Card</h3>
+                    <div className="v-profile-view-header">
+                        <div className="v-view-avatar">
                             {user.name.charAt(0).toUpperCase()}
                         </div>
-                        <div>
-                            <h3 style={{ margin: 0, fontSize: '1.5rem' }}>{user.name}</h3>
-                            <span className={`role-pill ${user.role}`}>{user.role.toUpperCase()}</span>
+                        <div className="v-view-meta">
+                            <h4>{user.name}</h4>
+                            <span className={`v-role-badge ${user.role}`}>
+                                {user.role === 'admin' ? 'SYSTEM OPERATOR' : 'STORE MEMBER'}
+                            </span>
                         </div>
                     </div>
-                    <div className="view-grid" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px' }}>
-                        <div>
-                            <div className="v-label">EMAIL ENDPOINT</div>
-                            <div className="v-val">{user.email}</div>
+                    
+                    <div className="v-view-grid">
+                        <div className="v-view-item">
+                            <label>ID NODE</label>
+                            <p>#{user._id.slice(-6).toUpperCase()}</p>
                         </div>
-                        <div>
-                            <div className="v-label">COMMUNICATION</div>
-                            <div className="v-val">{user.phone || 'No Signal'}</div>
+                        <div className="v-view-item">
+                            <label>AUTH ENDPOINT</label>
+                            <p>{user.email}</p>
                         </div>
-                        <div style={{ gridColumn: 'span 2' }}>
-                            <div className="v-label">GEOGRAPHIC BASE (ADDRESS)</div>
-                            <div className="v-val">{user.address || 'No location data registered.'}</div>
+                        <div className="v-view-item">
+                            <label>SIGNAL (PHONE)</label>
+                            <p>{user.phone || 'N/A'}</p>
                         </div>
-                        <div>
-                            <div className="v-label">JOIN EPOCH</div>
-                            <div className="v-val">{new Date(user.createdAt).toLocaleDateString()}</div>
+                        <div className="v-view-item">
+                            <label>JOIN EPOCH</label>
+                            <p>{new Date(user.createdAt).toLocaleDateString()}</p>
                         </div>
-                        <div>
-                            <div className="v-label">SYSTEM UID</div>
-                            <div className="v-val" style={{ fontFamily: 'monospace' }}>{user._id}</div>
+                        <div className="v-view-item full">
+                            <label>GEOGRAPHIC BASE (ADDRESS)</label>
+                            <p>{user.address || 'No location data registered.'}</p>
                         </div>
                     </div>
                 </div>
@@ -393,21 +397,57 @@ const AdminCustomers = () => {
                 .btn-action.delete { background: #fff1f2; color: #e11d48; }
                 .btn-action.delete:hover { background: #ef4444; color: white; transform: translateY(-3px); }
 
-                .v-label { font-size: 0.7rem; font-weight: 800; color: #94a3b8; letter-spacing: 1px; margin-bottom: 5px; text-transform: uppercase; }
-                .v-val { font-size: 1rem; font-weight: 700; color: #1e293b; margin-bottom: 15px; }
-                .role-pill { display: flex; align-items: center; gap: 6px; padding: 5px 10px; border-radius: 6px; font-size: 0.75rem; font-weight: 700; width: fit-content; }
-                .role-pill.admin { background: #fef2f2; color: #dc2626; border: 1px solid #fecaca; }
-                .role-pill.user { background: #f8fafc; color: #475569; border: 1px solid #e2e8f0; }
-                .reg-epoch { display: flex; align-items: center; gap: 6px; font-size: 0.85rem; color: #64748b; font-weight: 500; }
-                .status-pill.completed { background: #dcfce7; color: #15803d; }
-                .status-pill.processing { background: #eff6ff; color: #2563eb; }
-                .admin-loading-state { display: flex; flex-direction: column; align-items: center; padding: 80px 0; color: #475569; gap: 15px; }
-                @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
-                .animate-spin { animation: spin 1s linear infinite; }
-                .swal-custom-form.user-form .swal-row { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 20px; }
-                .swal-custom-form.user-form .swal-input-group { display: flex; flex-direction: column; align-items: flex-start; margin-bottom: 15px; }
-                .swal-custom-form.user-form label { font-size: 0.85rem; font-weight: 700; color: #64748b; margin-bottom: 8px; }
-                .swal-custom-form.user-form .swal2-input, .swal-custom-form.user-form .swal2-select, .swal-custom-form.user-form .swal2-textarea { margin: 0 !important; width: 100% !important; box-sizing: border-box; }
+                /* Standardized Admin Popups (View, Edit, Create) */
+                .v-standard-modal { border-radius: 20px !important; }
+                .v-modal-title { font-size: 1.4rem; font-weight: 800; color: #0f172a; text-align: left; margin: 0 0 20px 0; font-family: 'Outfit', sans-serif; }
+                .v-standard-form { text-align: left; width: 100%; display: flex; flex-direction: column; }
+                .v-form-group { margin-bottom: 12px; display: flex; flex-direction: column; width: 100%; }
+                .v-form-group label { font-size: 0.75rem; font-weight: 800; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 5px; }
+                .v-input { 
+                    margin: 0 !important; 
+                    width: 100% !important; 
+                    box-sizing: border-box; 
+                    height: 44px !important; 
+                    border-radius: 10px !important; 
+                    font-size: 0.95rem !important; 
+                    border: 1px solid #e2e8f0 !important;
+                    background: #f8fafc !important;
+                }
+                textarea.v-input { height: 90px !important; padding: 12px !important; }
+                .v-form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
+                
+                .v-btn-confirm { padding: 12px 30px !important; background: #3b82f6 !important; border-radius: 10px !important; font-weight: 800 !important; font-size: 0.9rem !important; }
+                .v-btn-cancel { padding: 12px 25px !important; background: #f1f5f9 !important; color: #64748b !important; border-radius: 10px !important; font-weight: 700 !important; font-size: 0.9rem !important; border: none !important; }
+
+                /* View Specific */
+                .v-profile-view-header { display: flex; align-items: center; gap: 15px; margin-bottom: 20px; }
+                .v-view-avatar { width: 48px; height: 48px; background: #eff6ff; color: #1e40af; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 1.3rem; font-weight: 800; border: 1px solid #dbeafe; }
+                .v-view-meta h4 { margin: 0; font-size: 1.1rem; font-weight: 800; color: #1e293b; }
+                .v-role-badge { font-size: 0.65rem; font-weight: 800; padding: 2px 8px; border-radius: 4px; letter-spacing: 0.5px; margin-top: 3px; display: inline-block; }
+                .v-role-badge.admin { background: #fee2e2; color: #ef4444; }
+                .v-role-badge.user { background: #f0fdf4; color: #16a34a; }
+                
+                .v-view-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
+                .v-view-item.full { grid-column: span 2; }
+                .v-view-item label { font-size: 0.65rem; font-weight: 800; color: #94a3b8; text-transform: uppercase; margin-bottom: 3px; display: block; }
+                .v-view-item p { margin: 0; font-size: 0.9rem; font-weight: 700; color: #334155; }
+                
+                /* Ultra-Compact View Profile Styles */
+                .v-profile-mini { text-align: left; }
+                .v-mini-header { display: flex; align-items: center; gap: 12px; margin-bottom: 15px; }
+                .v-mini-avatar { width: 44px; height: 44px; background: #eff6ff; color: #1e40af; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 1.2rem; font-weight: 800; border: 1px solid #dbeafe; }
+                .v-mini-meta h4 { margin: 0; font-size: 1rem; font-weight: 800; color: #1e293b; line-height: 1.2; }
+                .v-badge-xs { font-size: 0.6rem; font-weight: 900; padding: 1px 6px; border-radius: 4px; letter-spacing: 0.5px; display: inline-block; margin-top: 2px; }
+                .v-badge-xs.admin { background: #fee2e2; color: #ef4444; }
+                .v-badge-xs.user { background: #f1f5f9; color: #64748b; }
+                
+                .v-mini-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+                .v-mini-item.full { grid-column: span 2; }
+                .v-mini-item label { display: block; font-size: 0.6rem; font-weight: 800; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.4px; margin-bottom: 1px; }
+                .v-mini-item p { margin: 0; font-size: 0.8rem; font-weight: 700; color: #334155; word-break: break-all; }
+                
+                .v-view-swal-ultra-compact { border-radius: 18px !important; }
+                .b-swal-confirm-btn-blue-sm { padding: 8px 30px !important; font-size: 0.85rem !important; font-weight: 800 !important; border-radius: 10px !important; background: #3b82f6 !important; color: white !important; border: none !important; }
             `}</style>
         </div>
     );

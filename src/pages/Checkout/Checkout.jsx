@@ -39,6 +39,8 @@ const Checkout = ({ cartItems, onOrderComplete }) => {
     const [lastOrderId, setLastOrderId] = useState('');
 
     const [paymentMethod, setPaymentMethod] = useState('COD');
+    const [upiData, setUpiData] = useState(null);
+    const [showUpiModal, setShowUpiModal] = useState(false);
 
     useEffect(() => {
         if (!userData) {
@@ -149,6 +151,15 @@ const Checkout = ({ cartItems, onOrderComplete }) => {
                 } else if (paymentMethod === 'STRIPE' && res.data.stripeUrl) {
                     // Redirect to Stripe Checkout Session
                     window.location.href = res.data.stripeUrl;
+                } else if (paymentMethod === 'UPI') {
+                    // Fetch UPI Details
+                    const upiRes = await API.post('/payments/upi-intent', { amount: totalPrice, orderId: res.data.data._id });
+                    if (upiRes.data.success) {
+                        setUpiData(upiRes.data);
+                        setLastOrderId(res.data.data._id);
+                        setShowUpiModal(true);
+                        setLoading(false);
+                    }
                 } else if (res.data.data?._id) {
                     if (onOrderComplete) onOrderComplete();
                     const orderId = res.data.data._id;
@@ -388,6 +399,18 @@ const Checkout = ({ cartItems, onOrderComplete }) => {
                                                     <span>Stripe (Global Card/Pay)</span>
                                                 </div>
                                             </label>
+                                            <label className={`payment-pill ${paymentMethod === 'UPI' ? 'active' : ''}`}>
+                                                <input 
+                                                    type="radio" 
+                                                    name="payment" 
+                                                    checked={paymentMethod === 'UPI'}
+                                                    onChange={() => setPaymentMethod('UPI')}
+                                                />
+                                                <div className="payment-pill-box">
+                                                    <span className="dot"></span>
+                                                    <span>Direct UPI (ID/QR)</span>
+                                                </div>
+                                            </label>
                                         </div>
                                     </div>
                                 </div>
@@ -429,6 +452,53 @@ const Checkout = ({ cartItems, onOrderComplete }) => {
                                             VIEW ORDER RECEIPT <ArrowLeft size={18} style={{ transform: 'rotate(180deg)', marginLeft: '8px' }}/>
                                         </button>
                                         <button className="btn-home" onClick={() => navigate('/')}>BACK TO SHOP</button>
+                                    </div>
+                                </div>
+                            </div>
+                        )}
+
+                        {showUpiModal && upiData && (
+                            <div className="checkout-success-overlay">
+                                <div className="upi-payment-modal glass-panel animate-pop-in" style={{ maxWidth: '450px', padding: '30px', textAlign: 'center', margin: '0 20px' }}>
+                                    <div className="upi-header" style={{ marginBottom: '20px' }}>
+                                        <div style={{ background: '#2563eb', color: 'white', display: 'inline-block', padding: '10px 20px', borderRadius: '12px', fontWeight: '900', fontSize: '1.2rem', marginBottom: '10px' }}>
+                                            UPI PAYMENT
+                                        </div>
+                                        <p style={{ color: '#64748b' }}>Scan QR or pay to the UPI ID below</p>
+                                    </div>
+                                    
+                                    <div className="qr-container" style={{ background: 'white', padding: '20px', borderRadius: '16px', display: 'inline-block', border: '1px solid #e2e8f0', marginBottom: '20px' }}>
+                                        <img 
+                                            src={`https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(upiData.upiLink)}`} 
+                                            alt="UPI QR Code" 
+                                            style={{ width: '200px', height: '200px' }}
+                                        />
+                                    </div>
+
+                                    <div className="upi-id-box" style={{ background: '#f8fafc', padding: '15px', borderRadius: '12px', border: '1px solid #e2e8f0', marginBottom: '25px' }}>
+                                        <span style={{ fontSize: '0.8rem', color: '#64748b', display: 'block', marginBottom: '5px' }}>OFFICIAL UPI ID</span>
+                                        <strong style={{ fontSize: '1.1rem', color: '#1e293b' }}>{upiData.upiId}</strong>
+                                    </div>
+
+                                    <div className="upi-actions" style={{ display: 'flex', gap: '15px' }}>
+                                        <button 
+                                            className="btn-done" 
+                                            style={{ flex: 1, background: '#10b981', color: 'white', padding: '14px', borderRadius: '12px', fontWeight: '800', border: 'none', cursor: 'pointer' }}
+                                            onClick={() => {
+                                                setShowUpiModal(false);
+                                                setShowSuccessModal(true);
+                                                if (onOrderComplete) onOrderComplete();
+                                            }}
+                                        >
+                                            I HAVE PAID
+                                        </button>
+                                        <button 
+                                            className="btn-cancel" 
+                                            style={{ flex: 1, background: '#f1f5f9', color: '#64748b', padding: '14px', borderRadius: '12px', fontWeight: '700', border: 'none', cursor: 'pointer' }}
+                                            onClick={() => setShowUpiModal(false)}
+                                        >
+                                            CANCEL
+                                        </button>
                                     </div>
                                 </div>
                             </div>

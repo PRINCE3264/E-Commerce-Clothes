@@ -43,6 +43,23 @@ const AdminPayments = () => {
         (p.user?.email && p.user.email.toLowerCase().includes(searchTerm.toLowerCase()))
     );
 
+    const handleRefund = async (paymentId) => {
+        if (!window.confirm("Are you sure you want to refund this payment? This will also cancel the order.")) return;
+        
+        try {
+            const res = await API.post(`/payments/${paymentId}/refund`, { reason: "Admin Request" });
+            if (res.data.success) {
+                alert("Refund processed successfully!");
+                // Refresh list
+                const refreshed = await API.get('/payments');
+                if (refreshed.data.success) setPayments(refreshed.data.data);
+            }
+        } catch (err) {
+            console.error("Refund failed", err);
+            alert(err.response?.data?.message || "Refund failed");
+        }
+    };
+
     if (loading) return (
         <div className="admin-loading">
             <Loader size={32} className="pf-spin" />
@@ -85,8 +102,8 @@ const AdminPayments = () => {
                                     <div className="gateway-dot" style={{ background: '#3b82f6', boxShadow: '0 0 10px rgba(59,130,246,0.5)' }}></div>
                                     <span>{p.gateway} Node</span>
                                 </div>
-                                <div className={`status-pill ${p.status === 'Completed' ? 'completed' : 'pending'}`}>
-                                    {p.status === 'Completed' ? <ShieldCheck size={14}/> : <Clock size={14}/>}
+                                <div className={`status-pill ${p.status === 'Completed' ? 'completed' : p.status === 'Refunded' ? 'refunded' : 'pending'}`}>
+                                    {p.status === 'Completed' ? <ShieldCheck size={14}/> : p.status === 'Refunded' ? <Clock size={14} style={{color: '#ef4444'}}/> : <Clock size={14}/>}
                                     {p.status}
                                 </div>
                             </div>
@@ -115,6 +132,15 @@ const AdminPayments = () => {
                                     </div>
                                 </div>
                                 <div className="action-buttons">
+                                    {p.status !== 'Refunded' && (
+                                        <button 
+                                            className="btn-refund" 
+                                            style={{ background: '#fef2f2', color: '#dc2626', border: '1px solid #fee2e2', padding: '6px 12px', borderRadius: '8px', fontSize: '0.75rem', fontWeight: '800', cursor: 'pointer' }}
+                                            onClick={() => handleRefund(p._id)}
+                                        >
+                                            REFUND
+                                        </button>
+                                    )}
                                     <button className="btn-details" style={{ background: '#eff6ff', color: '#2563eb', border: '1px solid #bfdbfe' }} title="Analyze Node">
                                         ANALYZE <ArrowUpRight size={14}/>
                                     </button>

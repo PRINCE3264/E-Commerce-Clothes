@@ -37,6 +37,7 @@ import AdminPayments from '../../components/AdminPayments/AdminPayments';
 import AdminContact from '../../components/AdminContact/AdminContact';
 import AdminProfile from '../../components/AdminProfile/AdminProfile';
 import AdminReviews from '../../components/AdminReviews/AdminReviews';
+import AdminChat from '../../components/AdminChat/AdminChat';
 import './AdminDashboard.css';
 
 
@@ -181,17 +182,27 @@ const AdminDashboard = () => {
                                 <span>Leads / Help</span>
                                 <ChevronRight size={14} className="admin-chevron" />
                             </NavLink>
+                            <NavLink to="/admin/live-chat" className={({isActive}) => `admin-nav-item ${isActive ? 'active' : ''}`} onClick={() => window.innerWidth <= 992 && toggleSidebar()}>
+                                <div className="admin-icon-bg"><MessageSquare size={18} /></div>
+                                <span>Live Support</span>
+                                <ChevronRight size={14} className="admin-chevron" />
+                            </NavLink>
                             <NavLink to="/admin/profile" className={({isActive}) => `admin-nav-item ${isActive ? 'active' : ''}`} onClick={() => window.innerWidth <= 992 && toggleSidebar()}>
                                 <div className="admin-icon-bg"><UserCircle size={18} /></div>
                                 <span>My Profile</span>
                                 <ChevronRight size={14} className="admin-chevron" />
                             </NavLink>
-                            <a href="/payment?orderId=69ac07c5cbf16865b7e979a5" className="admin-nav-item" target="_blank" rel="noopener noreferrer">
-                                <div className="admin-icon-bg"><CreditCard size={18} /></div>
-                                <span>Quick Payment Link</span>
-                                <ChevronRight size={14} className="admin-chevron" />
-                            </a>
                         </nav>
+                    </div>
+
+                    {/* Premium Pro Card */}
+                    <div className="sidebar-help-card">
+                        <div className="help-icon-box">
+                            <Activity size={20} />
+                        </div>
+                        <h5>System Health</h5>
+                        <p>Server status is optimal with 99.9% uptime.</p>
+                        <button className="btn-status">View Status</button>
                     </div>
                 </div>
 
@@ -205,6 +216,17 @@ const AdminDashboard = () => {
 
             {/* Main Content Area */}
             <main className={`admin-main ${isSidebarOpen ? 'sidebar-open' : ''}`}>
+                {/* Promotion Bar with Ticker Effect */}
+                <div className="promotion-bar admin-ticker">
+                    <div className="ticker-wrapper">
+                        <div className="ticker-item">
+                            ADMIN PANEL ACTIVE | SYSTEM ONLINE | REVENUE TRACKING ACTIVE | NEW ORDERS WAITING FOR APPROVAL 🚀
+                        </div>
+                        <div className="ticker-item">
+                            ADMIN PANEL ACTIVE | SYSTEM ONLINE | REVENUE TRACKING ACTIVE | NEW ORDERS WAITING FOR APPROVAL 🚀
+                        </div>
+                    </div>
+                </div>
                 <header className="admin-header">
                     <div className="header-search">
                         <button className="admin-menu-btn" onClick={toggleSidebar}>
@@ -240,6 +262,7 @@ const AdminDashboard = () => {
                         <Route path="/contact" element={<AdminContact />} />
                         <Route path="/profile" element={<AdminProfile />} />
                         <Route path="/reviews" element={<AdminReviews />} />
+                        <Route path="/live-chat" element={<AdminChat />} />
                         <Route path="/dashboard" element={<Navigate to="/admin" replace />} />
                         <Route path="*" element={<Navigate to="/admin" replace />} />
                     </Routes>
