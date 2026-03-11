@@ -31,43 +31,47 @@ const ReturnDetailsModal = ({ item, onClose, onCancel }) => {
                         </div>
                     </div>
 
-                    {item.status !== 'Cancelled' ? (
-                        <div className="ret-timeline">
-                            {item.trackingLog ? (
-                                item.trackingLog.slice().reverse().map((log, i) => (
-                                    <div key={i} className={`ret-time-item ${i === 0 ? 'active' : 'done'}`}>
-                                        <div className="ret-time-icon"><Check size={14} /></div>
-                                        <div className="ret-time-info">
-                                            <strong>{log.status}</strong>
-                                            <span>{new Date(log.timestamp).toLocaleString()}</span>
-                                            <p>{log.message}</p>
-                                        </div>
-                                    </div>
-                                ))
-                            ) : (
-                                <div className="ret-time-item done">
+                    <div className="ret-timeline">
+                        {item.trackingLog ? (
+                            item.trackingLog.slice().reverse().map((log, i) => (
+                                <div key={i} className={`ret-time-item ${i === 0 ? 'active' : 'done'}`}>
                                     <div className="ret-time-icon"><Check size={14} /></div>
                                     <div className="ret-time-info">
-                                        <strong>Return Requested</strong>
-                                        <span>{item.date} • 10:30 AM</span>
-                                        <p>Your request has been received and is being processed.</p>
+                                        <strong>{log.status === 'Cancelled' ? 'Cancellation' : log.status}</strong>
+                                        <span>{new Date(log.timestamp).toLocaleString()}</span>
+                                        <p>{log.message || (log.status === 'Cancelled' ? 'Order was cancelled.' : '')}</p>
                                     </div>
                                 </div>
-                            )}
-                        </div>
-                    ) : (
-                        <div className="ret-cancelled-notice">
-                            <AlertCircle size={20} />
-                            <p>This return request has been cancelled. No further actions are required.</p>
-                        </div>
-                    )}
+                            ))
+                        ) : (
+                            <div className="ret-time-item done">
+                                <div className="ret-time-icon"><Check size={14} /></div>
+                                <div className="ret-time-info">
+                                    <strong>Return Requested</strong>
+                                    <span>{item.date} • 10:30 AM</span>
+                                    <p>Your request has been received and is being processed.</p>
+                                </div>
+                            </div>
+                        )}
+                    </div>
 
                     {item.refundProof && (
                         <div className="ret-proof-section">
                             <h4>Refund confirmation</h4>
                             <div className="ret-proof-card">
                                 <div className="ret-proof-img-wrap">
-                                    <img src={item.refundProof} alt="Refund Proof" onClick={() => window.open(item.refundProof, '_blank')} />
+                                    {item.refundProof?.toLowerCase().endsWith('.pdf') ? (
+                                        <div 
+                                            style={{width:'80px',height:'80px',background:'#fff',borderRadius:'10px',display:'flex',alignItems:'center',justifyContent:'center',cursor:'pointer',border:'2px solid white', boxShadow:'0 4px 10px rgba(0,0,0,0.05)', color:'#ef4444', fontWeight:'bold', fontSize:'12px', textAlign:'center', padding:'5px', transition:'transform 0.2s'}} 
+                                            onClick={() => window.open(item.refundProof?.startsWith('/') ? `${import.meta.env.VITE_API_URL?.replace('/api', '') || 'http://127.0.0.1:8000'}${item.refundProof}` : item.refundProof, '_blank')}
+                                            onMouseOver={(e) => e.currentTarget.style.transform = 'scale(1.05)'}
+                                            onMouseOut={(e) => e.currentTarget.style.transform = 'scale(1)'}
+                                        >
+                                            PDF Receipt
+                                        </div>
+                                    ) : (
+                                        <img src={item.refundProof?.startsWith('/') ? `${import.meta.env.VITE_API_URL?.replace('/api', '') || 'http://127.0.0.1:8000'}${item.refundProof}` : item.refundProof} alt="Refund Proof" onClick={() => window.open(item.refundProof?.startsWith('/') ? `${import.meta.env.VITE_API_URL?.replace('/api', '') || 'http://127.0.0.1:8000'}${item.refundProof}` : item.refundProof, '_blank')} />
+                                    )}
                                 </div>
                                 <div className="ret-proof-details">
                                     <p>Your refund has been processed successfully.</p>
@@ -101,13 +105,13 @@ const Returns = () => {
                 const res = await API.get('/orders/myorders');
                 if (res.data.success) {
                     const refunds = res.data.data.filter(order => 
-                        (order.status === 'Cancelled' && order.isPaid) || order.isRefunded
+                        order.status === 'Cancelled' || order.isRefunded || order.status === 'Returned'
                     ).map(order => ({
                         id: `REF-${order._id.substring(order._id.length - 4).toUpperCase()}`,
                         orderId: `#${order._id.substring(0, 8).toUpperCase()}`,
                         date: new Date(order.updatedAt).toLocaleDateString(),
-                        status: order.isRefunded ? 'Refunded' : 'Processing',
-                        refundAmount: `₹${order.totalPrice.toLocaleString('en-IN')}`,
+                        status: order.isRefunded ? 'Refunded' : (order.status === 'Cancelled' ? 'Cancelled' : 'Processing'),
+                        refundAmount: (order.status === 'Cancelled' && !order.isPaid) ? '—' : `₹${order.totalPrice.toLocaleString('en-IN')}`,
                         refundProof: order.refundProof,
                         refundTransactionId: order.refundTransactionId,
                         trackingLog: order.trackingLog,

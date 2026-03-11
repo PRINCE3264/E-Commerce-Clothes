@@ -272,8 +272,8 @@ exports.updateOrderStatus = async (req, res) => {
             }
         }
 
-        if (refundProof) order.refundProof = refundProof;
-        if (refundTransactionId) order.refundTransactionId = refundTransactionId;
+        if (refundProof !== undefined) order.refundProof = refundProof;
+        if (refundTransactionId !== undefined || refundTransactionId === '') order.refundTransactionId = refundTransactionId;
 
         // Add to tracking log if there's a status change or message
         if (status || message || isRefunded || refundProof) {

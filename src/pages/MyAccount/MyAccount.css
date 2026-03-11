@@ -1306,6 +1306,18 @@
     to { transform: translateY(0) scale(1); opacity: 1; }
 }
 
+.account-modal.return-detail-modal {
+    display: flex;
+    flex-direction: column;
+    max-height: 90vh;
+}
+
+.account-modal.return-detail-modal .modal-body {
+    overflow-y: auto;
+    padding: 24px;
+    flex: 1;
+}
+
 .modal-header {
     background: #ffffff;
     padding: 20px 24px;

@@ -324,6 +324,35 @@ Thank you for shopping with us!
                                 ))}
                             </div>
                         </motion.div>
+
+                        {/* Refund Proof Section */}
+                        {order.refundProof && (
+                            <motion.div className="refund-proof-display glass-panel shadow-premium" variants={itemVariants} style={{ marginTop: '25px', padding: '25px' }}>
+                                <h4 style={{ color: '#2b5a91', marginTop: 0, marginBottom: '15px', fontSize: '1.2rem', fontWeight: '900' }}>REFUND CONFIRMATION</h4>
+                                <div style={{ display: 'flex', gap: '20px', alignItems: 'center' }}>
+                                    {order.refundProof?.toLowerCase().endsWith('.pdf') ? (
+                                        <div 
+                                            style={{ width: '100px', height: '100px', background: '#f8fafc', borderRadius: '10px', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', border: '1px solid #e2e8f0', boxShadow: '0 4px 10px rgba(0,0,0,0.05)', color: '#ef4444', fontWeight: 'bold', fontSize: '13px', textAlign: 'center', padding: '10px' }} 
+                                            onClick={() => window.open(order.refundProof?.startsWith('/') ? `${import.meta.env.VITE_API_URL?.replace('/api', '') || 'http://127.0.0.1:8000'}${order.refundProof}` : order.refundProof, '_blank')} 
+                                        >
+                                            PDF Receipt
+                                        </div>
+                                    ) : (
+                                        <img 
+                                            src={order.refundProof?.startsWith('/') ? `${import.meta.env.VITE_API_URL?.replace('/api', '') || 'http://127.0.0.1:8000'}${order.refundProof}` : order.refundProof} 
+                                            alt="Refund Proof" 
+                                            style={{ width: '100px', height: '100px', objectFit: 'cover', borderRadius: '10px', border: '1px solid #e2e8f0', cursor: 'pointer', boxShadow: '0 4px 10px rgba(0,0,0,0.05)' }} 
+                                            onClick={() => window.open(order.refundProof?.startsWith('/') ? `${import.meta.env.VITE_API_URL?.replace('/api', '') || 'http://127.0.0.1:8000'}${order.refundProof}` : order.refundProof, '_blank')} 
+                                        />
+                                    )}
+                                    <div>
+                                        <p style={{ margin: '0 0 5px 0', fontWeight: 'bold', color: '#1e293b', fontSize: '1rem' }}>Your refund has been processed successfully.</p>
+                                        <p style={{ margin: '0 0 5px 0', fontSize: '0.85rem', color: '#64748b' }}>Transaction ID: <strong style={{color: '#1e293b'}}>{order.refundTransactionId || 'N/A'}</strong></p>
+                                        <p style={{ margin: '0', fontSize: '0.75rem', color: '#94a3b8', fontStyle: 'italic' }}>Click image to view full receipt.</p>
+                                    </div>
+                                </div>
+                            </motion.div>
+                        )}
                     </div>
 
                     <aside className="order-sidebar-view">
@@ -397,9 +426,10 @@ Thank you for shopping with us!
                             <p style={{ margin: '3px 0 0 0', color: '#94a3b8', fontSize: '11px' }}>Order ID: #{order._id.toUpperCase()}</p>
                         </div>
                         <div style={{ textAlign: 'right' }}>
-                            <h2 style={{ margin: 0, color: '#1e293b', fontSize: '26px', fontWeight: '800', letterSpacing: '1px' }}>OFFICIAL INVOICE</h2>
+                            <h2 style={{ margin: 0, color: '#1e293b', fontSize: '26px', fontWeight: '800', letterSpacing: '1px', textTransform: 'uppercase' }}>{order.status === 'Cancelled' ? (order.isRefunded || order.refundProof ? 'REFUND RECEIPT' : 'CANCELLED ORDER') : 'OFFICIAL INVOICE'}</h2>
                             <p style={{ margin: '5px 0 0 0', color: '#64748b', fontSize: '14px' }}>Date: {new Date(order.createdAt).toLocaleDateString()}</p>
-                            {order.isPaid && <div style={{ marginTop: '12px', display: 'inline-block', background: '#10b981', color: '#fff', padding: '6px 14px', borderRadius: '4px', fontSize: '11px', fontWeight: '900' }}>PAID ENTIRELY</div>}
+                            {order.isPaid ? <div style={{ marginTop: '12px', display: 'inline-block', background: order.status === 'Cancelled' ? '#64748b' : '#10b981', color: '#fff', padding: '6px 14px', borderRadius: '4px', fontSize: '11px', fontWeight: '900' }}>{order.status === 'Cancelled' ? 'PAID / CANCELLED' : 'PAID ENTIRELY'}</div> : <div style={{ marginTop: '12px', display: 'inline-block', background: '#ef4444', color: '#fff', padding: '6px 14px', borderRadius: '4px', fontSize: '11px', fontWeight: '900' }}>UNPAID</div>}
+                            {order.isRefunded && <div style={{ marginTop: '5px', display: 'inline-block', background: '#10b981', color: '#fff', padding: '6px 14px', borderRadius: '4px', fontSize: '11px', fontWeight: '900', marginLeft: '5px' }}>REFUNDED</div>}
                         </div>
                     </div>
 

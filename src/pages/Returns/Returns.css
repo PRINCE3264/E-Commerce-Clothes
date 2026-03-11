@@ -338,6 +338,7 @@
 .ret-modal-body {
     padding: 30px;
     overflow-y: auto;
+    flex: 1;
 }
 
 .ret-id-row {
@@ -439,6 +440,71 @@
     gap: 15px;
     align-items: center;
     color: #991b1b;
+}
+
+/* Refund Proof in Modal */
+.ret-proof-section {
+    margin-top: 25px;
+    padding-top: 20px;
+    border-top: 1px dashed #f1f5f9;
+}
+
+.ret-proof-section h4 {
+    font-size: 1.1rem;
+    color: var(--ret-deep-slate);
+    margin-bottom: 15px;
+}
+
+.ret-proof-card {
+    display: flex;
+    gap: 20px;
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    padding: 15px;
+    border-radius: 16px;
+    align-items: center;
+}
+
+.ret-proof-img-wrap img {
+    width: 80px;
+    height: 80px;
+    object-fit: cover;
+    border-radius: 10px;
+    cursor: pointer;
+    border: 2px solid white;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+    transition: transform 0.2s;
+}
+
+.ret-proof-img-wrap img:hover {
+    transform: scale(1.05);
+}
+
+.ret-proof-details {
+    flex: 1;
+}
+
+.ret-proof-details p {
+    font-size: 0.95rem;
+    font-weight: 700;
+    color: #1e293b;
+    margin: 0 0 5px;
+}
+
+.ret-tx-id {
+    font-size: 0.8rem;
+    color: #64748b;
+    margin-bottom: 5px;
+}
+
+.ret-tx-id strong {
+    color: #0f172a;
+}
+
+.ret-notice {
+    font-size: 0.75rem;
+    color: #94a3b8;
+    font-style: italic;
 }
 
 /* Animations */

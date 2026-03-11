@@ -103,8 +103,8 @@ const AdminOrders = () => {
                                 ${order.refundProof ? `
                                     <div class="sov-refund-proof" style="margin-top:15px; background:#f8fafc; padding:10px; border-radius:10px; border:1px solid #e2e8f0;">
                                         <div style="font-size:0.65rem; font-weight:800; color:#64748b; text-transform:uppercase; margin-bottom:5px;">Refund Proof</div>
-                                        <a href="${order.refundProof}" target="_blank" style="display:block; margin-bottom:5px;">
-                                            <img src="${order.refundProof}" style="width:100%; max-height:100px; object-fit:contain; border-radius:5px;" />
+                                        <a href="${order.refundProof.startsWith('/') ? `${import.meta.env.VITE_API_URL?.replace('/api', '') || 'http://127.0.0.1:8000'}${order.refundProof}` : order.refundProof}" target="_blank" style="display:block; margin-bottom:5px; text-decoration:none;">
+                                            ${order.refundProof.toLowerCase().endsWith('.pdf') ? `<div style="padding:15px; text-align:center; background:#fff; border-radius:5px; border:1px solid #e2e8f0; color:#ef4444; font-weight:800; font-size:12px;">📄 View PDF Receipt</div>` : `<img src="${order.refundProof.startsWith('/') ? `${import.meta.env.VITE_API_URL?.replace('/api', '') || 'http://127.0.0.1:8000'}${order.refundProof}` : order.refundProof}" style="width:100%; max-height:100px; object-fit:contain; border-radius:5px;" />`}
                                         </a>
                                         <div style="font-size:0.75rem; color:#1e293b;">ID: <b>${order.refundTransactionId || 'N/A'}</b></div>
                                     </div>
@@ -157,9 +157,16 @@ const AdminOrders = () => {
                             <input type="checkbox" id="swal-is-refunded" style="width: 18px; height: 18px; cursor: pointer;" ${order.isRefunded ? 'checked' : ''} />
                             <label style="margin: 0; color: #1e293b; cursor: pointer;" for="swal-is-refunded">Mark Payment as Refunded</label>
                         </div>
-                        <div class="su-input-group">
-                            <label>Refund Proof URL (Screenshot/Receipt)</label>
-                            <input id="swal-refund-proof" type="text" class="su-input" value="${order.refundProof || ''}" placeholder="https://image-link.com/proof.jpg" />
+                        <div class="su-input-group b-upload-zone-mini">
+                            <label>Refund Proof Image</label>
+                            <input type="hidden" id="swal-refund-proof" value="${order.refundProof || ''}" />
+                            <div style="display:flex; align-items:center; gap:10px; margin-top:5px;">
+                                <input type="file" id="swal-refund-file" accept="image/*,application/pdf" style="display:none;" />
+                                <label for="swal-refund-file" class="b-btn-upload-trigger">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-upload"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" x2="12" y1="3" y2="15"/></svg> Choose File
+                                </label>
+                                <span id="swal-upload-status" class="b-upload-status">${order.refundProof ? 'Existing Proof Found' : 'No file chosen'}</span>
+                            </div>
                         </div>
                         <div class="su-input-group">
                             <label>Refund Transaction ID</label>
@@ -177,6 +184,34 @@ const AdminOrders = () => {
                 popup: 'luxury-admin-swal',
                 confirmButton: 'b-swal-confirm-btn-blue',
                 cancelButton: 'b-swal-cancel-btn-blue'
+            },
+            didOpen: () => {
+                const fileInput = document.getElementById('swal-refund-file');
+                if (fileInput) {
+                    fileInput.addEventListener('change', async (e) => {
+                        const file = e.target.files[0];
+                        if(!file) return;
+
+                        const formData = new FormData();
+                        formData.append('image', file);
+
+                        const statusText = document.getElementById('swal-upload-status');
+                        if(statusText) statusText.innerText = "Uploading proof...";
+
+                        try {
+                            const res = await API.post('/upload', formData, {
+                                headers: { 'Content-Type': 'multipart/form-data' }
+                            });
+                            if (res.data.success) {
+                                document.getElementById('swal-refund-proof').value = res.data.path || res.data.data;
+                                if(statusText) statusText.innerText = "Upload Complete!";
+                            }
+                        } catch (err) {
+                            console.error("Upload failed", err);
+                            if(statusText) statusText.innerText = "Upload Failed: " + (err.response?.data?.message || err.message);
+                        }
+                    });
+                }
             },
             preConfirm: () => {
                 const payload = {
