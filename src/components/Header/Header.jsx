@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { Search, Menu, ChevronDown, UserCircle, ShoppingCart, Heart, User, LogOut, Package, CreditCard } from 'lucide-react';
+import { Search, Menu, ChevronDown, UserCircle, ShoppingCart, Heart, User, LogOut, Package, CreditCard, RotateCcw } from 'lucide-react';
 import API from '../../utils/api';
 import './Header.css';
 
@@ -83,14 +83,15 @@ const Header = ({ toggleSidebar, cartCount, wishlistCount, userData, handleLogou
                             {categories.length > 0 ? (
                                 categories.map(cat => (
                                     <Link key={cat._id} to={`/products?category=${cat.name}`}>
-                                        {cat.name}
+                                        {cat.name} Collection
                                     </Link>
                                 ))
                             ) : (
                                 <>
-                                    <Link to="/products?category=Men's Wear">Men's Collection</Link>
-                                    <Link to="/products?category=Women's Wear">Women's Collection</Link>
-                                    <Link to="/products?category=Kids Wear">Kid's Collection</Link>
+                                    <Link to="/products?category=Men">Men Collection</Link>
+                                    <Link to="/products?category=Women">Women Collection</Link>
+                                    <Link to="/products?category=Kids">Kids Collection</Link>
+                                    <Link to="/products?category=Accessories">Accessories Collection</Link>
                                 </>
                             )}
                             <div className="dropdown-divider"></div>
@@ -164,7 +165,7 @@ const Header = ({ toggleSidebar, cartCount, wishlistCount, userData, handleLogou
                     </div>
 
                     <div className="control-icons">
-                        <Link to="/wishlist" className="control-icon-btn">
+                        <Link to="/account/wishlist" className="control-icon-btn">
                             <Heart size={26} />
                             {wishlistCount > 0 && <span className="cart-badge wishlist-badge-color">{wishlistCount}</span>}
                         </Link>
@@ -206,15 +207,17 @@ const Header = ({ toggleSidebar, cartCount, wishlistCount, userData, handleLogou
                                             </div>
                                         </div>
                                         <div className="hdr-dropdown-divider" />
-                                        <Link to="/profile" className="hdr-drop-item" onClick={() => setDropdownOpen(false)}>
+                                        <Link to="/account" className="hdr-drop-item" onClick={() => setDropdownOpen(false)}>
                                             <User size={16} /> My Account
                                         </Link>
-                                        <Link to="/my-orders" className="hdr-drop-item" onClick={() => setDropdownOpen(false)}>
+                                        {/* <Link to="/account/orders" className="hdr-drop-item" onClick={() => setDropdownOpen(false)}>
                                             <Package size={16} /> My Orders
                                         </Link>
-                                        <Link to="/mypayments" className="hdr-drop-item" onClick={() => setDropdownOpen(false)}>
+                                        <Link to="/account/payments" className="hdr-drop-item" onClick={() => setDropdownOpen(false)}>
                                             <CreditCard size={16} /> My Payments
-                                        </Link>
+                                        </Link> */}
+                                        
+                                        
                                         <div className="hdr-dropdown-divider" />
                                         <button className="hdr-drop-item hdr-drop-logout" onClick={() => { handleLogout(); setDropdownOpen(false); }}>
                                             <LogOut size={16} /> Sign Out

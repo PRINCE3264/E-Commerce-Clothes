@@ -44,7 +44,13 @@ exports.createOrder = async (req, res) => {
             itemsPrice,
             taxPrice,
             shippingPrice,
-            totalPrice
+            totalPrice,
+            trackingLog: [{
+                status: 'Processing',
+                message: 'Order has been placed and is being processed.',
+                location: 'Warehouse',
+                timestamp: Date.now()
+            }]
         };
 
         let razorpayOrder = null;
@@ -183,9 +189,15 @@ exports.getOrderById = async (req, res) => {
         });
     } catch (err) {
         console.error("GET_ORDER_BY_ID_ERROR:", err.message);
-        res.status(err.name === 'CastError' ? 400 : 500).json({ 
+        if (err.name === 'CastError') {
+            return res.status(404).json({ 
+                success: false, 
+                message: 'This order could not be found. Please check your Order ID.' 
+            });
+        }
+        res.status(500).json({ 
             success: false, 
-            message: err.name === 'CastError' ? 'The provided Order ID is invalid.' : 'Systems encountered an internal error processing your order request.'
+            message: 'Systems encountered an internal error processing your order request.'
         });
     }
 };
@@ -232,7 +244,7 @@ exports.getAllOrders = async (req, res) => {
 // @access  Private/Admin
 exports.updateOrderStatus = async (req, res) => {
     try {
-        const { status, message, location, isRefunded } = req.body;
+        const { status, message, location, isRefunded, refundProof, refundTransactionId } = req.body;
         const validStatuses = ['Processing', 'Shipped', 'Out for Delivery', 'Delivered', 'Cancelled'];
 
         if (status && !validStatuses.includes(status)) {
@@ -260,11 +272,21 @@ exports.updateOrderStatus = async (req, res) => {
             }
         }
 
+        if (refundProof) order.refundProof = refundProof;
+        if (refundTransactionId) order.refundTransactionId = refundTransactionId;
+
         // Add to tracking log if there's a status change or message
-        if (status || message || isRefunded) {
+        if (status || message || isRefunded || refundProof) {
+            let trackingMsg = message;
+            if (!trackingMsg) {
+                if (refundProof) trackingMsg = 'Refund proof uploaded by admin.';
+                else if (isRefunded) trackingMsg = 'Payment successfully refunded.';
+                else trackingMsg = `Order marked as ${status || order.status}`;
+            }
+
             order.trackingLog.push({
                 status: status || order.status,
-                message: message || (isRefunded ? 'Payment successfully refunded.' : `Order marked as ${status || order.status}`),
+                message: trackingMsg,
                 location: location || 'Warehouse',
                 timestamp: Date.now()
             });

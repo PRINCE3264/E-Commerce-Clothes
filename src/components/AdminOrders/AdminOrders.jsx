@@ -99,12 +99,16 @@ const AdminOrders = () => {
                                 <div class="sov-info-line">${order.shippingAddress.city}, ${order.shippingAddress.postalCode}</div>
                                 <div class="sov-info-line">📞 ${order.shippingAddress.phone}</div>
                             </div>
-                            <div class="sov-info-block">
-                                <div class="sov-info-title">PAYMENT</div>
-                                <div class="sov-info-line">Method: <b>${order.paymentMethod}</b></div>
-                                <div class="sov-info-line">Status: <span class="${order.isPaid ? 'sov-val-paid' : 'sov-val-due'}">${order.isPaid ? 'Paid' : 'Unpaid'}</span></div>
-                                ${order.isRefunded ? `<div class="sov-info-line">Refund: <span class="sov-val-paid">YES (Processed)</span></div>` : ''}
                                 ${order.isPaid ? `<div class="sov-txn">TXN: ${order.razorpayPaymentId || order.stripePaymentIntentId || order.paymentResult?.id || 'N/A'}</div>` : ''}
+                                ${order.refundProof ? `
+                                    <div class="sov-refund-proof" style="margin-top:15px; background:#f8fafc; padding:10px; border-radius:10px; border:1px solid #e2e8f0;">
+                                        <div style="font-size:0.65rem; font-weight:800; color:#64748b; text-transform:uppercase; margin-bottom:5px;">Refund Proof</div>
+                                        <a href="${order.refundProof}" target="_blank" style="display:block; margin-bottom:5px;">
+                                            <img src="${order.refundProof}" style="width:100%; max-height:100px; object-fit:contain; border-radius:5px;" />
+                                        </a>
+                                        <div style="font-size:0.75rem; color:#1e293b;">ID: <b>${order.refundTransactionId || 'N/A'}</b></div>
+                                    </div>
+                                ` : ''}
                             </div>
                         </div>
                     </div>
@@ -148,10 +152,18 @@ const AdminOrders = () => {
                         <label>Geographic Node Override (Optional)</label>
                         <input id="swal-transit-loc" type="text" class="su-input" placeholder="e.g. Distribution Center, Mumbai" />
                     </div>
-                    ${(order.status === 'Cancelled' && order.isPaid && !order.isRefunded) ? `
-                        <div class="su-input-group" style="flex-direction: row; align-items: center; gap: 10px; background: #fff1f2; padding: 12px; border-radius: 10px; border: 1px dashed #fecaca;">
-                            <input type="checkbox" id="swal-is-refunded" style="width: 18px; height: 18px; cursor: pointer;" />
-                            <label style="margin: 0; color: #e11d48; cursor: pointer;" for="swal-is-refunded">Mark Payment as Refunded</label>
+                    ${(order.status === 'Cancelled' && order.isPaid) ? `
+                        <div class="su-input-group" style="flex-direction: row; align-items: center; gap: 10px; background: #f8fafc; padding: 12px; border-radius: 10px; border: 1px dashed #e2e8f0; margin-bottom: 15px;">
+                            <input type="checkbox" id="swal-is-refunded" style="width: 18px; height: 18px; cursor: pointer;" ${order.isRefunded ? 'checked' : ''} />
+                            <label style="margin: 0; color: #1e293b; cursor: pointer;" for="swal-is-refunded">Mark Payment as Refunded</label>
+                        </div>
+                        <div class="su-input-group">
+                            <label>Refund Proof URL (Screenshot/Receipt)</label>
+                            <input id="swal-refund-proof" type="text" class="su-input" value="${order.refundProof || ''}" placeholder="https://image-link.com/proof.jpg" />
+                        </div>
+                        <div class="su-input-group">
+                            <label>Refund Transaction ID</label>
+                            <input id="swal-refund-txid" type="text" class="su-input" value="${order.refundTransactionId || ''}" placeholder="TXN_123456789" />
                         </div>
                     ` : ''}
                 </div>
@@ -170,7 +182,9 @@ const AdminOrders = () => {
                 const payload = {
                     status: document.getElementById('swal-transit-status').value,
                     message: document.getElementById('swal-transit-msg').value,
-                    location: document.getElementById('swal-transit-loc').value
+                    location: document.getElementById('swal-transit-loc').value,
+                    refundProof: document.getElementById('swal-refund-proof')?.value || '',
+                    refundTransactionId: document.getElementById('swal-refund-txid')?.value || ''
                 };
                 const refundCheck = document.getElementById('swal-is-refunded');
                 if (refundCheck) {

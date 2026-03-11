@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { BrowserRouter as Router, Routes, Route, useLocation, useNavigate } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, useLocation, useNavigate, Navigate } from 'react-router-dom';
 import Header from './components/Header/Header';
 import Sidebar from './components/Sidebar/Sidebar';
 import Footer from './components/Footer/Footer';
@@ -11,22 +11,24 @@ import BlogDetails from './pages/Blog/BlogDetails';
 import Contact from './pages/Contact/Contact';
 import Login from './pages/Login/Login';
 import Cart from './pages/Cart/Cart';
-import Profile from './pages/Profile/Profile';
-import Wishlist from './pages/Wishlist/Wishlist';
 import Register from './pages/Register/Register';
 import Checkout from './pages/Checkout/Checkout';
-import MyOrders from './pages/MyOrders/MyOrders';
 import OrderDetails from './pages/OrderDetails/OrderDetails';
 import ProductDetails from './pages/ProductDetails/ProductDetails';
 import ForgotPassword from './pages/ForgotPassword/ForgotPassword';
 import ResetPassword from './pages/ResetPassword/ResetPassword';
 import AdminDashboard from './pages/AdminDashboard/AdminDashboard';
 import Payment from './pages/Payment/Payment';
-import MyPayments from './pages/MyPayments/MyPayments';
 import VerifyOTP from './pages/VerifyOTP/VerifyOTP';
 import Arrivals from './pages/Arrivals/Arrivals';
 import BestProducts from './pages/BestProducts/BestProducts';
 import Support from './pages/Support/Support';
+import MyAccount from './pages/MyAccount/MyAccount';
+import MyOrders from './pages/MyOrders/MyOrders';
+import MyPayments from './pages/MyPayments/MyPayments';
+import Profile from './pages/Profile/Profile';
+import Returns from './pages/Returns/Returns';
+import Wishlist from './pages/Wishlist/Wishlist';
 import LiveChat from './components/Chat/LiveChat';
 import { X, CheckCircle, ShoppingBag, AlertCircle } from 'lucide-react';
 import API from './utils/api';
@@ -44,7 +46,6 @@ const AppContent = ({
   toggleSidebar, 
   addToCart, 
   toggleWishlist, 
-  removeFromWishlist, 
   confirmWishlistRemoval, 
   removeCartItem, 
   updateCartQuantity, 
@@ -111,15 +112,29 @@ const AppContent = ({
               onUpdateQuantity={updateCartQuantity}
             />
           } />
-          <Route path="/wishlist" element={
-            <Wishlist
-              wishlistItems={wishlist}
-              onRemoveFromWishlist={removeFromWishlist}
-              onToggleWishlist={toggleWishlist}
-              onAddToCart={addToCart}
+          <Route path="/account/profile" element={<MyAccount onAddToCart={addToCart} onToggleWishlist={toggleWishlist} wishlist={wishlist} />} />
+          <Route path="/account" element={<Navigate to="/account/profile" replace />} />
+          <Route path="/account/orders" element={<MyOrders />} />
+          <Route path="/account/wishlist" element={
+            <Wishlist 
+              wishlistItems={wishlist} 
+              onToggleWishlist={toggleWishlist} 
+              onAddToCart={addToCart} 
             />
           } />
-          <Route path="/profile" element={<Profile />} />
+          <Route path="/account/address" element={<MyAccount onAddToCart={addToCart} onToggleWishlist={toggleWishlist} wishlist={wishlist} />} />
+          <Route path="/account/payments" element={<MyPayments />} />
+          <Route path="/account/tracking" element={<MyAccount onAddToCart={addToCart} onToggleWishlist={toggleWishlist} wishlist={wishlist} />} />
+          <Route path="/account/coupons" element={<MyAccount onAddToCart={addToCart} onToggleWishlist={toggleWishlist} wishlist={wishlist} />} />
+          <Route path="/account/returns" element={<MyAccount onAddToCart={addToCart} onToggleWishlist={toggleWishlist} wishlist={wishlist} />} />
+          
+          <Route path="/orders" element={<Navigate to="/account/orders" replace />} />
+          <Route path="/wishlist" element={<Navigate to="/account/wishlist" replace />} />
+          <Route path="/addresses" element={<Navigate to="/account/address" replace />} />
+          <Route path="/tracking" element={<Navigate to="/account/tracking" replace />} />
+          <Route path="/coupons" element={<Navigate to="/account/coupons" replace />} />
+          <Route path="/returns" element={<Navigate to="/account/returns" replace />} />
+          <Route path="/mypayments" element={<Navigate to="/account/payments" replace />} />
           <Route path="/product/:id" element={
             <ProductDetails
               onAddToCart={addToCart}
@@ -133,13 +148,14 @@ const AppContent = ({
               onOrderComplete={() => setCart([])} 
             />
           } />
-          <Route path="/my-orders" element={<MyOrders />} />
-          <Route path="/mypayments" element={<MyPayments />} />
           <Route path="/order/:id" element={<OrderDetails />} />
           <Route path="/payment" element={<Payment setCart={setCart} />} />
           <Route path="/arrivals" element={<Arrivals onAddToCart={addToCart} onToggleWishlist={toggleWishlist} wishlist={wishlist} />} />
           <Route path="/best-products" element={<BestProducts onAddToCart={addToCart} onToggleWishlist={toggleWishlist} wishlist={wishlist} />} />
           <Route path="/support" element={<Support />} />
+          
+          {/* Simplified unified account routing */}
+          
           <Route path="/admin/*" element={<AdminDashboard />} />
         </Routes>
       </main>
@@ -377,10 +393,6 @@ function App() {
     });
   };
 
-  const removeFromWishlist = (product) => {
-    setWishlist((prevWish) => prevWish.filter(item => item._id !== product._id));
-  };
-
   const confirmWishlistRemoval = () => {
     if (wishlistConfirm.product) {
       setWishlist((prevWish) => prevWish.filter(item => item._id !== wishlistConfirm.product._id));
@@ -410,7 +422,6 @@ function App() {
         toggleSidebar={toggleSidebar}
         addToCart={addToCart}
         toggleWishlist={toggleWishlist}
-        removeFromWishlist={removeFromWishlist}
         confirmWishlistRemoval={confirmWishlistRemoval}
         removeCartItem={removeCartItem}
         updateCartQuantity={updateCartQuantity}

@@ -44,27 +44,12 @@ const Products = ({ onAddToCart, onToggleWishlist, wishlist }) => {
 
     useEffect(() => {
         if (urlCategory) {
-            const lowCaseUrl = urlCategory.toLowerCase();
-            const mapped = {
-                'men': 'Men\'s Wear',
-                'women': 'Women\'s Wear',
-                'kids': 'Kids Wear',
-                'accessories': 'Accessories',
-                'footwear': 'Footwear',
-                'shoes': 'Footwear'
-            };
-
-            // 1. Check if it's a short handle from the map
-            // 2. OR use the urlCategory directly (useful if Header sends "Men's Wear")
-            const resolved = mapped[lowCaseUrl] || urlCategory;
-            
-            // Try to find a casing match in our current products list if possible
-            // but for now setting it directly is better than 'All'
-            setActiveCategory(resolved);
+            // Use the urlCategory directly as we've standardized the DB to match (e.g. 'Men', 'Women')
+            setActiveCategory(urlCategory);
         } else {
             setActiveCategory('All');
         }
-    }, [urlCategory, products]);
+    }, [urlCategory]);
 
     // Fetch Products from DB
     useEffect(() => {
@@ -88,10 +73,10 @@ const Products = ({ onAddToCart, onToggleWishlist, wishlist }) => {
         const categoryMatch = activeCategory === 'All' || 
             (product.category && product.category.toLowerCase() === activeCategory.toLowerCase());
         const priceMatch = product.price <= priceRange;
-        // Check both p.name (mongo) and p.title (legacy)
         const nameToSearch = product.name || '';
-        const searchMatch = nameToSearch.toLowerCase().includes(searchQuery.toLowerCase()) ||
-            product.category.toLowerCase().includes(searchQuery.toLowerCase());
+        const searchMatch = searchQuery === '' || 
+            nameToSearch.toLowerCase().includes(searchQuery.toLowerCase());
+        
         return categoryMatch && priceMatch && searchMatch;
     });
 

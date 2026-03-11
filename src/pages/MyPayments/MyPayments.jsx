@@ -33,13 +33,13 @@ const MyPayments = () => {
     );
 
     return (
-        <div className="my-payments-page animate-fade-in">
-            <div className="container">
-                <div className="page-header-premium">
-                    <h1>Transaction History</h1>
-                    <p>Track your premium purchases and secure payment confirmations.</p>
-                </div>
+        <div className="my-payments-page animate-fade-in premium-orders-page-standalone">
+            <div className="page-header-premium premium-orders-header">
+                <h1>Transaction History</h1>
+                <p>Track your premium purchases and secure payment confirmations.</p>
+            </div>
 
+            <div className="container">
                 <div className="payments-grid">
                     {payments.length === 0 ? (
                         <div className="empty-payments-state">
@@ -50,48 +50,51 @@ const MyPayments = () => {
                         </div>
                     ) : (
                         payments.map(payment => (
-                            <div key={payment._id} className="payment-card-premium glass-panel">
-                                <div className="card-top">
-                                    <div className="gateway-indicator">
-                                        <div className="gateway-dot"></div>
-                                        <span>{payment.gateway} Secure</span>
+                            <div key={payment._id} className="payment-card-premium animate-slide-up">
+                                <div className="card-top-elite">
+                                    <div className="gateway-badge">
+                                        <div className="dot-blue"></div>
+                                        <span>{payment.gateway.toUpperCase()} SECURE</span>
                                     </div>
-                                    <div className={`status-pill ${payment.status.toLowerCase()}`}>
-                                        {payment.status === 'Completed' ? <CheckCircle size={14}/> : <Clock size={14}/>}
-                                        {payment.status}
+                                    <div className={`status-pill-elite ${payment.status.toLowerCase()}`}>
+                                        <CheckCircle size={14}/>
+                                        <span>{payment.status.toUpperCase()}</span>
                                     </div>
                                 </div>
 
                                 <div className="card-body">
-                                    <div className="txn-info">
+                                    <div className="txn-info-elite">
                                         <small>TRANSACTION ID</small>
                                         <strong>{payment.transactionId}</strong>
                                     </div>
-                                    <div className="amount-info">
+                                    <div className="amount-info-elite">
                                         <small>TOTAL PAID</small>
-                                        <div className="price-tag">
-                                            <IndianRupee size={16}/>
+                                        <div className="price-tag-elite">
+                                            <div className="currency-symbol">₹</div>
                                             <span>{payment.amount.toLocaleString()}</span>
                                         </div>
                                     </div>
                                 </div>
 
-                                <div className="card-footer">
-                                    <div className="order-ref">
-                                        <Hash size={14}/>
-                                        <span>Order: #{payment.order?._id ? payment.order._id.substring(0, 8).toUpperCase() : 'N/A'}</span>
+                                <div className="card-footer-elite">
+                                    <div className="order-ref-elite">
+                                        <div className="hash-icon">#</div>
+                                        <div className="ref-content">
+                                            <small>Order:</small>
+                                            <strong>#{payment.order?._id ? payment.order._id.substring(0, 8).toUpperCase() : 'N/A'}</strong>
+                                        </div>
                                     </div>
-                                    <div className="action-buttons">
-                                        <button className="btn-details" onClick={() => navigate(`/order/${payment.order?._id}`)}>
-                                            VIEW ORDER <ArrowRight size={14}/>
-                                        </button>
-                                        <button className="btn-invoice-mini" title="Download Receipt">
-                                            <Download size={14}/>
+                                    <div className="action-buttons-elite">
+                                        <button className="btn-view-order-pill" onClick={() => navigate(`/order/${payment.order?._id}`)}>
+                                            <span>VIEW ORDER</span>
+                                            <ArrowRight size={16} strokeWidth={3}/>
                                         </button>
                                     </div>
                                 </div>
-                                <div className="payment-date">
-                                    {new Date(payment.createdAt).toLocaleDateString(undefined, { day: 'numeric', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' })}
+                                <div className="payment-timestamp-centered">
+                                    {new Date(payment.createdAt).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })}
+                                    <span className="dot-separator">•</span>
+                                    {new Date(payment.createdAt).toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit', hour12: true }).toLowerCase()}
                                 </div>
                             </div>
                         ))

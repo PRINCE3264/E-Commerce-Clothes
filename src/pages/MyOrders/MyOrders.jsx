@@ -104,115 +104,104 @@ const MyOrders = () => {
     );
 
     return (
-        <div className="my-orders-page">
-            <div className="container">
-                <div className="orders-header">
-                    <div className="header-content">
-                        <h1>Your Orders</h1>
-                        <p>Manage and track all your luxury purchases in one place.</p>
-                    </div>
-                    <div className="orders-search">
-                        <Search size={20} />
-                        <input 
-                            type="text" 
-                            placeholder="Search by Order ID or Product..." 
-                            value={searchTerm}
-                            onChange={(e) => setSearchTerm(e.target.value)}
-                        />
-                    </div>
+        <div className="premium-orders-page-standalone animate-fade-in">
+            <div className="premium-orders-header">
+                <div className="header-meta">
+                    <h1>Your Orders</h1>
+                    <p>Manage and track all your luxury purchases in one place.</p>
                 </div>
+                <div className="premium-orders-search">
+                    <Search size={18} />
+                    <input 
+                        type="text" 
+                        placeholder="Search by Order ID or Product..." 
+                        value={searchTerm}
+                        onChange={(e) => setSearchTerm(e.target.value)}
+                    />
+                </div>
+            </div>
 
+            <div className="premium-orders-list container">
                 {orders.length === 0 ? (
-                    <div className="empty-orders-card animate-pop-in">
-                        <div className="empty-icon">
-                            <ShoppingBag size={60} />
-                        </div>
-                        <h2>No orders found</h2>
-                        <p>It seems you haven't placed any orders yet. Start exploring our premium collection.</p>
+                    <div className="empty-state">
+                        <Package size={48} />
+                        <p>You haven't placed any orders yet.</p>
                         <Link to="/products" className="start-shopping-btn">Explore Collection</Link>
                     </div>
                 ) : (
-                    <div className="orders-list">
-                        {filteredOrders.map((order, idx) => (
-                            <div key={order._id} className="order-card glass-panel animate-slide-up" style={{animationDelay: `${idx * 0.1}s`}}>
-                                <div className="order-card-header">
-                                    <div className="order-main-meta">
-                                        <div className="meta-item">
-                                            <span className="label">ORDER PLACED</span>
-                                            <span className="value">{new Date(order.createdAt).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })}</span>
-                                        </div>
-                                        <div className="meta-item">
-                                            <span className="label">TOTAL</span>
-                                            <span className="value">₹{order.totalPrice.toLocaleString()}</span>
-                                        </div>
-                                        <div className="meta-item">
-                                            <span className="label">SHIP TO</span>
-                                            <span className="value user-name">{order.shippingAddress.city}</span>
-                                        </div>
-                                    </div>
-                                    <div className="order-id-meta">
-                                        <span className="label">ORDER # {order._id.toUpperCase()}</span>
-                                        <div className="order-actions-top">
-                                            <Link to={`/order/${order._id}`} className="view-details-link">View Order Details</Link>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <div className="order-card-body">
-                                    <div className="order-delivery-status">
-                                        <div className="status-badge">
-                                            {getStatusIcon(order.status)}
-                                            <span>{order.status}</span>
-                                        </div>
-                                        <span className="payment-status">
-                                            <CreditCard size={14} /> 
-                                            {order.isPaid ? 'Paid' : (order.paymentMethod === 'COD' ? 'Pay on Delivery' : 'Payment Pending')}
+                    filteredOrders.map((order, idx) => (
+                        <div key={order._id} className="premium-order-card animate-slide-up" style={{animationDelay: `${idx * 0.1}s`}}>
+                            <div className="premium-card-header">
+                                <div className="meta-grid">
+                                    <div className="meta-col">
+                                        <span className="label">ORDER PLACED</span>
+                                        <span className="value">
+                                            {new Date(order.createdAt).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })}
+                                            <span className="time-sub"> at {new Date(order.createdAt).toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit', hour12: true })}</span>
                                         </span>
                                     </div>
-
-                                    <div className="order-products-preview">
-                                        {order.orderItems.map((item, i) => (
-                                            <div key={i} className="prod-preview-item">
-                                                <div className="prod-img">
-                                                    <img src={item.image} alt={item.name} />
-                                                </div>
-                                                <div className="prod-info">
-                                                    <h5>{item.name}</h5>
-                                                    <p>Qty: {item.quantity} • {item.size}</p>
-                                                    <span className="prod-price">₹{item.price.toLocaleString()}</span>
-                                                </div>
-                                            </div>
-                                        ))}
+                                    <div className="meta-col">
+                                        <span className="label">TOTAL</span>
+                                        <span className="value">₹{order.totalPrice.toLocaleString()}</span>
+                                    </div>
+                                    <div className="meta-col">
+                                        <span className="label">SHIP TO</span>
+                                        <span className="value">{order.shippingAddress.city.toLowerCase() === 'surat' ? 'surat' : order.shippingAddress.city}</span>
                                     </div>
                                 </div>
-
-                                <div className="order-card-footer">
-                                    <button 
-                                        className="track-pkg-btn"
-                                        onClick={() => navigate(`/order/${order._id}`)}
-                                    >
-                                        Track Package <ChevronRight size={18} />
-                                    </button>
-                                    
-                                    {(order.status === 'Processing' || order.status === 'Shipped') && (
-                                        <button 
-                                            className="cancel-order-btn-sm"
-                                            onClick={() => handleCancel(order._id, order.isPaid)}
-                                        >
-                                            Cancel Order
-                                        </button>
-                                    )}
+                                <div className="id-col">
+                                    <span className="label">ORDER # {order._id.toUpperCase()}</span>
+                                    <Link to={`/order/${order._id}`} className="text-link-btn">View Order Details</Link>
                                 </div>
                             </div>
-                        ))}
-                        
-                        {filteredOrders.length === 0 && (
-                            <div className="no-results-message">
-                                <AlertCircle size={40} />
-                                <p>No orders matched your search term.</p>
+
+                            <div className="premium-card-body">
+                                <div className="delivery-row">
+                                    <div className={`status-pill ${order.status.toLowerCase() === 'cancelled' ? 'cancelled' : ''}`}>
+                                        {getStatusIcon(order.status)}
+                                        <span>{order.status.toUpperCase()}</span>
+                                    </div>
+                                    <span className="pmt-label">
+                                        <CreditCard size={14} /> 
+                                        {order.isPaid ? 'Paid' : (order.paymentMethod === 'COD' ? 'Pay on Delivery' : 'Pending')}
+                                    </span>
+                                </div>
+
+                                <div className="products-preview">
+                                    {order.orderItems.map((item, i) => (
+                                        <div key={i} className="preview-row">
+                                            <div className="img-box">
+                                                <img src={item.image} alt={item.name} />
+                                            </div>
+                                            <div className="info-box">
+                                                <h5>{item.name}</h5>
+                                                <p>Qty: {item.quantity} • {item.size}</p>
+                                                <span className="price-tag">₹{item.price.toLocaleString()}</span>
+                                            </div>
+                                        </div>
+                                    ))}
+                                </div>
                             </div>
-                        )}
-                    </div>
+
+                            <div className="premium-card-footer">
+                                <button 
+                                    className="premium-track-btn"
+                                    onClick={() => navigate(`/order/${order._id}`)}
+                                >
+                                    Track Package <ChevronRight size={18} />
+                                </button>
+                                
+                                {(order.status === 'Processing' || order.status === 'Shipped') && (
+                                    <button 
+                                        className="cancel-btn-lite"
+                                        onClick={() => handleCancel(order._id, order.isPaid)}
+                                    >
+                                        Cancel Order
+                                    </button>
+                                )}
+                            </div>
+                        </div>
+                    ))
                 )}
             </div>
         </div>

@@ -161,19 +161,173 @@ const getMe = async (req, res) => {
 
 const updateProfile = async (req, res) => {
     try {
-        const { name, phone, address, city, postalCode, country, avatar } = req.body;
+        const { name, phone, gender, dob, address, city, postalCode, country, avatar, addresses } = req.body;
         const updateFields = {};
         if (name)       updateFields.name       = name;
         if (phone)      updateFields.phone      = phone;
+        if (gender)     updateFields.gender     = gender;
+        if (dob)        updateFields.dob        = dob;
         if (address)    updateFields.address    = address;
         if (city)       updateFields.city       = city;
         if (postalCode) updateFields.postalCode = postalCode;
         if (country)    updateFields.country    = country;
         if (avatar !== undefined) updateFields.avatar = avatar;
+        if (addresses)  updateFields.addresses = addresses;
 
         const user = await User.findByIdAndUpdate(req.user.id, updateFields, { new: true, runValidators: true });
         // Update stored token data
         res.status(200).json({ success: true, data: user });
+    } catch (err) {
+        res.status(400).json({ success: false, message: err.message });
+    }
+};
+
+const addAddress = async (req, res) => {
+    try {
+        const user = await User.findById(req.user.id);
+        
+        // Limit to maximum 2 addresses
+        if (user.addresses.length >= 2) {
+            return res.status(400).json({ success: false, message: "Maximum of 2 addresses allowed" });
+        }
+
+        const { fullName, mobileNumber, houseNumber, street, city, state, pincode, addressType, isDefault } = req.body;
+        
+        const newAddress = { fullName, mobileNumber, houseNumber, street, city, state, pincode, addressType, isDefault };
+        
+        if (isDefault) {
+            user.addresses.forEach(addr => addr.isDefault = false);
+        } else if (user.addresses.length === 0) {
+            newAddress.isDefault = true;
+        }
+        
+        user.addresses.push(newAddress);
+        await user.save();
+        res.status(201).json({ success: true, data: user.addresses });
+    } catch (err) {
+        res.status(400).json({ success: false, message: err.message });
+    }
+};
+
+const updateAddress = async (req, res) => {
+    try {
+        const user = await User.findById(req.user.id);
+        const addressId = req.params.id;
+        const { fullName, mobileNumber, houseNumber, street, city, state, pincode, addressType, isDefault } = req.body;
+        
+        const addrIndex = user.addresses.findIndex(addr => addr._id.toString() === addressId);
+        if (addrIndex === -1) return res.status(404).json({ success: false, message: "Address not found" });
+        
+        if (isDefault) {
+            user.addresses.forEach(addr => addr.isDefault = false);
+        }
+        
+        user.addresses[addrIndex] = {
+            ...user.addresses[addrIndex].toObject(),
+            fullName, mobileNumber, houseNumber, street, city, state, pincode, addressType, isDefault
+        };
+        
+        await user.save();
+        res.status(200).json({ success: true, data: user.addresses });
+    } catch (err) {
+        res.status(400).json({ success: false, message: err.message });
+    }
+};
+
+const deleteAddress = async (req, res) => {
+    try {
+        const user = await User.findById(req.user.id);
+        const addressId = req.params.id;
+        
+        const addrIndex = user.addresses.findIndex(addr => addr._id.toString() === addressId);
+        if (addrIndex === -1) return res.status(404).json({ success: false, message: "Address not found" });
+        
+        const wasDefault = user.addresses[addrIndex].isDefault;
+        user.addresses.splice(addrIndex, 1);
+        
+        if (wasDefault && user.addresses.length > 0) {
+            user.addresses[0].isDefault = true;
+        }
+        
+        await user.save();
+        res.status(200).json({ success: true, data: user.addresses });
+    } catch (err) {
+        res.status(400).json({ success: false, message: err.message });
+    }
+};
+
+const setDefaultAddress = async (req, res) => {
+    try {
+        const user = await User.findById(req.user.id);
+        const addressId = req.params.id;
+        
+        user.addresses.forEach(addr => {
+            addr.isDefault = addr._id.toString() === addressId;
+        });
+        
+        await user.save();
+        res.status(200).json({ success: true, data: user.addresses });
+    } catch (err) {
+        res.status(400).json({ success: false, message: err.message });
+    }
+};
+
+// ── Payment Methods Controllers ──
+
+const addPaymentMethod = async (req, res) => {
+    try {
+        const user = await User.findById(req.user.id);
+        const { methodType, cardHolder, cardNumber, expiry, cardType, upiId, isDefault } = req.body;
+        
+        const newMethod = { methodType, cardHolder, cardNumber, expiry, cardType, upiId, isDefault };
+        
+        if (isDefault) {
+            user.paymentMethods.forEach(pm => pm.isDefault = false);
+        } else if (user.paymentMethods.length === 0) {
+            newMethod.isDefault = true;
+        }
+        
+        user.paymentMethods.push(newMethod);
+        await user.save();
+        res.status(201).json({ success: true, data: user.paymentMethods });
+    } catch (err) {
+        res.status(400).json({ success: false, message: err.message });
+    }
+};
+
+const deletePaymentMethod = async (req, res) => {
+    try {
+        const user = await User.findById(req.user.id);
+        const methodId = req.params.id;
+        
+        const methodIndex = user.paymentMethods.findIndex(pm => pm._id.toString() === methodId);
+        if (methodIndex === -1) return res.status(404).json({ success: false, message: "Payment method not found" });
+        
+        const wasDefault = user.paymentMethods[methodIndex].isDefault;
+        user.paymentMethods.splice(methodIndex, 1);
+        
+        if (wasDefault && user.paymentMethods.length > 0) {
+            user.paymentMethods[0].isDefault = true;
+        }
+        
+        await user.save();
+        res.status(200).json({ success: true, data: user.paymentMethods });
+    } catch (err) {
+        res.status(400).json({ success: false, message: err.message });
+    }
+};
+
+const setDefaultPaymentMethod = async (req, res) => {
+    try {
+        const user = await User.findById(req.user.id);
+        const methodId = req.params.id;
+        
+        user.paymentMethods.forEach(pm => {
+            pm.isDefault = pm._id.toString() === methodId;
+        });
+        
+        await user.save();
+        res.status(200).json({ success: true, data: user.paymentMethods });
     } catch (err) {
         res.status(400).json({ success: false, message: err.message });
     }
@@ -240,6 +394,24 @@ const forgotPassword = async (req, res) => {
             await user.save({ validateBeforeSave: false });
             return res.status(500).json({ success: false, message: 'Failed to send password reset email.' });
         }
+    } catch (err) {
+        res.status(500).json({ success: false, message: err.message });
+    }
+};
+
+const changePassword = async (req, res) => {
+    try {
+        const { currentPassword, newPassword } = req.body;
+        const user = await User.findById(req.user.id).select('+password');
+
+        if (!(await user.comparePassword(currentPassword, user.password))) {
+            return res.status(401).json({ success: false, message: 'Invalid current password' });
+        }
+
+        user.password = newPassword;
+        await user.save();
+
+        res.status(200).json({ success: true, message: 'Password updated successfully' });
     } catch (err) {
         res.status(500).json({ success: false, message: err.message });
     }
@@ -318,8 +490,16 @@ module.exports = {
     adminLogin, 
     getMe, 
     updateProfile, 
-    forgotPassword, 
+    addAddress,
+    updateAddress,
+    deleteAddress,
+    setDefaultAddress,
+    addPaymentMethod,
+    deletePaymentMethod,
+    setDefaultPaymentMethod,
+    forgotPassword,
     resetPassword,
+    changePassword,
     googleAuthUrl,
     googleAuthCallback
 };

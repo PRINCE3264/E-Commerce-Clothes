@@ -1,5 +1,6 @@
 const mongoose = require('mongoose');
 const Wishlist = require('../models/Wishlist');
+const Product = require('../models/Product'); // Ensure Product model is registered for population
 
 // @desc    Get user wishlist
 // @route   GET /api/wishlist
@@ -15,8 +16,8 @@ const getWishlist = async (req, res) => {
         }
         res.status(200).json({ success: true, data: wishlist });
     } catch (err) {
-        console.error("WISHLIST_ERROR_GET:", err);
-        res.status(500).json({ success: false, message: "Wishlist loading failed: " + err.message });
+        console.error("WISHLIST_ERROR_GET (500):", err);
+        res.status(500).json({ success: false, message: "Internal server error while fetching wishlist" });
     }
 };
 

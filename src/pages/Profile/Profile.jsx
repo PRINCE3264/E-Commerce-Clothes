@@ -1,9 +1,9 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
-    Camera, LogOut, ChevronRight, MapPin, User,
-    Mail, Phone, CheckCircle, AlertCircle,
-    Loader, Edit3, Save, X
+    Camera, LogOut, ChevronRight, User,
+    Mail, Phone, AlertCircle,
+    Loader, Edit3, Save, X, Crown, Calendar
 } from 'lucide-react';
 import API from '../../utils/api';
 import './Profile.css';
@@ -72,7 +72,6 @@ const Profile = () => {
             const base64 = reader.result;
             setAvatarPreview(base64);
             
-            // Auto-save avatar to backend immediately
             try {
                 const res = await API.put('/auth/profile', { ...editForm, avatar: base64 });
                 if (res.data.success) {
@@ -80,7 +79,6 @@ const Profile = () => {
                     setUser(u);
                     localStorage.setItem('user_data', JSON.stringify(u));
                     window.dispatchEvent(new Event('user_data_updated'));
-                    // Optional: show a small toast or success indicator
                 }
             } catch (err) {
                 console.error("Failed to auto-save avatar", err);
@@ -119,7 +117,6 @@ const Profile = () => {
         navigate('/login');
     };
 
-    /* Same 3-step chain as sidebar: preview → saved avatar → initials */
     const fallbackAvatar = `${DEFAULT_AVATAR}${encodeURIComponent(user?.name || 'U')}`;
     const avatarSrc = avatarPreview || user?.avatar || fallbackAvatar;
     const onAvatarError = (e) => { e.target.onerror = null; e.target.src = fallbackAvatar; };
@@ -128,7 +125,6 @@ const Profile = () => {
         ? new Date(user.createdAt).toLocaleDateString('en-US', { month: 'long', year: 'numeric' })
         : 'Recently Joined';
 
-    /* ── Loading state ── */
     if (loading) return (
         <div className="pf-loading">
             <Loader size={44} className="pf-spin" />
@@ -144,211 +140,129 @@ const Profile = () => {
     );
 
     return (
-        <div className="pf-page">
-            <div className="pf-wrap">
-
-                {/* ══════════════════════════════
-                    ONE SINGLE CARD
-                ══════════════════════════════ */}
-                <div className="pf-single-card">
-
-                    {/* ── Hero: Avatar + Name ── */}
-                    <div className="pf-hero-inner">
-                        <div className="pf-hero-bg-strip" />
-                        <div className="pf-hero-body">
-                            <div className="pf-avatar-ring">
-                                <img src={avatarSrc} alt={user.name} className="pf-avatar" onError={onAvatarError} />
-                                <button className="pf-cam-btn" type="button" onClick={() => fileInputRef.current?.click()}>
-                                    <Camera size={14} />
+        <div className="pf-page-standalone animate-fade-in elite-profile-page">
+            <div className="elite-profile-wrap">
+                
+                {/* ── RED CURVED HEADER ── */}
+                <div className="elite-hero-card">
+                    <div className="elite-hero-banner"></div>
+                    <div className="elite-hero-content">
+                        <div className="elite-avatar-container">
+                            <div className="elite-avatar-ring">
+                                <img src={avatarSrc} alt={user.name} className="elite-avatar-img" onError={onAvatarError} />
+                                <button className="elite-cam-btn" onClick={() => fileInputRef.current?.click()}>
+                                    <Camera size={16} />
                                 </button>
-                                <input ref={fileInputRef} type="file" accept="image/*"
-                                    style={{ display: 'none' }} onChange={handleAvatarChange} />
+                                <input type="file" ref={fileInputRef} style={{ display: 'none' }} onChange={handleAvatarChange} />
                             </div>
-                            <h1 className="pf-hero-name">{user.name}</h1>
-                            <p className="pf-hero-email">{user.email}</p>
-                            {user.phone && <p className="pf-hero-phone">{user.phone}</p>}
-                            <span className="pf-premium-badge">👑 Premium Member</span>
-                            <span className="pf-join-badge">Since {joinDate}</span>
+                        </div>
+                        
+                        <div className="elite-identity">
+                            <h1 className="elite-name">{user.name}</h1>
+                            <p className="elite-email">{user.email}</p>
+                            {user.phone && <p className="elite-phone">{user.phone}</p>}
+                            
+                            <div className="elite-badges">
+                                <span className="badge-pill premium">
+                                    <Crown size={14} fill="#f59e0b" color="#f59e0b" /> Premium Member
+                                </span>
+                                <span className="badge-pill join">Since {joinDate}</span>
+                            </div>
                         </div>
                     </div>
-
-                    <div className="pf-card-divider" />
-
-                    {/* ── Account Details ── */}
-                    <div className="pf-details-block">
-                        <h2 className="pf-block-title"><User size={16} /> Account Details</h2>
-                        <div className="pf-details-list">
-                            <div className="pf-detail-row">
-                                <User size={15} className="pf-detail-icon" />
-                                <div>
-                                    <span className="pf-detail-label">Full Name</span>
-                                    <span className="pf-detail-val">{user.name}</span>
-                                </div>
-                            </div>
-                            <div className="pf-detail-row">
-                                <Mail size={15} className="pf-detail-icon" />
-                                <div>
-                                    <span className="pf-detail-label">Email</span>
-                                    <span className="pf-detail-val">{user.email}</span>
-                                </div>
-                            </div>
-                            {user.phone && (
-                                <div className="pf-detail-row">
-                                    <Phone size={15} className="pf-detail-icon" />
-                                    <div>
-                                        <span className="pf-detail-label">Phone</span>
-                                        <span className="pf-detail-val">{user.phone}</span>
-                                    </div>
-                                </div>
-                            )}
-                            {(user.address || user.city) && (
-                                <div className="pf-detail-row">
-                                    <MapPin size={15} className="pf-detail-icon" />
-                                    <div>
-                                        <span className="pf-detail-label">Address</span>
-                                        <span className="pf-detail-val">
-                                            {[user.address, user.city, user.postalCode, user.country].filter(Boolean).join(', ')}
-                                        </span>
-                                    </div>
-                                </div>
-                            )}
-                        </div>
-                    </div>
-
-                    <div className="pf-card-divider" />
-
-                    {/* ── Edit Profile + Shipping ── */}
-                    <div className="pf-details-block">
-
-                        {/* Edit Profile toggle */}
-                        <button className="pf-menu-item" onClick={() => setActiveSection(activeSection === 'edit' ? null : 'edit')}>
-                            <div className="pf-menu-left">
-                                <div className="pf-menu-icon" style={{ background: '#eff6ff', color: '#3b82f6' }}>
-                                    <Edit3 size={17} />
-                                </div>
-                                <span>Edit Profile</span>
-                            </div>
-                            <ChevronRight size={18} className={`pf-chevron ${activeSection === 'edit' ? 'rotated' : ''}`} />
-                        </button>
-
-                        {activeSection === 'edit' && (
-                            <form className="pf-inline-form" onSubmit={handleSave}>
-                                {saveStatus === 'ok' && (
-                                    <div className="pf-banner success"><CheckCircle size={16} /> Saved successfully!</div>
-                                )}
-                                {saveStatus === 'err' && (
-                                    <div className="pf-banner error"><AlertCircle size={16} /> Save failed. Try again.</div>
-                                )}
-                                <div className="pf-form-avatar-row">
-                                    <img src={avatarSrc} alt="avatar" className="pf-form-avatar" onError={onAvatarError} />
-                                    <button type="button" className="pf-change-photo-btn" onClick={() => fileInputRef.current?.click()}>
-                                        <Camera size={15} /> Change Photo
-                                    </button>
-                                </div>
-                                <div className="pf-form-grid">
-                                    <div className="pf-form-group">
-                                        <label>Full Name *</label>
-                                        <input type="text" value={editForm.name}
-                                            onChange={e => setEditForm({ ...editForm, name: e.target.value })}
-                                            placeholder="Your full name" required />
-                                    </div>
-                                    <div className="pf-form-group">
-                                        <label>Email (cannot change)</label>
-                                        <input type="email" value={user.email} disabled />
-                                    </div>
-                                    <div className="pf-form-group">
-                                        <label>Phone Number</label>
-                                        <input type="text" value={editForm.phone}
-                                            onChange={e => setEditForm({ ...editForm, phone: e.target.value })}
-                                            placeholder="+91 98765 43210" />
-                                    </div>
-                                    <div className="pf-form-group">
-                                        <label>Country</label>
-                                        <input type="text" value={editForm.country}
-                                            onChange={e => setEditForm({ ...editForm, country: e.target.value })}
-                                            placeholder="India" />
-                                    </div>
-                                    <div className="pf-form-group pf-full-col">
-                                        <label>Street Address</label>
-                                        <input type="text" value={editForm.address}
-                                            onChange={e => setEditForm({ ...editForm, address: e.target.value })}
-                                            placeholder="House No, Street" />
-                                    </div>
-                                    <div className="pf-form-group">
-                                        <label>City</label>
-                                        <input type="text" value={editForm.city}
-                                            onChange={e => setEditForm({ ...editForm, city: e.target.value })}
-                                            placeholder="Mumbai" />
-                                    </div>
-                                    <div className="pf-form-group">
-                                        <label>Postal Code</label>
-                                        <input type="text" value={editForm.postalCode}
-                                            onChange={e => setEditForm({ ...editForm, postalCode: e.target.value })}
-                                            placeholder="400001" />
-                                    </div>
-                                </div>
-                                <div className="pf-form-actions">
-                                    <button type="button" className="pf-btn-cancel" onClick={() => setActiveSection(null)}>
-                                        <X size={16} /> Cancel
-                                    </button>
-                                    <button type="submit" className="pf-btn-save" disabled={saving}>
-                                        {saving
-                                            ? <><Loader size={16} className="pf-spin" /> Saving…</>
-                                            : <><Save size={16} /> Save Changes</>}
-                                    </button>
-                                </div>
-                            </form>
-                        )}
-
-                        <div className="pf-menu-divider" />
-
-                        {/* Shipping Address toggle */}
-                        <button className="pf-menu-item" onClick={() => setActiveSection(activeSection === 'shipping' ? null : 'shipping')}>
-                            <div className="pf-menu-left">
-                                <div className="pf-menu-icon" style={{ background: '#f0fdf4', color: '#16a34a' }}>
-                                    <MapPin size={17} />
-                                </div>
-                                <span>Shipping Address</span>
-                            </div>
-                            <ChevronRight size={18} className={`pf-chevron ${activeSection === 'shipping' ? 'rotated' : ''}`} />
-                        </button>
-
-                        {activeSection === 'shipping' && (
-                            <div className="pf-shipping-detail">
-                                {user.address || user.city ? (
-                                    <>
-                                        {user.address    && <p><strong>Street:</strong> {user.address}</p>}
-                                        {user.city       && <p><strong>City:</strong> {user.city}</p>}
-                                        {user.postalCode && <p><strong>Postal Code:</strong> {user.postalCode}</p>}
-                                        {user.country    && <p><strong>Country:</strong> {user.country}</p>}
-                                        <button className="pf-edit-addr-btn" onClick={() => setActiveSection('edit')}>
-                                            <Edit3 size={14} /> Edit Address
-                                        </button>
-                                    </>
-                                ) : (
-                                    <div className="pf-no-addr">
-                                        <MapPin size={30} color="#cbd5e1" />
-                                        <p>No address saved yet.</p>
-                                        <button className="pf-edit-addr-btn" onClick={() => setActiveSection('edit')}>
-                                            + Add Address
-                                        </button>
-                                    </div>
-                                )}
-                            </div>
-                        )}
-                    </div>
-
-                    <div className="pf-card-divider" />
-
-                    {/* ── Logout ── */}
-                    <div className="pf-details-block">
-                        <button className="pf-logout-inline" onClick={handleLogout}>
-                            <LogOut size={18} /><span>Logout</span>
-                        </button>
-                    </div>
-
                 </div>
-                {/* end pf-single-card */}
+
+                <div className="elite-details-container">
+                    <div className="elite-section">
+                        <div className="elite-section-title">
+                            <User size={18} /> <span>Account Details</span>
+                        </div>
+                        
+                        <div className="elite-details-list">
+                            <div className="elite-detail-row">
+                                <div className="detail-icon"><User size={18} /></div>
+                                <div className="detail-info">
+                                    <small>FULL NAME</small>
+                                    <strong>{user.name}</strong>
+                                </div>
+                            </div>
+                            
+                            <div className="elite-detail-row">
+                                <div className="detail-icon"><Mail size={18} /></div>
+                                <div className="detail-info">
+                                    <small>EMAIL</small>
+                                    <strong>{user.email}</strong>
+                                </div>
+                            </div>
+
+                            {user.phone && (
+                                <div className="elite-detail-row">
+                                    <div className="detail-icon"><Phone size={18} /></div>
+                                    <div className="detail-info">
+                                        <small>PHONE</small>
+                                        <strong>{user.phone}</strong>
+                                    </div>
+                                </div>
+                            )}
+                        </div>
+                    </div>
+
+                    <div className="elite-divider"></div>
+
+                    <div className="elite-section">
+                        <div className="elite-section-title">
+                            <Edit3 size={18} /> <span>Profile Settings</span>
+                        </div>
+                        
+                        <div className="elite-actions">
+                            <button className="elite-action-btn" onClick={() => setActiveSection(activeSection === 'edit' ? null : 'edit')}>
+                                <div className="action-icon edit"><Edit3 size={18} /></div>
+                                <span className="action-label">Edit Profile Information</span>
+                                <ChevronRight size={18} className={`chevron ${activeSection === 'edit' ? 'active' : ''}`} />
+                            </button>
+
+                            {activeSection === 'edit' && (
+                                <form className="elite-edit-form" onSubmit={handleSave}>
+                                    <div className="elite-form-grid">
+                                        <div className="form-group">
+                                            <label>Full Name</label>
+                                            <input type="text" value={editForm.name} onChange={e => setEditForm({...editForm, name: e.target.value})} required />
+                                        </div>
+                                        <div className="form-group">
+                                            <label>Phone Number</label>
+                                            <input type="text" value={editForm.phone} onChange={e => setEditForm({...editForm, phone: e.target.value})} />
+                                        </div>
+                                        <div className="form-group full-width">
+                                            <label>Shipping Address</label>
+                                            <input type="text" value={editForm.address} onChange={e => setEditForm({...editForm, address: e.target.value})} />
+                                        </div>
+                                        <div className="form-group">
+                                            <label>City</label>
+                                            <input type="text" value={editForm.city} onChange={e => setEditForm({...editForm, city: e.target.value})} />
+                                        </div>
+                                        <div className="form-group">
+                                            <label>Postal Code</label>
+                                            <input type="text" value={editForm.postalCode} onChange={e => setEditForm({...editForm, postalCode: e.target.value})} />
+                                        </div>
+                                    </div>
+                                    <div className="form-footer">
+                                        <button type="submit" className="elite-save-btn" disabled={saving}>
+                                            {saving ? <Loader className="spin" size={16} /> : <Save size={16} />}
+                                            {saving ? 'Saving...' : 'Save Changes'}
+                                        </button>
+                                        {saveStatus === 'ok' && <span className="status-msg success">Profile updated!</span>}
+                                    </div>
+                                </form>
+                            )}
+
+                            <button className="elite-action-btn logout-btn" onClick={handleLogout}>
+                                <div className="action-icon logout"><LogOut size={18} /></div>
+                                <span className="action-label">Sign Out Account</span>
+                                <ChevronRight size={18} />
+                            </button>
+                        </div>
+                    </div>
+                </div>
 
             </div>
         </div>

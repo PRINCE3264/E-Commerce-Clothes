@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 import {
     X, User, Heart, ShoppingBag, CreditCard,
     CheckSquare, Truck, Star, Power, ChevronRight,
-    Crown, Home, Info, LayoutList, BookOpen, Phone, LogIn, MessageSquare
+    Crown, Home, Info, LayoutList, BookOpen, Phone, LogIn, MessageSquare, RotateCcw
 } from 'lucide-react';
 import './Sidebar.css';
 
@@ -95,14 +95,14 @@ const Sidebar = ({ isOpen, toggleSidebar, userData, handleLogout }) => {
                         <h4 className="section-label">PERSONAL SELECTION</h4>
                         <ul className="sidebar-links">
                             <li>
-                                <Link to="/profile" className="sidebar-link" onClick={toggleSidebar}>
+                                <Link to="/account/profile" className="sidebar-link" onClick={toggleSidebar}>
                                     <div className="link-icon-bg"><User size={20} /></div>
-                                    <span className="link-text">My Profile</span>
+                                    <span className="link-text">My Profile & Account</span>
                                     <ChevronRight size={16} className="chevron" />
                                 </Link>
                             </li>
                             <li>
-                                <Link to="/wishlist" className="sidebar-link" onClick={toggleSidebar}>
+                                <Link to="/account/wishlist" className="sidebar-link" onClick={toggleSidebar}>
                                     <div className="link-icon-bg"><Heart size={20} /></div>
                                     <span className="link-text">My Wishlist</span>
                                     <span className="new-badge">NEW</span>
@@ -116,10 +116,11 @@ const Sidebar = ({ isOpen, toggleSidebar, userData, handleLogout }) => {
                         <h4 className="section-label">SHOPPING ACTIVITY</h4>
                         <ul className="sidebar-links">
                             {[
-                                { to: '/my-orders',       icon: <ShoppingBag size={20} />, label: 'My Orders' },
+                                { to: '/account/orders',   icon: <ShoppingBag size={20} />, label: 'My Orders' },
+                                { to: '/account/returns',  icon: <RotateCcw size={20} />,   label: 'Returns & Refunds' },
                                 { to: `/payment?orderId=${latestOrderId}`, icon: <CreditCard size={20} />, label: 'Confirm Payment' },
                                 { to: '/checkout',     icon: <CheckSquare size={20} />, label: 'Checkout' },
-                                { to: '/mypayments',   icon: <CreditCard size={20} />,  label: 'Payments Details' },
+                                { to: '/account/payments', icon: <CreditCard size={20} />,  label: 'Payments Details' },
                                 { to: '/arrivals',     icon: <Truck size={20} />,       label: 'Arrivals' },
                                 { to: '/best-products',icon: <Star size={20} />,        label: 'Best Products' },
                             ].map(({ to, icon, label }) => (

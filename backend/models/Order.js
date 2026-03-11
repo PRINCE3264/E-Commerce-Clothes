@@ -89,6 +89,12 @@ const orderSchema = new mongoose.Schema({
     refundedAt: {
         type: Date
     },
+    refundProof: {
+        type: String
+    },
+    refundTransactionId: {
+        type: String
+    },
     status: {
         type: String,
         required: true,

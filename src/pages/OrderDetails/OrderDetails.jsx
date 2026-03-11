@@ -25,7 +25,8 @@ import {
     Navigation,
     Activity,
     MessageCircle,
-    Send
+    Send,
+    ArrowLeft
 } from 'lucide-react';
 import { jsPDF } from "jspdf";
 import html2canvas from "html2canvas";
@@ -169,7 +170,7 @@ Thank you for shopping with us!
             <AlertCircle size={60} color="#ef4444" />
             <h2>Order Not Found</h2>
             <p>We couldn't locate the order you're looking for. It may have been deleted or the ID is incorrect.</p>
-            <Link to="/my-orders" className="back-link">Return to My Orders</Link>
+            <Link to="/account/orders" className="back-link">Return to My Orders</Link>
         </motion.div>
     );
 
@@ -199,7 +200,7 @@ Thank you for shopping with us!
                 <div className="order-details-header">
                     <div className="header-main-flex">
                         <div className="header-info-group">
-                            <button className="btn-back" onClick={() => navigate('/my-orders')}>
+                            <button className="btn-back" onClick={() => navigate('/account/orders')}>
                                 <ChevronLeft size={18} /> BACK TO ORDERS
                             </button>
                             <h1 className="luxury-header-title">PANDIT FASHION</h1>
@@ -352,6 +353,9 @@ Thank you for shopping with us!
                             </div>
 
                             <div style={{ marginTop: '25px', display: 'flex', flexDirection: 'column', gap: '10px' }}>
+                                <Link to="/account/orders" style={{ display: 'flex', alignItems: 'center', gap: '8px', color: '#64748b', textDecoration: 'none', fontWeight: '600', fontSize: '0.9rem' }}>
+                                    <ArrowLeft size={18} /> BACK TO ORDERS
+                                </Link>
                                 <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.8rem', fontWeight: 'bold', color: '#94a3b8' }}>
                                     <span>PAYMENT MODE</span>
                                     <span>{order.paymentMethod}</span>

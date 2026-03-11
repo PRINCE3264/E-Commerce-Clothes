@@ -41,10 +41,25 @@ const userSchema = new mongoose.Schema({
         default: ''
     },
     phone: String,
+    gender: String,
+    dob: Date,
     address: String,
     city: String,
     postalCode: String,
     country: String,
+    addresses: [
+        {
+            fullName: String,
+            mobileNumber: String,
+            houseNumber: String,
+            street: String,
+            city: String,
+            state: String,
+            pincode: String,
+            addressType: { type: String, enum: ['Home', 'Work', 'Other'], default: 'Home' },
+            isDefault: { type: Boolean, default: false }
+        }
+    ],
     resetPasswordToken: String,
     resetPasswordExpire: Date,
     createdAt: {
@@ -58,7 +73,18 @@ const userSchema = new mongoose.Schema({
     wishlist: {
         type: Array,
         default: []
-    }
+    },
+    paymentMethods: [
+        {
+            methodType: { type: String, enum: ['Card', 'UPI'], required: true },
+            cardHolder: String,
+            cardNumber: String, // Masked like **** 1234
+            expiry: String,
+            cardType: String, // Visa, Mastercard, etc.
+            upiId: String,
+            isDefault: { type: Boolean, default: false }
+        }
+    ]
 }, {
     timestamps: true
 });

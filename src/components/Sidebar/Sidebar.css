@@ -404,3 +404,14 @@
     100% { transform: scale(1); opacity: 1; }
 }
 
+.premium-badge-mini {
+    background: #c0392b;
+    color: white;
+    font-size: 0.65rem;
+    font-weight: 800;
+    padding: 2px 6px;
+    border-radius: 4px;
+    margin-left: auto;
+    letter-spacing: 0.5px;
+}
+
