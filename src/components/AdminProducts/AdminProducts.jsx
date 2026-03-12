@@ -13,7 +13,8 @@ import {
     Flame,
     Zap,
     Tag,
-    Upload
+    Upload,
+    Star
 } from 'lucide-react';
 import API from '../../utils/api';
 import Swal from 'sweetalert2';
@@ -205,6 +206,13 @@ const AdminProducts = () => {
                                 <label>Product Abstract</label>
                                 <textarea id="swal-desc" className="swal2-textarea compact" defaultValue={product?.description || ''} placeholder="Architectural details of the garment..." style={{ height: '100px', borderRadius: '15px' }}></textarea>
                             </div>
+                            <div className="swal-input-group" style={{ marginTop: '10px' }}>
+                                <label>Manual Rating (0-5)</label>
+                                <div className="input-with-icon">
+                                    <Star size={16} className="field-icon" />
+                                    <input id="swal-rating" type="number" step="0.1" min="0" max="5" className="swal2-input" defaultValue={product?.rating || 0} placeholder="5.0" />
+                                </div>
+                            </div>
                         </div>
 
                         {/* Section 2: Technicals */}
@@ -325,6 +333,7 @@ const AdminProducts = () => {
                 const colorRaw = document.getElementById('swal-color').value;
                 const isNewArrival = document.getElementById('swal-new-arrival').checked;
                 const isBestSeller = document.getElementById('swal-best-seller').checked;
+                const rating = document.getElementById('swal-rating').value;
 
                 if (!name || !category || !price) {
                     Swal.showValidationMessage('Product Name, Category and Sale Price are required');
@@ -339,12 +348,14 @@ const AdminProducts = () => {
                     stock: parseInt(stock), 
                     image, 
                     description,
+                    rating: parseFloat(rating) || 0,
                     size: sizeRaw.split(',').map(s => s.trim()).filter(s => s !== ''),
                     color: colorRaw.split(',').map(c => c.trim()).filter(c => c !== ''),
                     outOfStockSizes: document.getElementById('swal-out-size').value.split(',').map(s => s.trim()).filter(s => s !== ''),
                     outOfStockColors: document.getElementById('swal-out-color').value.split(',').map(c => c.trim()).filter(c => c !== ''),
                     isNewArrival,
-                    isBestSeller
+                    isBestSeller,
+                    badge: (oldPrice && parseFloat(oldPrice) > parseFloat(price)) ? `${Math.round(((parseFloat(oldPrice) - parseFloat(price)) / parseFloat(oldPrice)) * 100)}%` : null
                 };
             }
         });
@@ -470,6 +481,20 @@ const AdminProducts = () => {
                              <div class="v-label">AVAILABILITY</div>
                             <div class="v-val">${product.stock || 50} Units in Core</div>
 
+                            ${product.oldPrice && product.oldPrice > product.price ? `
+                                <div class="v-label">OFFER SCALE</div>
+                                <div class="v-val" style="color: #16a34a; background: #f0fdf4; padding: 4px 10px; border-radius: 8px; border: 1px solid #dcfce7; width: fit-content; font-size: 0.9rem;">${Math.round(((product.oldPrice - product.price) / product.oldPrice) * 100)}% OFF Applied</div>
+                            ` : ''}
+
+                            <div class="v-label">PRODUCT RATING</div>
+                            <div class="v-val" style="display: flex; align-items: center; gap: 8px;">
+                                <span style="background: #fffbeb; color: #b45309; padding: 4px 10px; border-radius: 8px; font-weight: 800; border: 1px solid #fef3c7; display: flex; align-items: center; gap: 5px;">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="#b45309" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-star"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+                                    ${product.rating || '0.0'}
+                                </span>
+                                <span style="color: #94a3b8; font-size: 0.8rem; font-weight: 600;">(${product.numReviews || 0} Reviews)</span>
+                            </div>
+
                             <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 15px;">
                                 <div>
                                     <div class="v-label" style="color: #ef4444;">OUT OF STOCK SIZES</div>
@@ -567,9 +592,11 @@ const AdminProducts = () => {
                                     <th onClick={() => toggleSort('price')} style={{cursor: 'pointer'}}>
                                         Price <ArrowUpDown size={14} />
                                     </th>
-                                    <th onClick={() => toggleSort('stock')} style={{cursor: 'pointer'}}>
+                                     <th onClick={() => toggleSort('stock')} style={{cursor: 'pointer'}}>
                                         Stock <ArrowUpDown size={14} />
                                     </th>
+                                    <th>Discount</th>
+                                    <th>Rating</th>
                                     <th>Status</th>
                                     <th>Control</th>
                                 </tr>
@@ -610,6 +637,19 @@ const AdminProducts = () => {
                                             <td>{product.category}</td>
                                             <td className="p-price"><IndianRupee size={12} style={{marginRight: '2px'}} />{parseFloat(product.price).toLocaleString()}</td>
                                             <td>{product.stock || 50}</td>
+                                            <td>
+                                                {product.oldPrice && product.oldPrice > product.price ? (
+                                                    <span className="p-badge arrival" style={{ background: '#f0fdf4', color: '#16a34a', borderColor: '#dcfce7' }}>
+                                                        {Math.round(((product.oldPrice - product.price) / product.oldPrice) * 100)}%
+                                                    </span>
+                                                ) : <span style={{color: '#94a3b8', fontSize: '0.8rem'}}>None</span>}
+                                            </td>
+                                            <td>
+                                                <div style={{ display: 'flex', alignItems: 'center', gap: '5px', background: '#fffbeb', color: '#b45309', padding: '4px 8px', borderRadius: '8px', border: '1px solid #fef3c7', fontWeight: '800', width: 'fit-content' }}>
+                                                    <Star size={12} fill="#b45309" />
+                                                    {product.rating ? product.rating.toFixed(1) : '0.0'}
+                                                </div>
+                                            </td>
                                             <td>
                                                 <span className={`status-badge ${(product.stock || 50) > 0 ? 'status-completed' : 'status-pending'}`}>
                                                     {(product.stock || 50) > 0 ? 'Regular' : 'Stock Out'}

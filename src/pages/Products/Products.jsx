@@ -192,6 +192,10 @@ const Products = ({ onAddToCart, onToggleWishlist, wishlist }) => {
                                             <span className="product-badge best-seller">BEST SELLER</span>
                                         ) : product.isNewArrival ? (
                                             <span className="product-badge new-arrival">NEW ARRIVAL</span>
+                                        ) : product.oldPrice && product.oldPrice > product.price ? (
+                                            <span className="product-badge discount">
+                                                {Math.round(((product.oldPrice - product.price) / product.oldPrice) * 100)}%
+                                            </span>
                                         ) : product.badge ? (
                                             <span className={`product-badge ${product.badge.toLowerCase()}`}>{product.badge}</span>
                                         ) : null}

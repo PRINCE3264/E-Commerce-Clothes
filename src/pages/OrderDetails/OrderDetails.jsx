@@ -1,5 +1,5 @@
 /* eslint-disable no-unused-vars */
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { 
@@ -38,6 +38,20 @@ const OrderDetails = () => {
     const navigate = useNavigate();
     const [order, setOrder] = useState(null);
     const [loading, setLoading] = useState(true);
+    const [uploading, setUploading] = useState(false);
+
+    const fetchOrder = useCallback(async (orderId = id) => {
+        try {
+            const res = await API.get(`/orders/${orderId}`);
+            if (res.data.success) {
+                setOrder(res.data.data);
+            }
+        } catch (err) {
+            console.error("Error fetching order details:", err);
+        } finally {
+            setLoading(false);
+        }
+    }, [id]);
 
     useEffect(() => {
         const token = localStorage.getItem('auth_token') || localStorage.getItem('admin_token');
@@ -46,20 +60,37 @@ const OrderDetails = () => {
             return;
         }
 
-        const fetchOrder = async () => {
-            try {
-                const res = await API.get(`/orders/${id}`);
-                if (res.data.success) {
-                    setOrder(res.data.data);
-                }
-            } catch (err) {
-                console.error("Error fetching order details:", err);
-            } finally {
-                setLoading(false);
-            }
-        };
         fetchOrder(id);
-    }, [id, navigate]);
+    }, [id, navigate, fetchOrder]);
+
+    const handleSubmitProof = async (e) => {
+        const file = e.target.files[0];
+        if (!file) return;
+
+        const formData = new FormData();
+        formData.append('image', file);
+
+        setUploading(true);
+        try {
+            const uploadRes = await API.post('/upload', formData, {
+                headers: { 'Content-Type': 'multipart/form-data' }
+            });
+
+            if (uploadRes.data.success) {
+                const proofPath = uploadRes.data.path || uploadRes.data.data;
+                const updateRes = await API.put(`/orders/${id}/refund-proof`, { refundProof: proofPath });
+                if (updateRes.data.success) {
+                    alert("Refund proof submitted successfully! Our team will review it.");
+                    fetchOrder();
+                }
+            }
+        } catch (err) {
+            console.error("Proof submission failed", err);
+            alert(err.response?.data?.message || "Failed to submit proof");
+        } finally {
+            setUploading(false);
+        }
+    };
 
     const getStatusColor = (status) => {
         switch (status) {
@@ -326,31 +357,82 @@ Thank you for shopping with us!
                         </motion.div>
 
                         {/* Refund Proof Section */}
-                        {order.refundProof && (
+                        {(order.status === 'Cancelled' || order.refundProof) && (
                             <motion.div className="refund-proof-display glass-panel shadow-premium" variants={itemVariants} style={{ marginTop: '25px', padding: '25px' }}>
-                                <h4 style={{ color: '#2b5a91', marginTop: 0, marginBottom: '15px', fontSize: '1.2rem', fontWeight: '900' }}>REFUND CONFIRMATION</h4>
-                                <div style={{ display: 'flex', gap: '20px', alignItems: 'center' }}>
-                                    {order.refundProof?.toLowerCase().endsWith('.pdf') ? (
-                                        <div 
-                                            style={{ width: '100px', height: '100px', background: '#f8fafc', borderRadius: '10px', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', border: '1px solid #e2e8f0', boxShadow: '0 4px 10px rgba(0,0,0,0.05)', color: '#ef4444', fontWeight: 'bold', fontSize: '13px', textAlign: 'center', padding: '10px' }} 
-                                            onClick={() => window.open(order.refundProof?.startsWith('/') ? `${import.meta.env.VITE_API_URL?.replace('/api', '') || 'http://127.0.0.1:8000'}${order.refundProof}` : order.refundProof, '_blank')} 
-                                        >
-                                            PDF Receipt
+                                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '20px' }}>
+                                    <h4 style={{ color: '#2b5a91', margin: 0, fontSize: '1.2rem', fontWeight: '900' }}>REFUND MANAGEMENT</h4>
+                                    {order.refundProof && (
+                                        <div className={`proof-status-pill ${order.refundProofStatus?.toLowerCase() || 'pending'}`} style={{
+                                            padding: '5px 12px',
+                                            borderRadius: '20px',
+                                            fontSize: '0.75rem',
+                                            fontWeight: '800',
+                                            textTransform: 'uppercase',
+                                            letterSpacing: '0.5px',
+                                            background: order.refundProofStatus === 'Approved' ? '#ecfdf5' : order.refundProofStatus === 'Rejected' ? '#fef2f2' : '#eff6ff',
+                                            color: order.refundProofStatus === 'Approved' ? '#059669' : order.refundProofStatus === 'Rejected' ? '#dc2626' : '#2563eb',
+                                            border: `1px solid ${order.refundProofStatus === 'Approved' ? '#a7f3d0' : order.refundProofStatus === 'Rejected' ? '#fee2e2' : '#bfdbfe'}`
+                                        }}>
+                                            {order.refundProofStatus || 'Pending'}
                                         </div>
-                                    ) : (
-                                        <img 
-                                            src={order.refundProof?.startsWith('/') ? `${import.meta.env.VITE_API_URL?.replace('/api', '') || 'http://127.0.0.1:8000'}${order.refundProof}` : order.refundProof} 
-                                            alt="Refund Proof" 
-                                            style={{ width: '100px', height: '100px', objectFit: 'cover', borderRadius: '10px', border: '1px solid #e2e8f0', cursor: 'pointer', boxShadow: '0 4px 10px rgba(0,0,0,0.05)' }} 
-                                            onClick={() => window.open(order.refundProof?.startsWith('/') ? `${import.meta.env.VITE_API_URL?.replace('/api', '') || 'http://127.0.0.1:8000'}${order.refundProof}` : order.refundProof, '_blank')} 
-                                        />
                                     )}
-                                    <div>
-                                        <p style={{ margin: '0 0 5px 0', fontWeight: 'bold', color: '#1e293b', fontSize: '1rem' }}>Your refund has been processed successfully.</p>
-                                        <p style={{ margin: '0 0 5px 0', fontSize: '0.85rem', color: '#64748b' }}>Transaction ID: <strong style={{color: '#1e293b'}}>{order.refundTransactionId || 'N/A'}</strong></p>
-                                        <p style={{ margin: '0', fontSize: '0.75rem', color: '#94a3b8', fontStyle: 'italic' }}>Click image to view full receipt.</p>
-                                    </div>
                                 </div>
+
+                                {order.refundProof ? (
+                                    <div style={{ display: 'flex', gap: '20px', alignItems: 'center' }}>
+                                        {order.refundProof?.toLowerCase().endsWith('.pdf') ? (
+                                            <div 
+                                                style={{ width: '100px', height: '100px', background: '#f8fafc', borderRadius: '10px', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', border: '1px solid #e2e8f0', boxShadow: '0 4px 10px rgba(0,0,0,0.05)', color: '#ef4444', fontWeight: 'bold', fontSize: '13px', textAlign: 'center', padding: '10px' }} 
+                                                onClick={() => window.open(order.refundProof?.startsWith('/') ? `${import.meta.env.VITE_API_URL?.replace('/api', '') || 'http://127.0.0.1:8000'}${order.refundProof}` : order.refundProof, '_blank')} 
+                                            >
+                                                PDF Receipt
+                                            </div>
+                                        ) : (
+                                            <img 
+                                                src={order.refundProof?.startsWith('/') ? `${import.meta.env.VITE_API_URL?.replace('/api', '') || 'http://127.0.0.1:8000'}${order.refundProof}` : order.refundProof} 
+                                                alt="Refund Proof" 
+                                                style={{ width: '100px', height: '100px', objectFit: 'cover', borderRadius: '10px', border: '1px solid #e2e8f0', cursor: 'pointer', boxShadow: '0 4px 10px rgba(0,0,0,0.05)' }} 
+                                                onClick={() => window.open(order.refundProof?.startsWith('/') ? `${import.meta.env.VITE_API_URL?.replace('/api', '') || 'http://127.0.0.1:8000'}${order.refundProof}` : order.refundProof, '_blank')} 
+                                            />
+                                        )}
+                                        <div style={{ flex: 1 }}>
+                                            {order.refundProofStatus === 'Approved' ? (
+                                                <p style={{ margin: '0 0 5px 0', fontWeight: 'bold', color: '#059669', fontSize: '1rem' }}>✓ Refund Verified by Admin</p>
+                                            ) : order.refundProofStatus === 'Rejected' ? (
+                                                <p style={{ margin: '0 0 5px 0', fontWeight: 'bold', color: '#dc2626', fontSize: '1rem' }}>✗ Proof Rejected</p>
+                                            ) : (
+                                                <p style={{ margin: '0 0 5px 0', fontWeight: 'bold', color: '#1e293b', fontSize: '1rem' }}>Processing Refund Request</p>
+                                            )}
+                                            
+                                            <p style={{ margin: '0 0 5px 0', fontSize: '0.85rem', color: '#64748b' }}>Transaction ID: <strong style={{color: '#1e293b'}}>{order.refundTransactionId || 'Awaiting Verification'}</strong></p>
+                                            
+                                            {order.refundProofStatus === 'Rejected' && (
+                                                <div style={{ marginTop: '10px' }}>
+                                                    <input type="file" id="reupload-proof" style={{ display: 'none' }} onChange={handleSubmitProof} />
+                                                    <label htmlFor="reupload-proof" style={{ 
+                                                        background: '#dc2626', color: '#fff', padding: '6px 15px', borderRadius: '8px', 
+                                                        fontSize: '0.8rem', cursor: 'pointer', fontWeight: '700', display: 'inline-block' 
+                                                    }}>
+                                                        {uploading ? 'UPLOADING...' : 'RE-UPLOAD PROOF'}
+                                                    </label>
+                                                </div>
+                                            )}
+                                        </div>
+                                    </div>
+                                ) : (
+                                    <div style={{ textAlign: 'center', padding: '20px', border: '2px dashed #e2e8f0', borderRadius: '12px', background: '#f8fafc' }}>
+                                        <p style={{ color: '#64748b', fontSize: '0.9rem', marginBottom: '15px' }}>
+                                            Your order has been cancelled. Please upload a receipt or any proof for refund processing if applicable.
+                                        </p>
+                                        <input type="file" id="upload-proof" style={{ display: 'none' }} onChange={handleSubmitProof} />
+                                        <label htmlFor="upload-proof" style={{ 
+                                            background: '#2b5a91', color: '#fff', padding: '10px 25px', borderRadius: '8px', 
+                                            fontSize: '0.9rem', cursor: 'pointer', fontWeight: '700', display: 'inline-block' 
+                                        }}>
+                                            {uploading ? 'UPLOADING...' : 'SUBMIT REFUND PROOF'}
+                                        </label>
+                                    </div>
+                                )}
                             </motion.div>
                         )}
                     </div>

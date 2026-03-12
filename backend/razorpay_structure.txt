@@ -1,0 +1,3 @@
+Keys: key_id, key_secret, oauthToken, api, accounts, stakeholders, payments, refunds, orders, customers, transfers, tokens, virtualAccounts, invoices, iins, paymentLink, plans, products, subscriptions, addons, settlements, qrCode, fundAccount, items, cards, webhooks, documents, disputes
+Payments keys: all, fetch, capture, createPaymentJson, createRecurringPayment, edit, refund, fetchMultipleRefund, fetchRefund, fetchTransfer, transfer, bankTransfer, fetchCardDetails, fetchPaymentDowntime, fetchPaymentDowntimeById, otpGenerate, otpSubmit, otpResend, createUpi, validateVpa, fetchPaymentMethods
+Refunds keys: all, edit, fetch

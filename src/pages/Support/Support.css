@@ -1,7 +1,10 @@
 .support-page-container {
-    min-height: calc(100vh - 100px);
-    background: #e5ddd5; /* WhatsApp background color */
-    padding: 2rem;
+    padding-top: 140px; /* Offset for fixed header */
+    min-height: 100vh;
+    background: #e5ddd5;
+    padding-left: 2rem;
+    padding-right: 2rem;
+    padding-bottom: 2rem;
     display: flex;
     justify-content: center;
     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
@@ -396,11 +399,28 @@
 }
 
 @media (max-width: 768px) {
+    .support-page-container {
+        padding-top: 110px; /* Preserve fixed header offset */
+        padding-left: 1rem;
+        padding-right: 1rem;
+    }
     .support-info-sidebar {
-        display: none;
+        display: none; /* Keep sidebar hidden for responsiveness */
     }
     .support-layout {
-        height: calc(100vh - 150px);
+        height: calc(100vh - 140px);
+    }
+}
+
+@media (max-width: 480px) {
+    .support-page-container {
+        padding-top: 100px;
+        padding-left: 0.5rem;
+        padding-right: 0.5rem;
+        padding-bottom: 0.5rem;
+    }
+    .support-layout {
+        height: calc(100vh - 120px);
     }
 }
 

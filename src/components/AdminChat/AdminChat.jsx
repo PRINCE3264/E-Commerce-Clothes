@@ -22,10 +22,15 @@ const AdminChat = () => {
     const messagesEndRef = useRef(null);
     const fileInputRef = useRef(null);
 
-    const adminUser = (() => {
+    const adminUser = React.useMemo(() => {
         try { return JSON.parse(localStorage.getItem('admin_user')) || {}; }
         catch { return {}; }
-    })();
+    }, []);
+
+    const selectedUserRef = useRef(selectedUser);
+    useEffect(() => {
+        selectedUserRef.current = selectedUser;
+    }, [selectedUser]);
 
     const scrollToBottom = () => {
         messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -70,22 +75,25 @@ const AdminChat = () => {
     }, [socket]);
 
     useEffect(() => {
-        const newSocket = io(SOCKET_URL);
+        const newSocket = io(SOCKET_URL, {
+            transports: ['websocket', 'polling']
+        });
         setSocket(newSocket);
 
         newSocket.emit('join_admin_room');
 
         newSocket.on('receive_message', (msg) => {
             setMessages((prev) => {
-                const isRelevant = selectedUser && (
-                    (msg.groupId && msg.groupId === selectedUser._id) ||
-                    (!msg.groupId && (msg.sender === selectedUser._id || msg.receiver === selectedUser._id))
+                const currentSelected = selectedUserRef.current;
+                const isRelevant = currentSelected && (
+                    (msg.groupId && msg.groupId === currentSelected._id) ||
+                    (!msg.groupId && (msg.sender === currentSelected._id || msg.receiver === currentSelected._id))
                 );
 
                 if (isRelevant) {
                     if (!msg.groupId && msg.senderRole === 'user') {
-                        API.put(`/chat/read/${selectedUser._id}`);
-                        newSocket.emit('messages_read', { userId: selectedUser._id });
+                        API.put(`/chat/read/${currentSelected._id}`);
+                        newSocket.emit('messages_read', { userId: currentSelected._id });
                         msg.isRead = true;
                     }
                     return [...prev, msg];
@@ -97,13 +105,11 @@ const AdminChat = () => {
         });
 
         newSocket.on('incoming_call', ({ from, type }) => {
-            const caller = chatUsers.find(u => u._id === from);
             setIsCalling({ 
                 type, 
                 from, 
                 direction: 'incoming',
-                name: caller ? caller.name : 'User',
-                avatar: caller ? caller.avatar : null
+                name: 'User' // Default name, fetch later if needed
             });
         });
 
@@ -111,8 +117,13 @@ const AdminChat = () => {
             setIsCalling(null);
         });
 
-        return () => newSocket.close();
-    }, [selectedUser, chatUsers]);
+        return () => {
+            newSocket.off('receive_message');
+            newSocket.off('incoming_call');
+            newSocket.off('call_ended');
+            newSocket.close();
+        };
+    }, []); // Socket should be stable
 
     useEffect(() => {
         fetchChatUsers();
@@ -260,7 +271,7 @@ const AdminChat = () => {
             <aside className="chat-users-list">
                 <div className="users-list-header">
                     <div className="admin-profile-section">
-                        <div className="admin-avatar-mini">A</div>
+                        <div className="admin-avatar-mini"><CheckCheck size={20} /></div>
                         <div className="header-actions-mini">
                             <button onClick={() => setShowGroupModal(true)} title="Create Group"><Plus size={20} /></button>
                             <button title="Options"><MoreVertical size={20} /></button>

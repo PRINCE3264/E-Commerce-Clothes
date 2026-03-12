@@ -7,10 +7,10 @@ const {
     deleteProductReview,
     approveProductReview 
 } = require('../controllers/productController');
-const { protect, authorize } = require('../middleware/authMiddleware');
+const { protect, authorize, optionalProtect } = require('../middleware/authMiddleware');
 
 router.get('/', getProducts);
-router.get('/:id', getProductById);
+router.get('/:id', optionalProtect, getProductById);
 router.post('/:id/reviews', protect, createProductReview);
 router.put('/:id/reviews/:reviewId/approve', protect, authorize('admin'), approveProductReview);
 router.delete('/:id/reviews/:reviewId', protect, authorize('admin'), deleteProductReview);

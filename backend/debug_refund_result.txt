@@ -1,0 +1,11 @@
+{
+  "error": {
+    "code": "BAD_REQUEST_ERROR",
+    "description": "invalid request sent",
+    "metadata": {},
+    "reason": "NA",
+    "source": "NA",
+    "step": "NA"
+  },
+  "statusCode": 400
+}

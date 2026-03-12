@@ -567,9 +567,10 @@
     box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3);
 }
 
-.product-badge.sale {
+.product-badge.sale, .product-badge.discount {
     background: #10b981;
     color: #ffffff;
+    box-shadow: 0 4px 12px rgba(16, 185, 129, 0.2);
 }
 
 .product-info {

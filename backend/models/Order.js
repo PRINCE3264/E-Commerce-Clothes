@@ -92,6 +92,11 @@ const orderSchema = new mongoose.Schema({
     refundProof: {
         type: String
     },
+    refundProofStatus: {
+        type: String,
+        enum: ['Pending', 'Approved', 'Rejected'],
+        default: 'Pending'
+    },
     refundTransactionId: {
         type: String
     },

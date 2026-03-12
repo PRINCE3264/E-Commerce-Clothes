@@ -117,7 +117,7 @@ const AdminDashboard = () => {
                         <nav className="admin-nav-grid">
                             <NavLink to="/admin" end className={({isActive}) => `admin-nav-item ${isActive ? 'active' : ''}`} onClick={() => window.innerWidth <= 992 && toggleSidebar()}>
                                 <div className="admin-icon-bg"><LayoutDashboard size={18} /></div>
-                                <span>Overview</span>
+                                <span>Dashboard</span>
                                 <ChevronRight size={14} className="admin-chevron" />
                             </NavLink>
                             <NavLink to="/admin/products" className={({isActive}) => `admin-nav-item ${isActive ? 'active' : ''}`} onClick={() => window.innerWidth <= 992 && toggleSidebar()}>

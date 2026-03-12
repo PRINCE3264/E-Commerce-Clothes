@@ -16,22 +16,22 @@ const Support = () => {
     const messagesEndRef = useRef(null);
     const fileInputRef = useRef(null);
     
-    const userData = (() => {
+    const userData = React.useMemo(() => {
         try { return JSON.parse(localStorage.getItem('user_data')) || null; }
         catch { return null; }
-    })();
+    }, []);
 
     const scrollToBottom = () => {
         messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
     };
 
     useEffect(() => {
-        if (!userData) return;
-
-        const userId = userData.id || userData._id;
+        const userId = userData?.id || userData?._id;
         if (!userId) return;
 
-        const newSocket = io(SOCKET_URL);
+        const newSocket = io(SOCKET_URL, {
+            transports: ['websocket', 'polling']
+        });
         setSocket(newSocket);
         newSocket.emit('join_room', userId);
 
@@ -55,6 +55,20 @@ const Support = () => {
             setMessages((prev) => prev.map(m => m.senderRole === 'user' ? { ...m, isRead: true } : m));
         });
 
+        return () => {
+            newSocket.off('receive_message');
+            newSocket.off('message_deleted');
+            newSocket.off('message_updated');
+            newSocket.off('chat_cleared');
+            newSocket.off('messages_read_update');
+            newSocket.close();
+        };
+    }, [userData?.id, userData?._id]);
+
+    useEffect(() => {
+        const userId = userData?.id || userData?._id;
+        if (!userId) return;
+
         API.get(`/chat/history/${userId}`)
             .then(res => {
                 if (res.data.success) {
@@ -62,9 +76,7 @@ const Support = () => {
                 }
             })
             .catch(err => console.error('Error loading chat history:', err));
-
-        return () => newSocket.close();
-    }, [userData]);
+    }, [userData?.id, userData?._id]);
 
     useEffect(() => {
         scrollToBottom();

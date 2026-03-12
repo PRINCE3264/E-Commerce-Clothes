@@ -94,6 +94,11 @@ exports.createOrder = async (req, res) => {
                         quantity: item.quantity,
                     })),
                     mode: 'payment',
+                    customer_email: req.user.email,
+                    shipping_address_collection: {
+                        allowed_countries: ['IN'],
+                    },
+                    automatic_payment_methods: { enabled: true },
                     success_url: `${process.env.FRONTEND_URL || 'http://127.0.0.1:5173'}/payment?orderId=${createdOrder._id}&sessionId={CHECKOUT_SESSION_ID}&gateway=stripe`,
                     cancel_url: `${process.env.FRONTEND_URL || 'http://127.0.0.1:5173'}/checkout`,
                     metadata: {
@@ -244,7 +249,7 @@ exports.getAllOrders = async (req, res) => {
 // @access  Private/Admin
 exports.updateOrderStatus = async (req, res) => {
     try {
-        const { status, message, location, isRefunded, refundProof, refundTransactionId } = req.body;
+        const { status, message, location, isRefunded, refundProof, refundProofStatus, refundTransactionId } = req.body;
         const validStatuses = ['Processing', 'Shipped', 'Out for Delivery', 'Delivered', 'Cancelled'];
 
         if (status && !validStatuses.includes(status)) {
@@ -273,6 +278,7 @@ exports.updateOrderStatus = async (req, res) => {
         }
 
         if (refundProof !== undefined) order.refundProof = refundProof;
+        if (refundProofStatus !== undefined) order.refundProofStatus = refundProofStatus;
         if (refundTransactionId !== undefined || refundTransactionId === '') order.refundTransactionId = refundTransactionId;
 
         // Add to tracking log if there's a status change or message
@@ -363,6 +369,45 @@ exports.cancelOrder = async (req, res) => {
 
     } catch (err) {
         console.error("ORDER_CANCEL_ERROR:", err);
+        res.status(500).json({ success: false, message: err.message });
+    }
+};
+
+// @desc    Submit refund proof (User)
+// @route   PUT /api/orders/:id/refund-proof
+// @access  Private
+exports.submitRefundProof = async (req, res) => {
+    try {
+        const { refundProof } = req.body;
+        const order = await Order.findById(req.params.id);
+
+        if (!order) {
+            return res.status(404).json({ success: false, message: 'Order not found' });
+        }
+
+        // Check ownership
+        if (order.user.toString() !== req.user._id.toString()) {
+            return res.status(401).json({ success: false, message: 'Not authorized' });
+        }
+
+        order.refundProof = refundProof;
+        order.refundProofStatus = 'Pending';
+        
+        order.trackingLog.push({
+            status: order.status,
+            message: 'Refund proof submitted by user. Awaiting admin approval.',
+            location: 'System',
+            timestamp: Date.now()
+        });
+
+        await order.save();
+
+        res.status(200).json({
+            success: true,
+            message: 'Refund proof submitted successfully. Admin will review it shortly.'
+        });
+    } catch (err) {
+        console.error("REFUND_PROOF_SUBMIT_ERROR:", err);
         res.status(500).json({ success: false, message: err.message });
     }
 };
