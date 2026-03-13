@@ -23,8 +23,54 @@ A modern React-based clothing e-commerce website UI where users can browse produ
 
 ## 🚀 Run Project Locally
 
-npm install  
+### Prerequisites
+
+- **Node.js** (v18+)
+- **MongoDB** running locally (`mongod`)
+- **MongoDB Database Tools** (`mongorestore` command) — [Download here](https://www.mongodb.com/try/download/database-tools)
+
+### 1. Clone & Install
+
+```bash
+git clone https://github.com/YourUsername/E-Commerce-Clothes.git
+cd E-Commerce-Clothes
+
+# Install frontend dependencies
+npm install
+
+# Install backend dependencies
+cd backend
+npm install
+```
+
+### 2. Seed the Database
+
+This project includes a full database dump so every developer gets the **exact same data** (users, products, orders, categories, etc.).
+
+```bash
+cd backend
+npm run seed
+```
+
+> This runs `mongorestore` to load all collections into a local `PanditFashion` database.
+
+### 3. Start the App
+
+```bash
+# Terminal 1 — Backend
+cd backend
 npm run dev
+
+# Terminal 2 — Frontend
+npm run dev
+```
+
+### 🔑 Test Credentials
+
+| Role  | Email             | Password   |
+|-------|-------------------|------------|
+| Admin | admin@gmail.com   | admin123   |
+
 
 ## 📸 Screenshots
 
