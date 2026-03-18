@@ -102,7 +102,6 @@ exports.createOrder = async (req, res) => {
                     shipping_address_collection: {
                         allowed_countries: ['IN'],
                     },
-                    automatic_payment_methods: { enabled: true },
                     success_url: `${process.env.FRONTEND_URL || 'http://127.0.0.1:5173'}/payment?orderId=${createdOrder._id}&sessionId={CHECKOUT_SESSION_ID}&gateway=stripe`,
                     cancel_url: `${process.env.FRONTEND_URL || 'http://127.0.0.1:5173'}/checkout`,
                     metadata: {

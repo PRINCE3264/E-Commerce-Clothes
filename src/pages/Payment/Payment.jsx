@@ -321,10 +321,10 @@ const Payment = ({ setCart }) => {
                                     TRACK YOUR COLLECTION <ArrowRight size={18} />
                                 </button>
                                 <div className="secondary-action-buttons">
-                                    <button className="btn-icon-elite" title="Download Receipt">
+                                    <button className="btn-icon-elite" title="Download Receipt" onClick={() => window.print()}>
                                         <Download size={18} /> RECEIPT
                                     </button>
-                                    <button className="btn-icon-elite" title="View History">
+                                    <button className="btn-icon-elite" title="View History" onClick={() => navigate('/account/payments')}>
                                         <FileText size={18} /> INVOICE
                                     </button>
                                 </div>

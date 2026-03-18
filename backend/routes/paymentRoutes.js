@@ -6,7 +6,8 @@ const {
     verifyRazorpay, 
     verifyStripe,
     refundPayment,
-    initiateUPIPay
+    initiateUPIPay,
+    verifyUPITest
 } = require('../controllers/paymentController');
 const { protect, authorize } = require('../middleware/authMiddleware');
 
@@ -16,5 +17,6 @@ router.post('/verify-razorpay', protect, verifyRazorpay);
 router.post('/verify-stripe', protect, verifyStripe);
 router.post('/:id/refund', protect, authorize('admin'), refundPayment);
 router.post('/upi-intent', protect, initiateUPIPay);
+router.post('/verify-upi-test', protect, verifyUPITest);
 
 module.exports = router;

@@ -257,3 +257,37 @@ exports.initiateUPIPay = async (req, res) => {
         res.status(500).json({ success: false, message: err.message });
     }
 };
+
+// @desc    Verify mock UPI payment for test mode
+// @route   POST /api/payments/verify-upi-test
+exports.verifyUPITest = async (req, res) => {
+    try {
+        const { orderId } = req.body;
+        const Order = require('../models/Order');
+        const Payment = require('../models/Payment');
+        const order = await Order.findById(orderId).populate('user', 'name');
+        
+        if (!order) {
+            return res.status(404).json({ success: false, message: 'Order not found' });
+        }
+
+        // Mark order as paid
+        order.isPaid = true;
+        order.paidAt = Date.now();
+        order.paymentResult = { id: `MOCK_UPI_${Date.now()}`, status: 'Success' };
+        await order.save();
+
+        // Update payment record to Completed
+        const payment = await Payment.findOne({ order: order._id, gateway: 'UPI' });
+        if (payment) {
+            payment.status = 'Completed';
+            payment.transactionId = `MOCK_UPI_${Date.now()}`;
+            payment.paidAt = Date.now();
+            await payment.save();
+        }
+
+        res.status(200).json({ success: true, message: "UPI Payment verified (Test Mode)" });
+    } catch (err) {
+        res.status(500).json({ success: false, message: err.message });
+    }
+};

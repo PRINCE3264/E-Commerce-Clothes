@@ -653,3 +653,45 @@
     text-align: center;
   }
 }
+
+/* Print / Receipt styling for window.print() */
+@media print {
+  body {
+    background: white;
+  }
+  
+  .payment-status-page {
+    padding: 0 !important;
+    margin: 0 !important;
+  }
+
+  /* Hide UI elements not meant for receipt PDF */
+  .header-elite, .footer, .continue-shopping-wrap, .summary-actions-elite, .page-accents, .trust-badges-card {
+    display: none !important;
+  }
+
+  .payment-header-elite {
+    margin-bottom: 20px;
+  }
+
+  .luxury-brand-title {
+    font-size: 2.5rem;
+    color: #000;
+  }
+
+  .container {
+    max-width: 100%;
+    width: 100%;
+  }
+
+  .payment-main-grid-layout {
+    display: block;
+  }
+
+  .status-hero-card, .info-sub-card, .purchase-list-card, .summary-sticky-card {
+    box-shadow: none;
+    border: 1px solid #e2e8f0;
+    margin-bottom: 15px;
+    break-inside: avoid;
+  }
+}

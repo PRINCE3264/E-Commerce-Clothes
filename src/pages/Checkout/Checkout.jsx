@@ -646,7 +646,12 @@ const Checkout = ({ cartItems, onOrderComplete }) => {
                                         <button 
                                             className="btn-done" 
                                             style={{ flex: 1, background: '#10b981', color: 'white', padding: '14px', borderRadius: '12px', fontWeight: '800', border: 'none', cursor: 'pointer' }}
-                                            onClick={() => {
+                                            onClick={async () => {
+                                                try {
+                                                    await API.post('/payments/verify-upi-test', { orderId: lastOrderId });
+                                                } catch(err) {
+                                                    console.error("Test UPI verify error:", err);
+                                                }
                                                 setShowUpiModal(false);
                                                 setShowSuccessModal(true);
                                                 if (onOrderComplete) onOrderComplete();

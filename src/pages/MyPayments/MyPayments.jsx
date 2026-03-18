@@ -84,10 +84,14 @@ const MyPayments = () => {
                                             <strong>#{payment.order?._id ? payment.order._id.substring(0, 8).toUpperCase() : 'N/A'}</strong>
                                         </div>
                                     </div>
-                                    <div className="action-buttons-elite">
-                                        <button className="btn-view-order-pill" onClick={() => navigate(`/order/${payment.order?._id}`)}>
-                                            <span>VIEW ORDER</span>
-                                            <ArrowRight size={16} strokeWidth={3}/>
+                                    <div className="action-buttons-elite" style={{ display: 'flex', gap: '6px' }}>
+                                        <button className="btn-view-order-pill" onClick={() => navigate(`/payment?orderId=${payment.order?._id}`)} style={{ background: '#f1f5f9', color: '#1e293b', padding: '8px 14px', gap: '6px', fontSize: '0.75rem' }}>
+                                            <Download size={14} strokeWidth={2.5}/>
+                                            <span>RECEIPT</span>
+                                        </button>
+                                        <button className="btn-view-order-pill" onClick={() => navigate(`/order/${payment.order?._id}`)} style={{ padding: '8px 14px', gap: '6px', fontSize: '0.75rem' }}>
+                                            <span>ORDER</span>
+                                            <ArrowRight size={14} strokeWidth={3}/>
                                         </button>
                                     </div>
                                 </div>
