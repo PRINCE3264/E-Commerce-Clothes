@@ -20,6 +20,7 @@ const ProductDetails = ({ onAddToCart, onToggleWishlist, wishlist }) => {
     const [reviewComment, setReviewComment] = useState('');
     const [submittingReview, setSubmittingReview] = useState(false);
     const [reviewError, setReviewError] = useState('');
+    const [magnifier, setMagnifier] = useState({ show: false, x: 0, y: 0, bgX: 0, bgY: 0, bgSizeX: 0, bgSizeY: 0 });
 
     const loggedInUser = (() => {
         try { return JSON.parse(localStorage.getItem('user')) || null; }
@@ -280,27 +281,48 @@ const ProductDetails = ({ onAddToCart, onToggleWishlist, wishlist }) => {
                 <div className="pd-layout">
                     {/* Left: Image Gallery */}
                     <div className="pd-gallery-section">
-                        <div 
-                            className="pd-main-img-box" 
-                            onMouseMove={(e) => {
-                                const image = e.currentTarget.querySelector('img');
-                                if (image) {
-                                    const { left, top, width, height } = e.currentTarget.getBoundingClientRect();
-                                    const x = ((e.clientX - left) / width) * 100;
-                                    const y = ((e.clientY - top) / height) * 100;
-                                    image.style.transformOrigin = `${x}% ${y}%`;
-                                    image.style.transform = 'scale(2.5)';
-                                }
-                            }}
-                            onMouseLeave={(e) => {
-                                const image = e.currentTarget.querySelector('img');
-                                if (image) {
-                                    image.style.transformOrigin = 'center center';
-                                    image.style.transform = 'scale(1)';
-                                }
-                            }}
-                        >
-                            <img src={mainImage} alt={product.name} className="animate-zoom-in" />
+                        <div className="pd-main-img-box">
+                            <div 
+                                className="image-magnifier-container"
+                                onMouseMove={(e) => {
+                                    const rect = e.currentTarget.getBoundingClientRect();
+                                    const x = e.clientX - rect.left;
+                                    const y = e.clientY - rect.top;
+                                    const percentX = (x / rect.width) * 100;
+                                    const percentY = (y / rect.height) * 100;
+                                    
+                                    setMagnifier({
+                                        show: true,
+                                        x: x,
+                                        y: y,
+                                        bgX: percentX,
+                                        bgY: percentY,
+                                        bgSizeX: rect.width * 2.5,
+                                        bgSizeY: rect.height * 2.5
+                                    });
+                                }}
+                                onMouseLeave={() => {
+                                    setMagnifier(prev => ({ ...prev, show: false }));
+                                }}
+                            >
+                                <img 
+                                    src={mainImage} 
+                                    alt={product.name} 
+                                    className="animate-zoom-in zoom-target" 
+                                />
+                                {magnifier.show && (
+                                    <div 
+                                        className="magnifier-loupe"
+                                        style={{
+                                            left: `${magnifier.x}px`,
+                                            top: `${magnifier.y}px`,
+                                            backgroundImage: `url(${mainImage})`,
+                                            backgroundPosition: `${magnifier.bgX}% ${magnifier.bgY}%`,
+                                            backgroundSize: `${magnifier.bgSizeX}px ${magnifier.bgSizeY}px`
+                                        }}
+                                    ></div>
+                                )}
+                            </div>
                             <div className="gallery-accents">
                                 <div className="accent-glow"></div>
                             </div>
