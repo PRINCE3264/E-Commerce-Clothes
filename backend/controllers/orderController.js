@@ -91,7 +91,7 @@ exports.createOrder = async (req, res) => {
                             currency: 'inr',
                             product_data: {
                                 name: item.name,
-                                images: [item.image.startsWith('http') ? item.image : 'https://ui-avatars.com/api/?name=PF&background=2b5a91&color=fff']
+                                images: [item.image.startsWith('http') ? item.image : `${process.env.BACKEND_URL || 'http://localhost:8000'}${item.image}`]
                             },
                             unit_amount: Math.round(item.price * 100),
                         },

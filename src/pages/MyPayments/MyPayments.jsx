@@ -11,6 +11,11 @@ const MyPayments = () => {
 
     useEffect(() => {
         const fetchPayments = async () => {
+            const token = localStorage.getItem('auth_token');
+            if (!token) {
+                navigate('/login?redirect=/account/payments');
+                return;
+            }
             try {
                 const res = await API.get('/payments/mypayments');
                 if (res.data.success) {
@@ -18,12 +23,17 @@ const MyPayments = () => {
                 }
             } catch (err) {
                 console.error("Failed to fetch personal payments", err);
+                if (err.response && err.response.status === 401) {
+                    localStorage.removeItem('auth_token');
+                    localStorage.removeItem('user_data');
+                    navigate('/login?redirect=/account/payments');
+                }
             } finally {
                 setLoading(false);
             }
         };
         fetchPayments();
-    }, []);
+    }, [navigate]);
 
     if (loading) return (
         <div className="pd-loading-container">

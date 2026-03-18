@@ -175,7 +175,7 @@ const Checkout = ({ cartItems, onOrderComplete }) => {
 
     const initRazorpay = (orderData, razorpayOrder) => {
         const options = {
-            key: import.meta.env.VITE_RAZORPAY_KEY_ID, // Use env directly
+            key: import.meta.env.VITE_RAZORPAY_KEY_ID || 'rzp_test_RGlPdevCgkpRiA', // Use env directly or fallback
             amount: razorpayOrder.amount,
             currency: razorpayOrder.currency,
             name: "PANDIT FASHION",

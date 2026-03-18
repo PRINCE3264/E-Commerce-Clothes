@@ -190,10 +190,12 @@ const Payment = ({ setCart }) => {
                     </div>
                     <motion.h1 className="luxury-brand-title" variants={cardVariants}>PANDIT FASHION</motion.h1>
                     <motion.h2 className="header-title-glam" variants={cardVariants}>
-                        {isSuccess ? 'Transaction Perfected' : 'Order Secured'}
+                        {isSuccess ? 'Transaction Perfected' : 'Action Required'}
                     </motion.h2>
                     <motion.p className="header-subtitle-glam" variants={cardVariants}>
-                        Thank you for choosing Pandit Fashion. Your curated collection is being prepared.
+                        {isSuccess 
+                            ? 'Thank you for choosing Pandit Fashion. Your curated collection is being prepared.' 
+                            : 'Your payment process was interrupted. Please complete your payment to secure the collection.'}
                     </motion.p>
                 </div>
 
@@ -201,18 +203,18 @@ const Payment = ({ setCart }) => {
                     {/* Left: Primary Status & Details */}
                     <div className="payment-column-primary">
                         <motion.div className="status-hero-card glass-panel shadow-premium" variants={cardVariants}>
-                            <div className={`status-highlight-bar ${isSuccess ? 'success' : 'pending'}`}></div>
+                            <div className={`status-highlight-bar ${isSuccess ? 'success' : 'failed'}`}></div>
                             <div className="hero-content-wrap">
                                 <div className="hero-icon-box">
-                                    {isSuccess ? <ShieldCheck size={40} /> : <Package size={40} />}
+                                    {isSuccess ? <ShieldCheck size={40} /> : <XCircle size={40} color="#ef4444" />}
                                 </div>
                                 <div className="hero-text-box">
-                                    <h3>{isSuccess ? "Payment Verified" : "Order Processing"}</h3>
+                                    <h3>{isSuccess ? "Payment Verified" : "Payment Incomplete"}</h3>
                                     <p>Order ID: <strong>#{order._id.toUpperCase()}</strong></p>
                                 </div>
                                 <div className="redirect-countdown-pill">
                                     <Loader size={12} className="spin" />
-                                    <span>Tracking in {redirectTimer}s</span>
+                                    <span>Redirecting in {redirectTimer}s</span>
                                 </div>
                             </div>
                         </motion.div>
