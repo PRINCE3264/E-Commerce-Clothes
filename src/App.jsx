@@ -98,7 +98,7 @@ const AppContent = ({
             />
           } />
           <Route path="/blog" element={<Blog />} />
-          <Route path="/blog/:id" element={<BlogDetails />} />
+          <Route path="/blog/:id" element={<BlogDetails userData={userData} />} />
           <Route path="/contact" element={<Contact />} />
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />

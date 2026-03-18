@@ -721,7 +721,7 @@ const AdminProducts = () => {
 
                 .admin-filters-bar { display: flex; gap: 15px; background: white; padding: 15px; border-radius: 20px; border: 1px solid #f1f5f9; box-shadow: 0 4px 15px rgba(0,0,0,0.02); }
                 .admin-product-search-wrapper { position: relative; flex: 1; }
-                .search-icon { position: absolute; left: 15px; top: 50%; transform: translateY(-50%); color: #94a3b8; }
+                .admin-product-search-wrapper .search-icon { position: absolute; left: 15px; top: 50%; transform: translateY(-50%); color: #94a3b8; }
                 .admin-product-search-wrapper input { box-sizing: border-box; width: 100%; padding: 12px 15px 12px 45px; border: 1px solid #f1f5f9; border-radius: 14px; background: #f8fafc; font-weight: 600; outline: none; transition: 0.3s; }
                 .admin-product-search-wrapper input:focus { background: white; border-color: #3b82f6; box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.05); }
 

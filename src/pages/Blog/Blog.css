@@ -68,7 +68,7 @@
 
 /* Search & Filter */
 .filter-container {
-    margin-top: -1px;
+    margin-top: 15px;
     position: relative;
     z-index: 10;
 }

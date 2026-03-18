@@ -13,7 +13,8 @@ import {
     Image as ImageIcon,
     ExternalLink,
     Upload,
-    Loader2
+    Loader2,
+    MessageCircle
 } from 'lucide-react';
 import Swal from 'sweetalert2';
 import withReactContent from 'sweetalert2-react-content';
@@ -261,6 +262,44 @@ const AdminBlog = () => {
         });
     };
 
+    const handleManageComments = async (post) => {
+        try {
+            const res = await API.get(`/blogs/${post._id}`);
+            const comments = res.data.data.comments || [];
+
+            MySwal.fire({
+                title: 'Refine Discourse',
+                html: (
+                    <div className="comment-manage-list">
+                        {comments.length > 0 ? comments.map(c => (
+                            <div key={c._id} className="comment-manage-item">
+                                <div className="c-manage-text">
+                                    <span className="c-manage-user">{c.name}</span>
+                                    <span className="c-manage-body">{c.text}</span>
+                                </div>
+                                <button className="btn-delete-comment" onClick={async () => {
+                                    try {
+                                        await API.delete(`/blogs/${post._id}/comments/${c._id}`);
+                                        Swal.close();
+                                        handleManageComments(post);
+                                    } catch (err) {
+                                        console.error(err);
+                                    }
+                                }}>Discard</button>
+                            </div>
+                        )) : <p style={{textAlign: 'center', color: '#94a3b8', padding: '20px'}}>No comments active for this article.</p>}
+                    </div>
+                ),
+                showConfirmButton: true,
+                confirmButtonText: 'Done',
+                confirmButtonColor: '#3b82f6',
+                width: '600px'
+            });
+        } catch (err) {
+            console.error("Error fetching comments for management", err);
+        }
+    };
+
     return (
         <div className="admin-blog-container">
             <div className="admin-panel fade-in">
@@ -347,6 +386,9 @@ const AdminBlog = () => {
                                             <div className="blog-actions-bar">
                                                 <button className="btn-circle-action edit" onClick={() => handleOpenForm(post)} title="Edit Article">
                                                     <Edit size={16} />
+                                                </button>
+                                                <button className="btn-circle-action comments" onClick={() => handleManageComments(post)} title="Manage Comments">
+                                                    <MessageCircle size={16} />
                                                 </button>
                                                 <button className="btn-circle-action delete" onClick={() => handleDelete(post)} title="Delete Article">
                                                     <Trash2 size={16} />
@@ -465,9 +507,19 @@ const AdminBlog = () => {
                 }
                 .btn-circle-action.edit { background: #f1f5f9; color: #64748b; }
                 .btn-circle-action.edit:hover { background: #3b82f6; color: white; transform: translateY(-3px); }
+                .btn-circle-action.comments { background: #f1f5f9; color: #64748b; }
+                .btn-circle-action.comments:hover { background: #3b82f6; color: white; transform: translateY(-3px); }
                 .btn-circle-action.delete { background: #f1f5f9; color: #64748b; }
                 .btn-circle-action.delete:hover { background: #ef4444; color: white; transform: translateY(-3px); }
                 .btn-circle-action.view { background: #f8fafc; color: #cbd5e1; }
+
+                .comment-manage-list { display: flex; flex-direction: column; gap: 12px; margin-top: 20px; text-align: left; }
+                .comment-manage-item { display: flex; justify-content: space-between; align-items: start; padding: 12px; background: #f8fafc; border-radius: 10px; }
+                .c-manage-text { flex: 1; padding-right: 15px; }
+                .c-manage-user { display: block; font-weight: 800; color: #1e293b; font-size: 0.85rem; }
+                .c-manage-body { display: block; font-size: 0.85rem; color: #64748b; margin-top: 4px; }
+                .btn-delete-comment { background: #fecaca; color: #b91c1c; border: none; padding: 5px 10px; border-radius: 6px; font-size: 0.75rem; font-weight: 700; cursor: pointer; }
+                .btn-delete-comment:hover { background: #ef4444; color: white; }
 
                 /* Advance Blue Blog Swal Pop CSS */
                 .b-extreme-swal-blue { border-radius: 20px !important; overflow: hidden !important; animation: b-slide-up 0.4s cubic-bezier(0.16, 1, 0.3, 1); }

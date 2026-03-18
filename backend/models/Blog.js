@@ -32,7 +32,25 @@ const blogSchema = new mongoose.Schema({
     category: {
         type: String,
         default: 'Fashion'
-    }
+    },
+    comments: [
+        {
+            user: {
+                type: mongoose.Schema.ObjectId,
+                ref: 'User',
+                required: true
+            },
+            name: String,
+            text: {
+                type: String,
+                required: true
+            },
+            date: {
+                type: Date,
+                default: Date.now
+            }
+        }
+    ]
 }, {
     timestamps: true
 });

@@ -19,37 +19,75 @@ import {
 import API from '../../utils/api';
 import './BlogDetails.css';
 
-const BlogDetails = () => {
+const BlogDetails = ({ userData }) => {
     const { id } = useParams();
     const navigate = useNavigate();
     const [blog, setBlog] = useState(null);
     const [loading, setLoading] = useState(true);
     const [recentPosts, setRecentPosts] = useState([]);
+    const [commentText, setCommentText] = useState('');
+    const [submitting, setSubmitting] = useState(false);
 
     useEffect(() => {
-        const fetchBlogDetails = async () => {
+        let isMounted = true;
+        const loadStory = async () => {
             try {
                 const res = await API.get(`/blogs/${id}`);
-                if (res.data.success) {
+                if (res.data.success && isMounted) {
                     setBlog(res.data.data);
                 }
                 
                 // Fetch recent posts for sidebar
                 const recentRes = await API.get('/blogs');
-                if (recentRes.data.success) {
+                if (recentRes.data.success && isMounted) {
                     setRecentPosts(recentRes.data.data.filter(p => p._id !== id).slice(0, 3));
                 }
                 
-                setLoading(false);
+                if (isMounted) setLoading(false);
             } catch (err) {
                 console.error("Error fetching blog details:", err);
-                setLoading(false);
+                if (isMounted) setLoading(false);
             }
         };
 
-        fetchBlogDetails();
+        loadStory();
         window.scrollTo(0, 0);
+
+        return () => { isMounted = false; };
     }, [id]);
+
+    const handleCommentSubmit = async (e) => {
+        e.preventDefault();
+        if (!userData) {
+            navigate(`/login?redirect=${encodeURIComponent(window.location.pathname)}`);
+            return;
+        }
+        if (!commentText.trim()) return;
+
+        setSubmitting(true);
+        try {
+            const res = await API.post(`/blogs/${id}/comments`, { text: commentText });
+            if (res.data.success) {
+                setBlog({ ...blog, comments: res.data.data });
+                setCommentText('');
+            }
+            setSubmitting(false);
+        } catch (err) {
+            console.error("Error posting comment:", err);
+            setSubmitting(false);
+        }
+    };
+
+    const handleDeleteComment = async (commentId) => {
+        try {
+            const res = await API.delete(`/blogs/${id}/comments/${commentId}`);
+            if (res.data.success) {
+                setBlog({ ...blog, comments: res.data.data });
+            }
+        } catch (err) {
+            console.error("Error deleting comment:", err);
+        }
+    };
 
     if (loading) {
         return (
@@ -131,10 +169,78 @@ const BlogDetails = () => {
                             <span>2026</span>
                         </div>
                         <div className="story-actions">
-                            <button className="action-btn-large"><MessageCircle size={20} /> 12 Comments</button>
+                            <a href="#comments" className="action-btn-large">
+                                <MessageCircle size={20} /> {blog.comments?.length || 0} Comments
+                            </a>
                             <button className="action-btn-large"><Share2 size={20} /> Share Article</button>
                         </div>
                     </footer>
+
+                    {/* Comment Section */}
+                    <section id="comments" className="story-comments-section">
+                        <div className="comments-header">
+                            <h3>Conversation ({blog.comments?.length || 0})</h3>
+                        </div>
+
+                        {/* Comment Form */}
+                        <div className="comment-form-box">
+                            {userData ? (
+                                <form onSubmit={handleCommentSubmit}>
+                                    <div className="form-user-info">
+                                        <div className="user-avatar-mini">
+                                            {userData.avatar ? <img src={userData.avatar} alt="" /> : (userData.name?.charAt(0) || 'U')}
+                                        </div>
+                                        <span>Posting as <strong>{userData.name}</strong></span>
+                                    </div>
+                                    <textarea 
+                                        placeholder="Add your insight or voice your thought..."
+                                        value={commentText}
+                                        onChange={(e) => setCommentText(e.target.value)}
+                                        required
+                                    ></textarea>
+                                    <div className="form-actions">
+                                        <button type="submit" disabled={submitting || !commentText.trim()}>
+                                            {submitting ? 'Post...' : 'Post Thought'}
+                                        </button>
+                                    </div>
+                                </form>
+                            ) : (
+                                <div className="login-to-comment">
+                                    <p>Login to join the conversation and share your perspectives.</p>
+                                    <Link to="/login" className="btn-login-small">Login to Comment</Link>
+                                </div>
+                            )}
+                        </div>
+
+                        {/* Comments List */}
+                        <div className="comments-list">
+                            {blog.comments && blog.comments.length > 0 ? (
+                                blog.comments.map(comment => (
+                                    <div key={comment._id} className="comment-item">
+                                        <div className="comment-user-avatar">
+                                            {comment.name?.charAt(0) || 'U'}
+                                        </div>
+                                        <div className="comment-content">
+                                            <div className="comment-meta">
+                                                <span className="comment-author">{comment.name}</span>
+                                                <span className="comment-date">{new Date(comment.date).toLocaleDateString()}</span>
+                                            </div>
+                                            <p className="comment-text">{comment.text}</p>
+                                            {(userData && (userData.id === comment.user || userData.role === 'admin')) && (
+                                                <div className="comment-actions">
+                                                    <button onClick={() => handleDeleteComment(comment._id)}>Delete</button>
+                                                </div>
+                                            )}
+                                        </div>
+                                    </div>
+                                ))
+                            ) : (
+                                <div className="no-comments">
+                                    <p>Be the first to start a conversation about this article.</p>
+                                </div>
+                            )}
+                        </div>
+                    </section>
                 </main>
 
                 <aside className="story-sidebar">

@@ -77,10 +77,76 @@ const deleteBlog = async (req, res) => {
     }
 };
 
+// @desc    Add comment to blog
+// @route   POST /api/blogs/:id/comments
+// @access  Private
+const addComment = async (req, res) => {
+    try {
+        const blog = await Blog.findById(req.params.id);
+
+        if (!blog) {
+            return res.status(404).json({ success: false, message: 'Blog not found' });
+        }
+
+        const newComment = {
+            user: req.user.id,
+            text: req.body.text,
+            name: req.user.name
+        };
+
+        blog.comments.unshift(newComment);
+        await blog.save();
+
+        res.status(200).json({ success: true, data: blog.comments });
+    } catch (err) {
+        res.status(500).json({ success: false, message: err.message });
+    }
+};
+
+// @desc    Delete comment from blog
+// @route   DELETE /api/blogs/:id/comments/:comment_id
+// @access  Private
+const deleteComment = async (req, res) => {
+    try {
+        const blog = await Blog.findById(req.params.id);
+
+        if (!blog) {
+            return res.status(404).json({ success: false, message: 'Blog not found' });
+        }
+
+        // Pull out comment
+        const comment = blog.comments.find(
+            (comment) => comment.id === req.params.comment_id
+        );
+
+        // Make sure comment exists
+        if (!comment) {
+            return res.status(404).json({ success: false, message: 'Comment does not exist' });
+        }
+
+        // Check user
+        if (comment.user.toString() !== req.user.id && req.user.role !== 'admin') {
+            return res.status(401).json({ success: false, message: 'User not authorized' });
+        }
+
+        blog.comments = blog.comments.filter(
+            ({ id }) => id !== req.params.comment_id
+        );
+
+        await blog.save();
+
+        res.status(200).json({ success: true, data: blog.comments });
+    } catch (err) {
+        res.status(500).json({ success: false, message: err.message });
+    }
+};
+
 module.exports = {
     getBlogs,
     getBlogById,
     createBlog,
     updateBlog,
-    deleteBlog
+    deleteBlog,
+    addComment,
+    deleteComment
 };

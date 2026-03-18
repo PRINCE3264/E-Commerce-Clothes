@@ -72,6 +72,7 @@
 
 .header-brand-section {
   gap: 15px;
+  flex-shrink: 0;
 }
 
 .header-controls {
@@ -374,8 +375,7 @@
   display: flex;
   align-items: center;
   gap: 1.2rem;
-  height: 46px;
-  /* Match the height of search and login button */
+  flex-shrink: 0;
 }
 
 .control-icon-btn {
@@ -385,6 +385,7 @@
   color: #64748b;
   position: relative;
   transition: all 0.3s ease;
+  flex-shrink: 0;
 }
 
 .cart-control-group {
@@ -457,11 +458,55 @@
   .search-bar-wrapper {
     display: none;
   }
+
+  /* Prevent brand from growing and squishing controls */
+  .header-brand-section {
+    flex: 0 0 auto;
+  }
+
+  /* Hide user name/email text + chevron — show avatar only */
+  .hdr-user-info {
+    display: none !important;
+  }
+  .hdr-chevron {
+    display: none !important;
+  }
+
+  /* Shrink pill to avatar-only circle */
+  .hdr-user-btn {
+    padding: 5px !important;
+    width: 44px !important;
+    height: 44px !important;
+    border-radius: 50% !important;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+
+  /* Tighten icon gap but keep all icons visible */
+  .header-controls {
+    gap: 0.8rem;
+    flex-shrink: 0;
+  }
+
+  .control-icons {
+    gap: 0.8rem;
+    flex-shrink: 0;
+  }
+
+  /* Ensure wishlist + cart are always visible */
+  .control-icon-btn {
+    flex-shrink: 0 !important;
+    display: flex !important;
+  }
+
+  .cart-control-group {
+    flex-shrink: 0;
+  }
 }
 
 @media (max-width: 768px) {
   .header-top {
-    padding: 0 2%;
+    padding: 0 3%;
     height: 70px;
   }
 
@@ -480,7 +525,11 @@
   }
 
   .control-icons {
-    gap: 0.8rem;
+    gap: 0.6rem;
+  }
+
+  .header-controls {
+    gap: 0.6rem;
   }
 
   .auth-button-pill {
@@ -490,29 +539,87 @@
   .auth-button-pill span {
     display: none;
   }
-}
 
-@media (max-width: 480px) {
-  .logo-sub {
+  /* Ensure avatar-only on mobile too */
+  .hdr-user-info,
+  .hdr-chevron {
     display: none;
   }
 
+  .hdr-user-btn {
+    padding: 5px;
+    width: 42px;
+    height: 42px;
+    border-radius: 50%;
+    justify-content: center;
+  }
+
+  .hdr-user-avatar {
+    width: 32px;
+    height: 32px;
+  }
+}
+
+@media (max-width: 480px) {
+  /* Always show "Fashion" — just make it smaller */
+  .logo-sub {
+    font-size: 0.65rem;
+    letter-spacing: 1.5px;
+    display: block;
+  }
+
   .logo-main {
-    font-size: 1.3rem;
+    font-size: 1.2rem;
   }
 
   .control-icons {
-    gap: 0.5rem;
+    gap: 0.4rem;
+    flex-shrink: 0;
   }
 
   .auth-button-pill {
-    width: 40px;
+    width: 38px;
     padding: 0;
     justify-content: center;
   }
 
   .header-top {
     height: 60px;
+  }
+
+  /* Prevent brand from expanding and squishing right icons */
+  .header-brand-section {
+    flex: 0 0 auto;
+    gap: 8px;
+  }
+
+  .header-controls {
+    flex: 1;
+    justify-content: flex-end;
+    gap: 0.4rem;
+    flex-shrink: 0;
+    overflow: visible;
+  }
+
+  /* Prevent cart-badge from causing overlap */
+  .control-icon-btn {
+    flex-shrink: 0;
+  }
+
+  .hdr-user-btn {
+    width: 36px;
+    height: 36px;
+    flex-shrink: 0;
+  }
+
+  .hdr-user-avatar {
+    width: 28px;
+    height: 28px;
+  }
+
+  .menu-trigger {
+    width: 36px;
+    height: 36px;
   }
 }
 
