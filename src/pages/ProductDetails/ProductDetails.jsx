@@ -280,7 +280,26 @@ const ProductDetails = ({ onAddToCart, onToggleWishlist, wishlist }) => {
                 <div className="pd-layout">
                     {/* Left: Image Gallery */}
                     <div className="pd-gallery-section">
-                        <div className="pd-main-img-box">
+                        <div 
+                            className="pd-main-img-box" 
+                            onMouseMove={(e) => {
+                                const image = e.currentTarget.querySelector('img');
+                                if (image) {
+                                    const { left, top, width, height } = e.currentTarget.getBoundingClientRect();
+                                    const x = ((e.clientX - left) / width) * 100;
+                                    const y = ((e.clientY - top) / height) * 100;
+                                    image.style.transformOrigin = `${x}% ${y}%`;
+                                    image.style.transform = 'scale(2.5)';
+                                }
+                            }}
+                            onMouseLeave={(e) => {
+                                const image = e.currentTarget.querySelector('img');
+                                if (image) {
+                                    image.style.transformOrigin = 'center center';
+                                    image.style.transform = 'scale(1)';
+                                }
+                            }}
+                        >
                             <img src={mainImage} alt={product.name} className="animate-zoom-in" />
                             <div className="gallery-accents">
                                 <div className="accent-glow"></div>

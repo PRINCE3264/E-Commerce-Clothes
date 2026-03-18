@@ -52,6 +52,7 @@
     overflow: hidden;
     background: #f8fafc;
     border: 1px solid #f1f5f9;
+    cursor: crosshair;
 }
 
 .pd-main-img-box img {
@@ -59,6 +60,8 @@
     height: 100%;
     object-fit: contain;
     mix-blend-mode: multiply;
+    transition: transform 0.1s ease-out;
+    pointer-events: none;
 }
 
 .accent-glow {
