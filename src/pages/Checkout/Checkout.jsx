@@ -9,8 +9,18 @@ import {
     ArrowLeft, 
     MapPin, 
     Phone, 
-    Package,
-    ShieldCheck
+    Clock,
+    Crown,
+    Home,
+    Briefcase,
+    Building2,
+    Gift,
+    X,
+    Check,
+    Percent,
+    Plus,
+    ShieldCheck,
+    Package
 } from 'lucide-react';
 import API from '../../utils/api';
 import './Checkout.css';
@@ -42,12 +52,91 @@ const Checkout = ({ cartItems, onOrderComplete }) => {
     const [upiData, setUpiData] = useState(null);
     const [showUpiModal, setShowUpiModal] = useState(false);
 
+    // Address / Saved Address States
+    const [savedAddresses, setSavedAddresses] = useState([]);
+    const [selectedAddressId, setSelectedAddressId] = useState(null);
+
+    // Coupon / Rewards States
+    const [showCouponModal, setShowCouponModal] = useState(false);
+    const [selectedCoupon, setSelectedCoupon] = useState(null);
+    const [redeemPoints, setRedeemPoints] = useState(false);
+    const availablePoints = 1250; // From Elite Rewards
+    const pointsValue = availablePoints * 0.5; // Each point = ₹0.5
+
+    const availableCoupons = [
+        {
+            id: 1,
+            code: "SAVE20",
+            discount: 20,
+            isPercent: true,
+            type: "OFF",
+            desc: "Get 20% OFF on all elite luxury collections.",
+            minOrder: 2500,
+            tag: "BEST SELLER",
+            color: "#c0392b"
+        },
+        {
+            id: 2,
+            code: "FIRST500",
+            discount: 500,
+            isPercent: false,
+            type: "BACK",
+            desc: "Flat ₹500 discount on your shopping spree.",
+            minOrder: 1500,
+            tag: "NEW USER",
+            color: "#166534"
+        },
+        {
+            id: 3,
+            code: "ELITE1000",
+            discount: 1000,
+            isPercent: false,
+            type: "OFF",
+            desc: "Exclusive ₹1000 discount for valued members.",
+            minOrder: 5000,
+            tag: "HIGH VALUE",
+            color: "#1e40af"
+        }
+    ];
+
     useEffect(() => {
+        const fetchAddresses = async () => {
+            if (!userData) return;
+            try {
+                const res = await API.get('/auth/me');
+                if (res.data.success && res.data.data.addresses) {
+                    setSavedAddresses(res.data.data.addresses);
+                    // Auto-select default address if available
+                    const defaultAddr = res.data.data.addresses.find(a => a.isDefault);
+                    if (defaultAddr) {
+                        applyAddress(defaultAddr);
+                    }
+                }
+            } catch (err) {
+                console.error("Failed to fetch saved addresses", err);
+            }
+        };
+
         if (!userData) {
             // If not logged in, redirect to login with redirect param
             navigate('/login?redirect=/checkout');
+        } else {
+            fetchAddresses();
         }
     }, [navigate, userData]);
+
+    const applyAddress = (addr) => {
+        setSelectedAddressId(addr._id);
+        setShippingData({
+            address: `${addr.houseNumber}, ${addr.street}`,
+            city: addr.city,
+            postalCode: addr.pincode,
+            country: 'India',
+            phone: addr.mobileNumber,
+            aadharNumber: '',
+            panNumber: ''
+        });
+    };
 
     if (cartItems.length === 0) {
         return (
@@ -70,12 +159,23 @@ const Checkout = ({ cartItems, onOrderComplete }) => {
     const baseShipping = itemsPrice > 5000 ? 0 : 150;
     const deliveryExtra = deliverySpeed === 'express' ? 250 : 0;
     const shippingPrice = baseShipping + deliveryExtra;
-    const taxPrice = Math.round(itemsPrice * 0.12); // 12% Tax
-    const totalPrice = itemsPrice + shippingPrice + taxPrice;
+    
+    // Coupon Logic
+    let discountAmount = 0;
+    if (selectedCoupon) {
+        if (selectedCoupon.isPercent) {
+            discountAmount = (itemsPrice * selectedCoupon.discount) / 100;
+        } else {
+            discountAmount = selectedCoupon.discount;
+        }
+    }
+
+    const taxPrice = Math.round((itemsPrice - discountAmount - (redeemPoints ? pointsValue : 0)) * 0.12); // 12% Tax on discounted price
+    const totalPrice = Math.max(0, itemsPrice + shippingPrice + taxPrice - discountAmount - (redeemPoints ? pointsValue : 0));
 
     const initRazorpay = (orderData, razorpayOrder) => {
         const options = {
-            key: "rzp_test_RGlPdevCgkpRiA", // Use the key provided by user
+            key: import.meta.env.VITE_RAZORPAY_KEY_ID, // Use env directly
             amount: razorpayOrder.amount,
             currency: razorpayOrder.currency,
             name: "PANDIT FASHION",
@@ -141,6 +241,8 @@ const Checkout = ({ cartItems, onOrderComplete }) => {
                 itemsPrice,
                 shippingPrice,
                 taxPrice,
+                discountAmount,
+                couponCode: selectedCoupon?.code,
                 totalPrice
             };
 
@@ -208,6 +310,63 @@ const Checkout = ({ cartItems, onOrderComplete }) => {
                                     <h3><Truck /> Shipping Essentials</h3>
                                     <p>Where should we deliver your premium collection?</p>
                                 </div>
+
+                                {/* Saved Addresses Quick Select */}
+                                {savedAddresses.length > 0 && (
+                                    <div className="saved-addresses-area">
+                                        <span className="section-small-label">SELECT SAVED ADDRESS</span>
+                                        <div className="address-quick-grid">
+                                            {savedAddresses.map((addr) => (
+                                                <div 
+                                                    key={addr._id} 
+                                                    className={`address-pill-card ${selectedAddressId === addr._id ? 'active' : ''}`}
+                                                    onClick={() => applyAddress(addr)}
+                                                >
+                                                    <div className="a-pill-header">
+                                                        <div className="a-type-icon">
+                                                            {addr.addressType === 'Home' && <Home size={14} />}
+                                                            {addr.addressType === 'Work' && <Briefcase size={14} />}
+                                                            {addr.addressType === 'Other' && <Building2 size={14} />}
+                                                        </div>
+                                                        <span className="a-type-text">{addr.addressType || 'Home'}</span>
+                                                        {selectedAddressId === addr._id && <Check size={14} className="check-mark" />}
+                                                    </div>
+                                                    <div className="a-pill-body">
+                                                        <strong>{addr.fullName}</strong>
+                                                        <p className="line-clamp-1">{addr.houseNumber}, {addr.street}</p>
+                                                        <p>{addr.city}, {addr.pincode}</p>
+                                                    </div>
+                                                </div>
+                                            ))}
+                                            {/* Manual Entry Toggle / New Address Visual Trigger */}
+                                            <div 
+                                                className={`address-pill-card manual-trigger ${!selectedAddressId ? 'active' : ''}`}
+                                                onClick={() => {
+                                                    setSelectedAddressId(null);
+                                                    setShippingData({
+                                                        address: '',
+                                                        city: '',
+                                                        postalCode: '',
+                                                        country: 'India',
+                                                        phone: '',
+                                                        aadharNumber: '',
+                                                        panNumber: ''
+                                                    });
+                                                }}
+                                            >
+                                                <div className="a-pill-header">
+                                                    <div className="a-type-icon"><Plus size={14} /></div>
+                                                    <span className="a-type-text">Other Address</span>
+                                                </div>
+                                                <div className="a-pill-body">
+                                                    <strong>Use New Address</strong>
+                                                    <p>Enter details manually below</p>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                )}
+
                                 <form className="checkout-form" onSubmit={(e) => { e.preventDefault(); setStep(2); }}>
                                     <div className="form-row">
                                         <div className="input-group full">
@@ -217,7 +376,10 @@ const Checkout = ({ cartItems, onOrderComplete }) => {
                                                 required 
                                                 placeholder="Street, Landmark, Apartment"
                                                 value={shippingData.address}
-                                                onChange={handleInputChange}
+                                                onChange={(e) => {
+                                                    setSelectedAddressId(null);
+                                                    handleInputChange(e);
+                                                }}
                                             />
                                         </div>
                                     </div>
@@ -530,6 +692,24 @@ const Checkout = ({ cartItems, onOrderComplete }) => {
                                     <span>Subtotal</span>
                                     <span>₹{itemsPrice.toLocaleString()}</span>
                                 </div>
+                                {selectedCoupon && (
+                                    <div className="calc-row discount-row animate-fade-in">
+                                        <div className="d-label">
+                                            <Gift size={14} />
+                                            <span>Discount ({selectedCoupon.code})</span>
+                                        </div>
+                                        <span className="d-val">-₹{discountAmount.toLocaleString()}</span>
+                                    </div>
+                                )}
+                                {redeemPoints && (
+                                    <div className="calc-row points-row animate-fade-in">
+                                        <div className="d-label">
+                                            <Crown size={14} />
+                                            <span>Points Redeemed ({availablePoints} Pts)</span>
+                                        </div>
+                                        <span className="d-val">-₹{pointsValue.toLocaleString()}</span>
+                                    </div>
+                                )}
                                 <div className="calc-row">
                                     <span>Shipping</span>
                                     <span style={{color: shippingPrice === 0 ? '#10b981' : ''}}>
@@ -540,6 +720,46 @@ const Checkout = ({ cartItems, onOrderComplete }) => {
                                     <span>GST (12%)</span>
                                     <span>₹{taxPrice.toLocaleString()}</span>
                                 </div>
+                                <div className="calc-divider"></div>
+
+                                {/* Reward & Points Selection Area */}
+                                <div className="rewards-application-zone">
+                                    {!selectedCoupon ? (
+                                        <button className="apply-coupon-trigger" onClick={() => setShowCouponModal(true)}>
+                                            <Gift size={18} />
+                                            <span>Apply Coupon / Rewards</span>
+                                            <ChevronRight size={16} />
+                                        </button>
+                                    ) : (
+                                        <div className="applied-reward-pill coupon">
+                                            <div className="a-info">
+                                                <CheckCircle size={16} color="#10b981" />
+                                                <strong>{selectedCoupon.code}</strong> Applied
+                                            </div>
+                                            <button className="remove-reward" onClick={() => setSelectedCoupon(null)}>
+                                                <X size={14} />
+                                            </button>
+                                        </div>
+                                    )}
+
+                                    {/* Points Toggle */}
+                                    <div className={`points-redemption-card ${redeemPoints ? 'active' : ''}`}>
+                                        <div className="p-info-main">
+                                            <Crown size={18} color={redeemPoints ? "#ffd700" : "#94a3b8"} />
+                                            <div className="p-text">
+                                                <span className="p-avail">Elite Points: <strong>{availablePoints}</strong></span>
+                                                <span className="p-val">Equivalent to ₹{pointsValue}</span>
+                                            </div>
+                                        </div>
+                                        <button 
+                                            className={`points-toggle-btn ${redeemPoints ? 'on' : ''}`}
+                                            onClick={() => setRedeemPoints(!redeemPoints)}
+                                        >
+                                            <div className="toggle-thumb"></div>
+                                        </button>
+                                    </div>
+                                </div>
+
                                 <div className="calc-divider"></div>
                                 <div className="calc-row total">
                                     <span>Order Total</span>
@@ -557,6 +777,63 @@ const Checkout = ({ cartItems, onOrderComplete }) => {
                     </div>
                 </div>
             </div>
+
+            {/* Coupon Selection Modal */}
+            {showCouponModal && (
+                <div className="checkout-success-overlay" onClick={() => setShowCouponModal(false)}>
+                    <div className="coupon-selector-popup glass-panel animate-pop-in" onClick={e => e.stopPropagation()}>
+                        <div className="c-popup-header">
+                            <div className="c-title-box">
+                                <Gift size={24} color="#c0392b" />
+                                <h3>Available Rewards</h3>
+                            </div>
+                            <button className="close-c-popup" onClick={() => setShowCouponModal(false)}>
+                                <X size={20} />
+                            </button>
+                        </div>
+                        <div className="c-popup-body">
+                            <p className="c-hint">Choose a reward to apply to your current order.</p>
+                            <div className="c-list">
+                                {availableCoupons.map((coupon) => {
+                                    const isDisabled = itemsPrice < coupon.minOrder;
+                                    return (
+                                        <div 
+                                            key={coupon.id} 
+                                            className={`c-option-card ${isDisabled ? 'disabled' : ''} ${selectedCoupon?.id === coupon.id ? 'selected' : ''}`}
+                                            onClick={() => !isDisabled && (setSelectedCoupon(coupon), setShowCouponModal(false))}
+                                        >
+                                            <div className="c-opt-left" style={{ backgroundColor: coupon.color + '15' }}>
+                                                <div className="c-opt-badge" style={{ backgroundColor: coupon.color }}>
+                                                    {coupon.isPercent ? <Percent size={18} /> : <Gift size={18} />}
+                                                </div>
+                                            </div>
+                                            <div className="c-opt-main">
+                                                <div className="c-opt-top">
+                                                    <span className="c-opt-code">{coupon.code}</span>
+                                                    <span className="c-opt-tag" style={{ color: coupon.color, backgroundColor: coupon.color + '10' }}>{coupon.tag}</span>
+                                                </div>
+                                                <h4 className="c-opt-desc">{coupon.desc}</h4>
+                                                <div className="c-opt-footer">
+                                                    <span className="c-min">Min. Order: ₹{coupon.minOrder.toLocaleString()}</span>
+                                                    {isDisabled && <span className="c-error">Add ₹{(coupon.minOrder - itemsPrice).toLocaleString()} more</span>}
+                                                </div>
+                                            </div>
+                                            {selectedCoupon?.id === coupon.id && (
+                                                <div className="c-selected-check">
+                                                    <Check size={20} color="#10b981" />
+                                                </div>
+                                            )}
+                                        </div>
+                                    );
+                                })}
+                            </div>
+                        </div>
+                        <div className="c-popup-footer">
+                            <p>You can only use one coupon per order.</p>
+                        </div>
+                    </div>
+                </div>
+            )}
         </div>
     );
 };

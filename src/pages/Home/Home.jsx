@@ -17,12 +17,11 @@ import {
     CheckCircle,
     Minus
 } from 'lucide-react';
+import QuickViewModal from '../../components/Modals/QuickViewModal';
+import ProductCard from '../../components/ProductCard/ProductCard';
 import './Home.css';
 import './Home_CartModal.css';
 import API from '../../utils/api';
-
-
-import QuickViewModal from '../../components/Modals/QuickViewModal';
 
 const Home = ({ onAddToCart, onToggleWishlist, wishlist = [] }) => {
     const navigate = useNavigate();
@@ -57,23 +56,20 @@ const Home = ({ onAddToCart, onToggleWishlist, wishlist = [] }) => {
             try {
                 const res = await API.get('/products');
                 if (res.data.success) {
-                    const allProducts = res.data.data;
+                    const allProducts = Array.isArray(res.data.data) ? res.data.data : res.data.data?.products || [];
                     const featured = [];
-                    const categories = ["Men's Wear", "Women's Wear", "Kids Wear", "Accessories"];
+                    const categories = ["Men", "Women", "Kids", "Accessories"];
                     
-                    // Try to get one from each major category for variety
+                    // Strictly get exactly one from each category
                     categories.forEach(cat => {
                         const found = allProducts.find(p => p.category === cat);
-                        if (found) featured.push(found);
+                        if (found) {
+                            featured.push(found);
+                        }
                     });
 
-                    // Fill up to 4 if some categories are missing
-                    if (featured.length < 4) {
-                        const remaining = allProducts.filter(p => !featured.includes(p));
-                        featured.push(...remaining.slice(0, 4 - featured.length));
-                    }
-
-                    setFeaturedProducts(featured.slice(0, 4));
+                    // Update Featured Products
+                    setFeaturedProducts(featured);
                 }
             } catch (err) {
                 console.error("Home: Error fetching products", err);
@@ -109,15 +105,15 @@ const Home = ({ onAddToCart, onToggleWishlist, wishlist = [] }) => {
             btnText: "Shop Kids"
         },
         {
-            bg: "https://images.unsplash.com/photo-1549298916-b41d501d3772?q=80&w=2012&auto=format&fit=crop",
-            title: <><span className="txt-cyan">Urban</span> <span className="txt-yellow">Footwear</span></>,
-            subtitle: <><span className="txt-pink">Classic</span> <span className="txt-yellow-light">White Essentials</span></>,
+            bg: "https://png.pngtree.com/thumb_back/fw800/background/20251101/pngtree-fashionable-gift-shopping-scene-with-clothing-and-accessories-image_20175581.webp",
+            title: <><span className="txt-cyan">Accessories</span> <span className="txt-yellow">Fashion</span></>,
+            subtitle: <><span className="txt-pink">Classic</span> <span className="txt-yellow-light">Style Collection</span></>,
             text: "Walk with confidence in our premium leather sneakers and athletic wear.",
-            link: "/products?category=shoes",
-            btnText: "Shop Shoes"
+            link: "/products?category=Accessories",
+            btnText: "Accessories"
         },
         {
-            bg: "https://images.unsplash.com/photo-1441986300917-64674bd600d8?q=80&w=2070&auto=format&fit=crop",
+            bg: "https://res.cloudinary.com/purnesh/image/upload/w_540,f_auto,q_auto:eco,c_limit/31609753253532.jpg",
             title: <><span className="txt-yellow-light">Eco-Friendly</span></>,
             subtitle: <><span className="txt-pink">Sustainable</span> <span className="txt-cyan">Choice</span></>,
             text: "Fashion that cares for the planet. Discover our organic and recycled fabrics.",
@@ -143,61 +139,6 @@ const Home = ({ onAddToCart, onToggleWishlist, wishlist = [] }) => {
     // const womenProducts = featuredProducts.filter(p => p.category === "Women's Wear" || p.category === "Women");
     // const kidsProducts = featuredProducts.filter(p => p.category === "Kids Wear" || p.category === "Kids");
 
-    const renderProductCard = (product) => (
-        <div className="product-card" key={product._id}>
-            <div 
-                className="product-image" 
-                style={{ backgroundImage: `url(${product.image})`, cursor: 'pointer' }}
-                onClick={() => navigate(`/product/${product._id}`)}
-            >
-                <div className="product-actions">
-                    <button className="action-btn heart-btn" title="Add to Wishlist" onClick={(e) => { e.stopPropagation(); handleWishlist(product); }}>
-                        <Heart
-                            size={18}
-                            fill={wishlist.find(item => item._id === product._id) ? "#ff7675" : "none"}
-                            color={wishlist.find(item => item._id === product._id) ? "#ff7675" : "currentColor"}
-                        />
-                    </button>
-                    <button className="action-btn" title="Quick View" onClick={(e) => { e.stopPropagation(); setQuickView(product); }}><Eye size={18} /></button>
-                </div>
-                {product.stock <= 0 ? (
-                    <span className={`product-badge out-of-stock`}>Sold Out</span>
-                ) : product.isBestSeller ? (
-                    <span className="product-badge best-seller">BEST SELLER</span>
-                ) : product.isNewArrival ? (
-                    <span className="product-badge new-arrival">NEW ARRIVAL</span>
-                ) : product.badge ? (
-                    <span className={`product-badge ${product.badge.toLowerCase()}`}>{product.badge}</span>
-                ) : null}
-            </div>
-            <div className="product-info">
-                <div className="product-meta-row">
-                    <span className="product-category-label">{product.category}</span>
-                    <div className="product-rating-compact">
-                        <Star
-                            size={14}
-                            fill="#f59e0b"
-                            color="#f59e0b"
-                        />
-                        <span className="rating-value">{product.rating || 4.5}</span>
-                    </div>
-                </div>
-                <h4 className="product-title">{product.name}</h4>
-                <div className="product-price">
-                    <span className="current-price">₹{(product.price || 0).toLocaleString('en-IN')}</span>
-                    {product.oldPrice && <span className="old-price">₹{product.oldPrice.toLocaleString('en-IN')}</span>}
-                </div>
-
-                <button
-                    className="btn-add-to-cart"
-                    onClick={() => navigate(`/product/${product._id}`)}
-                >
-                    <Eye size={20} />
-                    <span>VIEW DETAILS</span>
-                </button>
-            </div>
-        </div>
-    );
 
     return (
         <div className="home-page">
@@ -281,7 +222,7 @@ const Home = ({ onAddToCart, onToggleWishlist, wishlist = [] }) => {
                                 <div className="category-content-reveal">
                                     <span className="category-count">120+ Items</span>
                                     <h3>Men's Fashion</h3>
-                                    <a href="/products?category=Men's Wear" className="btn-category">Explore Now <ArrowRight size={16} /></a>
+                                    <a href="/products?category=Men" className="btn-category">Explore Now <ArrowRight size={16} /></a>
                                 </div>
                             </div>
                         </div>
@@ -291,7 +232,7 @@ const Home = ({ onAddToCart, onToggleWishlist, wishlist = [] }) => {
                                 <div className="category-content-reveal">
                                     <span className="category-count">85+ Items</span>
                                     <h3>Women's Boutique</h3>
-                                    <a href="/products?category=Women's Wear" className="btn-category">Explore Now <ArrowRight size={16} /></a>
+                                    <a href="/products?category=Women" className="btn-category">Explore Now <ArrowRight size={16} /></a>
                                 </div>
                             </div>
                         </div>
@@ -301,7 +242,7 @@ const Home = ({ onAddToCart, onToggleWishlist, wishlist = [] }) => {
                                 <div className="category-content-reveal">
                                     <span className="category-count">50+ Items</span>
                                     <h3>Kids Collection</h3>
-                                    <a href="/products?category=Kids Wear" className="btn-category">Explore Now <ArrowRight size={16} /></a>
+                                    <a href="/products?category=Kids" className="btn-category">Explore Now <ArrowRight size={16} /></a>
                                 </div>
                             </div>
                         </div>
@@ -340,7 +281,15 @@ const Home = ({ onAddToCart, onToggleWishlist, wishlist = [] }) => {
                             <p>Refined styles handpicked for your wardrobe</p>
                         </div>
                         <div className="products-grid">
-                            {featuredProducts.map(renderProductCard)}
+                            {featuredProducts.map(product => (
+                                <ProductCard 
+                                    key={product._id}
+                                    product={product}
+                                    wishlist={wishlist}
+                                    onToggleWishlist={handleWishlist}
+                                    onQuickView={(p) => setQuickView(p)}
+                                />
+                            ))}
                         </div>
                         <div className="centered mt-5">
                             <Link to="/products" className="btn-view-all">Explore All Products</Link>

@@ -190,18 +190,28 @@
 }
 
 .cc-pill {
+    padding: 10px;
+    width: 40px;
+    height: 40px;
     display: flex;
     align-items: center;
-    gap: 6px;
-    padding: 6px 12px;
-    border-radius: 50px;
-    font-size: 0.75rem;
-    font-weight: 800;
-    letter-spacing: 0.5px;
+    justify-content: center;
+    border-radius: 50%;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03);
+    transition: all 0.3s ease;
 }
 
-.cc-pill.pending { background: #fffbeb; color: #d97706; }
-.cc-pill.resolved { background: #ecfdf5; color: #059669; }
+.cc-pill.pending { 
+    background: #fffbeb; 
+    color: #d97706; 
+    box-shadow: 0 4px 12px rgba(217, 119, 6, 0.1);
+}
+
+.cc-pill.resolved { 
+    background: #f0fdf4; 
+    color: #16a34a; 
+    box-shadow: 0 4px 12px rgba(22, 163, 74, 0.15);
+}
 
 .cc-body {
     flex: 1;

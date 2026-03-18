@@ -14,7 +14,7 @@ const paymentSchema = new mongoose.Schema({
     gateway: {
         type: String,
         required: true,
-        enum: ['RAZORPAY', 'STRIPE', 'COD']
+        enum: ['RAZORPAY', 'STRIPE', 'COD', 'ONLINE', 'UPI']
     },
     transactionId: {
         type: String,

@@ -149,7 +149,7 @@ const AdminSettings = () => {
                                     <div className="s-form-grid mt-20">
                                         <div className="s-input-group full">
                                             <label>Key ID</label>
-                                            <input type="password" defaultValue="rzp_live_xxxxxxxxxxxx" />
+                                            <input type="password" defaultValue="rzp_live_placeholder" />
                                         </div>
                                         <div className="s-input-group full">
                                             <label>Key Secret</label>
@@ -170,11 +170,11 @@ const AdminSettings = () => {
                                     <div className="s-form-grid mt-20" style={{ opacity: 0.5 }}>
                                         <div className="s-input-group full">
                                             <label>Publishable Key</label>
-                                            <input type="text" placeholder="pk_test_..." disabled />
+                                            <input type="text" placeholder="stripe_publishable_key_placeholder" disabled />
                                         </div>
                                         <div className="s-input-group full">
                                             <label>Secret Key</label>
-                                            <input type="password" placeholder="sk_test_..." disabled />
+                                            <input type="password" placeholder="stripe_secret_key_placeholder" disabled />
                                         </div>
                                     </div>
                                 </div>

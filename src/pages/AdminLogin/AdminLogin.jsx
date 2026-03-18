@@ -66,6 +66,7 @@ const AdminLogin = () => {
             // Fallback: if backend is down, check hardcoded credentials
             if (credentials.email === 'admin@gmail.com' && credentials.password === 'admin123') {
                 localStorage.setItem('admin_auth', 'true');
+                localStorage.setItem('admin_token', 'dummy_admin_token'); // Prevent API failure in fallback mode
                 localStorage.setItem('admin_user', JSON.stringify({ name: 'Admin', email: credentials.email, role: 'admin' }));
                 navigate('/admin');
             } else {

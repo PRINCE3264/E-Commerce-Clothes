@@ -66,6 +66,14 @@ const orderSchema = new mongoose.Schema({
         required: true,
         default: 0.0
     },
+    discountAmount: {
+        type: Number,
+        default: 0.0
+    },
+    couponCode: {
+        type: String,
+        default: ''
+    },
     isPaid: {
         type: Boolean,
         required: true,
@@ -91,6 +99,11 @@ const orderSchema = new mongoose.Schema({
     },
     refundProof: {
         type: String
+    },
+    refundProofStatus: {
+        type: String,
+        enum: ['Pending', 'Approved', 'Rejected'],
+        default: 'Pending'
     },
     refundTransactionId: {
         type: String

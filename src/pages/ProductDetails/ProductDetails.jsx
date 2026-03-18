@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { ShoppingBag, Heart, Star, ShieldCheck, Truck, RefreshCcw, ArrowLeft, Plus, Minus, Share2, AlertCircle } from 'lucide-react';
+import { ShoppingBag, Heart, Star, ShieldCheck, Truck, RefreshCcw, ArrowLeft, Plus, Minus, Share2, AlertCircle, MessageSquare } from 'lucide-react';
 import API from '../../utils/api';
 import './ProductDetails.css';
 
@@ -326,7 +326,14 @@ const ProductDetails = ({ onAddToCart, onToggleWishlist, wishlist }) => {
                         <div className="pd-price-row">
                             <div className="price-group">
                                 <span className="pd-current-price">₹{displayPrice.toLocaleString()}</span>
-                                {product.oldPrice && <span className="pd-old-price">₹{product.oldPrice.toLocaleString()}</span>}
+                                {product.oldPrice && (
+                                    <>
+                                        <span className="pd-old-price">₹{product.oldPrice.toLocaleString()}</span>
+                                        <span className="pd-discount-badge">
+                                            {Math.round(((product.oldPrice - displayPrice) / product.oldPrice) * 100)}% OFF
+                                        </span>
+                                    </>
+                                )}
                                 <span className="pd-tax-note">Incl. all taxes</span>
                             </div>
                             <div className={`stock-badge ${!isOutOfStock ? 'in-stock' : 'out-of-stock'}`}>
@@ -573,9 +580,9 @@ const ProductDetails = ({ onAddToCart, onToggleWishlist, wishlist }) => {
 
                         {/* List Column */}
                         <div className="rev-list-col">
-                            {product.reviews && product.reviews.filter(r => r.isApproved).length > 0 ? (
+                            {product.reviews && product.reviews.length > 0 ? (
                                 <div className="rev-scroll-area">
-                                    {product.reviews.filter(r => r.isApproved).map((rev, idx) => (
+                                    {product.reviews.map((rev, idx) => (
                                         <div key={rev._id || idx} className="rev-card-elite">
                                             <div className="rev-card-header">
                                                 <div className="rev-user-profile">
@@ -589,10 +596,15 @@ const ProductDetails = ({ onAddToCart, onToggleWishlist, wishlist }) => {
                                                         <span className="rev-user-date">{new Date(rev.createdAt).toLocaleDateString(undefined, { month: 'long', day: 'numeric', year: 'numeric' })}</span>
                                                     </div>
                                                 </div>
-                                                <div className="rev-card-stars">
-                                                    {[...Array(5)].map((_, i) => (
-                                                        <Star key={i} size={14} fill={i < rev.rating ? "#f59e0b" : "none"} color={i < rev.rating ? "#f59e0b" : "#e2e8f0"} />
-                                                    ))}
+                                                <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: '5px' }}>
+                                                    <div className="rev-card-stars">
+                                                        {[...Array(5)].map((_, i) => (
+                                                            <Star key={i} size={14} fill={i < rev.rating ? "#f59e0b" : "none"} color={i < rev.rating ? "#f59e0b" : "#e2e8f0"} />
+                                                        ))}
+                                                    </div>
+                                                    <div className={`rev-status-pill ${rev.isApproved ? 'approved' : 'pending'}`}>
+                                                        {rev.isApproved ? '✓ Approved Member' : '⧗ Awaiting Approval'}
+                                                    </div>
                                                 </div>
                                             </div>
                                             <div className="rev-content">
@@ -604,9 +616,10 @@ const ProductDetails = ({ onAddToCart, onToggleWishlist, wishlist }) => {
                             ) : (
                                 <div className="rev-empty-state">
                                     <div className="empty-icon-wrap">
-                                        <Star size={48} color="#e2e8f0" />
+                                        <MessageSquare size={48} color="#e2e8f0" />
                                     </div>
-                                    <p>No reviews yet. Be the first to share your experience!</p>
+                                    <h3>No member reviews yet</h3>
+                                    <p>Our community hasn't shared their experience with this piece yet. Be the first to start the conversation!</p>
                                 </div>
                             )}
                         </div>

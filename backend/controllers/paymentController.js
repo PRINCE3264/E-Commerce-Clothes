@@ -14,8 +14,7 @@ const razorpay = new Razorpay({
     key_secret: process.env.RAZORPAY_KEY_SECRET
 });
 
-// @desc    Get all payments (Admin Only)
-// @route   GET /api/payments
+
 exports.getAllPayments = async (req, res) => {
     try {
         const payments = await Payment.find({})
@@ -175,21 +174,30 @@ exports.refundPayment = async (req, res) => {
 
         let refundResponse = null;
 
-        if (payment.gateway === 'RAZORPAY') {
-            // Razorpay Refund
-            refundResponse = await razorpay.payments.refund(payment.transactionId, {
-                amount: Math.round(payment.amount * 100), // Full refund
-                notes: { reason: req.body.reason || 'Admin Initiated Refund' }
+        try {
+            if (payment.gateway === 'RAZORPAY') {
+                // Razorpay Refund - Using the most robust way
+                refundResponse = await razorpay.payments.refund(payment.transactionId, {
+                    amount: Math.round(payment.amount * 100), // Full refund in paise
+                    notes: { reason: req.body.reason || 'Admin Initiated Refund' }
+                });
+            } else if (payment.gateway === 'STRIPE') {
+                // Stripe Refund
+                refundResponse = await stripe.refunds.create({
+                    payment_intent: payment.transactionId,
+                    amount: Math.round(payment.amount * 100)
+                });
+            } else if (payment.gateway === 'COD') {
+                // Manual Refund for COD
+                refundResponse = { status: 'Manual Refund Completed', date: new Date() };
+            }
+        } catch (gatewayErr) {
+            console.error(`[REFUND_GATEWAY_ERROR] Gateway: ${payment.gateway}, TXN: ${payment.transactionId}`, gatewayErr);
+            return res.status(gatewayErr.statusCode || 400).json({ 
+                success: false, 
+                message: gatewayErr.description || gatewayErr.message || "Gateway refund failed",
+                error: gatewayErr
             });
-        } else if (payment.gateway === 'STRIPE') {
-            // Stripe Refund
-            refundResponse = await stripe.refunds.create({
-                payment_intent: payment.transactionId,
-                amount: Math.round(payment.amount * 100)
-            });
-        } else if (payment.gateway === 'COD') {
-            // Manual Refund for COD
-            refundResponse = { status: 'Manual Refund Completed', date: new Date() };
         }
 
         // Update Payment Record
@@ -202,6 +210,8 @@ exports.refundPayment = async (req, res) => {
             const order = await Order.findById(payment.order._id);
             if (order) {
                 order.status = 'Cancelled';
+                order.isRefunded = true;
+                order.refundedAt = Date.now();
                 order.trackingLog.push({
                     status: 'Cancelled',
                     message: `Refund Processed: ${req.body.reason || 'Admin action'}`,
@@ -218,7 +228,7 @@ exports.refundPayment = async (req, res) => {
             data: refundResponse 
         });
     } catch (err) {
-        console.error("REFUND_ERROR:", err);
+        console.error("REFUND_FATAL_ERROR:", err);
         res.status(500).json({ success: false, message: err.message });
     }
 };

@@ -348,6 +348,17 @@ const AdminOverview = () => {
                     .overview-stats-row { grid-template-columns: repeat(2, 1fr); }
                     .grid-right { grid-template-columns: 1fr; }
                     .s-value { font-size: 1.5rem; }
+                    .stat-card-modern { padding: 15px; }
+                    .b-header h2 { font-size: 1.8rem; }
+                    .balance-card { padding: 20px; }
+                }
+                @media (max-width: 480px) {
+                    .overview-stats-row { grid-template-columns: 1fr; }
+                    .modern-table th, .modern-table td { padding: 10px; font-size: 0.75rem; }
+                    .user-cell img { width: 28px; height: 28px; }
+                    .prod-cell span { max-width: 100px; }
+                    .admin-panel { padding: 15px; border-radius: 16px; }
+                    .s-value { font-size: 1.6rem; }
                 }
             `}</style>
         </div>

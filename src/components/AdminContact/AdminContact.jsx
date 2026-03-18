@@ -223,9 +223,9 @@ const AdminContact = () => {
                                 </div>
                                 <div className="cc-status-container">
                                     {msg.status === 'Resolved' ? (
-                                        <span className="cc-pill resolved"><CheckCircle size={12}/> Resolved</span>
+                                        <span className="cc-pill resolved"><CheckCircle size={18}/></span>
                                     ) : (
-                                        <span className="cc-pill pending"><Clock size={12}/> Pending Rev.</span>
+                                        <span className="cc-pill pending"><Clock size={18}/></span>
                                     )}
                                 </div>
                             </div>

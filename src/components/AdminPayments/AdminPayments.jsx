@@ -108,14 +108,16 @@ const AdminPayments = () => {
                                 </div>
                             </div>
 
-                            <div className="card-body" style={{ background: '#f8fafc' }}>
-                                <div className="txn-info">
-                                    <small style={{ color: '#64748b' }}>TRANSACTION ID</small>
-                                    <strong style={{ fontSize: '0.85rem' }}>{p.transactionId}</strong>
+                            <div className="card-body" style={{ background: '#f8fafc', flexDirection: 'column', gap: '15px', alignItems: 'stretch' }}>
+                                <div className="txn-info" style={{ width: '100%' }}>
+                                    <small style={{ color: '#64748b', display: 'block', marginBottom: '4px' }}>TRANSACTION ID</small>
+                                    <strong style={{ fontSize: '0.85rem', wordBreak: 'break-all', display: 'block', color: '#1e293b' }}>{p.transactionId}</strong>
                                 </div>
-                                <div className="amount-info">
-                                    <small style={{ color: '#64748b' }}>VERIFIED YIELD</small>
-                                    <div className="price-tag" style={{ color: '#2563eb' }}>
+                                <div className="amount-info" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderTop: '1px solid #e2e8f0', paddingTop: '10px' }}>
+                                    <div>
+                                        <small style={{ color: '#64748b' }}>VERIFIED YIELD</small>
+                                    </div>
+                                    <div className="price-tag" style={{ color: '#2563eb', margin: 0 }}>
                                         <IndianRupee size={16}/>
                                         <span>{p.amount.toLocaleString()}</span>
                                     </div>
@@ -131,17 +133,42 @@ const AdminPayments = () => {
                                         <User size={12}/> <span>{p.user?.name || 'Guest'}</span>
                                     </div>
                                 </div>
-                                <div className="action-buttons">
+                                <div className="action-buttons" style={{ display: 'flex', gap: '8px' }}>
                                     {p.status !== 'Refunded' && (
                                         <button 
                                             className="btn-refund" 
-                                            style={{ background: '#fef2f2', color: '#dc2626', border: '1px solid #fee2e2', padding: '6px 12px', borderRadius: '8px', fontSize: '0.75rem', fontWeight: '800', cursor: 'pointer' }}
+                                            style={{ 
+                                                background: '#fef2f2', 
+                                                color: '#dc2626', 
+                                                border: '1px solid #fee2e2',
+                                                padding: '6px 12px',
+                                                borderRadius: '8px',
+                                                fontSize: '0.75rem',
+                                                fontWeight: '800',
+                                                cursor: 'pointer'
+                                            }}
                                             onClick={() => handleRefund(p._id)}
                                         >
                                             REFUND
                                         </button>
                                     )}
-                                    <button className="btn-details" style={{ background: '#eff6ff', color: '#2563eb', border: '1px solid #bfdbfe' }} title="Analyze Node">
+                                    <button 
+                                        className="btn-details" 
+                                        style={{ 
+                                            background: '#eff6ff', 
+                                            color: '#2563eb', 
+                                            border: '1px solid #bfdbfe',
+                                            padding: '6px 12px',
+                                            borderRadius: '8px',
+                                            fontSize: '0.75rem',
+                                            fontWeight: '800',
+                                            cursor: 'pointer',
+                                            display: 'flex',
+                                            alignItems: 'center',
+                                            gap: '4px'
+                                        }} 
+                                        title="Analyze Node"
+                                    >
                                         ANALYZE <ArrowUpRight size={14}/>
                                     </button>
                                 </div>

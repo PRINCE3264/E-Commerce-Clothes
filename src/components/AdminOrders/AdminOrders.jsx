@@ -157,7 +157,7 @@ const AdminOrders = () => {
                             <input type="checkbox" id="swal-is-refunded" style="width: 18px; height: 18px; cursor: pointer;" ${order.isRefunded ? 'checked' : ''} />
                             <label style="margin: 0; color: #1e293b; cursor: pointer;" for="swal-is-refunded">Mark Payment as Refunded</label>
                         </div>
-                        <div class="su-input-group b-upload-zone-mini">
+                        <div className="su-input-group">
                             <label>Refund Proof Image</label>
                             <input type="hidden" id="swal-refund-proof" value="${order.refundProof || ''}" />
                             <div style="display:flex; align-items:center; gap:10px; margin-top:5px;">
@@ -167,6 +167,14 @@ const AdminOrders = () => {
                                 </label>
                                 <span id="swal-upload-status" class="b-upload-status">${order.refundProof ? 'Existing Proof Found' : 'No file chosen'}</span>
                             </div>
+                        </div>
+                        <div class="su-input-group">
+                            <label>Proof Verification Status</label>
+                            <select id="swal-refund-proof-status" class="su-select" aria-label="Proof Status">
+                                <option value="Pending" ${order.refundProofStatus === 'Pending' ? 'selected' : ''}>Pending Approval</option>
+                                <option value="Approved" ${order.refundProofStatus === 'Approved' ? 'selected' : ''}>Approved</option>
+                                <option value="Rejected" ${order.refundProofStatus === 'Rejected' ? 'selected' : ''}>Rejected</option>
+                            </select>
                         </div>
                         <div class="su-input-group">
                             <label>Refund Transaction ID</label>
@@ -219,6 +227,7 @@ const AdminOrders = () => {
                     message: document.getElementById('swal-transit-msg').value,
                     location: document.getElementById('swal-transit-loc').value,
                     refundProof: document.getElementById('swal-refund-proof')?.value || '',
+                    refundProofStatus: document.getElementById('swal-refund-proof-status')?.value || 'Pending',
                     refundTransactionId: document.getElementById('swal-refund-txid')?.value || ''
                 };
                 const refundCheck = document.getElementById('swal-is-refunded');

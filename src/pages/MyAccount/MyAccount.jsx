@@ -1446,10 +1446,67 @@ const TrackingSection = () => {
 
 const CouponsSection = () => {
     const [timeLeft, setTimeLeft] = useState({ hours: 48, minutes: 0, seconds: 0 });
-    const [copied, setCopied] = useState(false);
+    const [copiedId, setCopiedId] = useState(null);
+    const [activeFilter, setActiveFilter] = useState('active');
+    const [showAllHistory, setShowAllHistory] = useState(false);
+
+    const historyData = [
+        { code: "FESTIVE30", date: "15 Mar 2024", savings: "₹450", status: "Applied Successfully" },
+        { code: "WELCOME10", date: "02 Feb 2024", savings: "₹150", status: "Applied Successfully" },
+        { code: "SAVE20", date: "20 Jan 2024", savings: "₹320", status: "Applied Successfully" },
+        { code: "NEWUSER", date: "15 Dec 2023", savings: "₹500", status: "Applied Successfully" },
+        { code: "FREESHIP", date: "10 Nov 2023", savings: "₹100", status: "Applied Successfully" },
+        { code: "DIWALI50", date: "25 Oct 2023", savings: "₹1250", status: "Applied Successfully" }
+    ];
+
+    const coupons = [
+        {
+            id: 1,
+            code: "SAVE20",
+            discount: "20%",
+            type: "OFF",
+            desc: "Get 20% OFF on all elite luxury collections.",
+            minOrder: "₹2,500",
+            status: "active",
+            tag: "BEST SELLER",
+            color: "#c0392b"
+        },
+        {
+            id: 2,
+            code: "FIRST500",
+            discount: "₹500",
+            type: "BACK",
+            desc: "Flat ₹500 discount on your first shopping spree.",
+            minOrder: "₹1,500",
+            status: "active",
+            tag: "NEW USER",
+            color: "#166534"
+        },
+        {
+            id: 3,
+            code: "FREESHIP",
+            discount: "FREE",
+            type: "DELIVERY",
+            desc: "Worry-free shipping on all orders nationwide.",
+            minOrder: "Any Order",
+            status: "active",
+            tag: "LIMITED",
+            color: "#1e40af"
+        },
+        {
+            id: 4,
+            code: "EXPIRED15",
+            discount: "15%",
+            type: "OFF",
+            desc: "Seasonal discount valid for March sale.",
+            minOrder: "₹1,000",
+            status: "expired",
+            tag: "EXPIRED",
+            color: "#94a3b8"
+        }
+    ];
 
     useEffect(() => {
-        // Simple countdown logic for demo purposes
         const targetDate = new Date();
         targetDate.setHours(targetDate.getHours() + 48);
 
@@ -1471,61 +1528,196 @@ const CouponsSection = () => {
         return () => clearInterval(timer);
     }, []);
 
-    const handleCopy = () => {
-        navigator.clipboard.writeText("SAVE20");
-        setCopied(true);
-        setTimeout(() => setCopied(false), 3000);
+    const handleCopy = (id, code) => {
+        navigator.clipboard.writeText(code);
+        setCopiedId(id);
+        setTimeout(() => setCopiedId(null), 3000);
     };
 
+    const filteredCoupons = coupons.filter(c => c.status === activeFilter);
+
     return (
-        <div className="section-container coupons-section animate-fade-in">
-            <div className="section-header">
-                <div className="header-info">
-                    <h2>Coupons & Rewards</h2>
-                    <p className="subtitle">Unlock exclusive premium savings</p>
-                </div>
+        <div className="section-container coupons-section-elite animate-fade-in">
+            <div className="page-header-premium">
+                <div className="header-badge">ELITE REWARDS</div>
+                <h2 className="title-glam">Coupons & Rewards</h2>
+                <p className="subtitle-glam">Exclusive privileges curated for our most valued customers.</p>
             </div>
-            
-            <div className="rewards-dashboard">
-                <div className="reward-points-card">
-                    <div className="points-icon"><Crown size={32} /></div>
-                    <div className="points-details">
-                        <span className="label">Total Reward Points</span>
-                        <strong className="value">450 <span className="pts">pts</span></strong>
+
+            <div className="rewards-overview-grid">
+                <div className="reward-balance-card-v2">
+                    <div className="top-row">
+                        <div className="icon-badge-gold">
+                            <Crown size={24} />
+                        </div>
+                        <div className="pts-info">
+                            <span className="tiny-label">AVAILABLE POINTS</span>
+                            <div className="pts-value">1,250 <span className="currency">Pts</span></div>
+                        </div>
+                    </div>
+                    <div className="tier-progress">
+                        <div className="tier-labels">
+                            <span>Silver Tier</span>
+                            <span>Gold Tier</span>
+                        </div>
+                        <div className="progress-bar-container">
+                            <div className="progress-bar-fill" style={{ width: '75%' }}></div>
+                        </div>
+                        <p className="pts-to-next">250 more points to unlock <strong>Gold Benefits</strong></p>
                     </div>
                 </div>
 
-                <h3 className="coupons-subhead">Available Deals</h3>
-                
-                <div className="coupon-grid-premium">
-                    <div className="coupon-card-luxury">
-                        <div className="coupon-discount-zone">
-                            <span className="discount-amount">20%</span>
-                            <span className="discount-type">OFF</span>
-                        </div>
-                        <div className="coupon-details-zone">
-                            <strong className="promo-code">SAVE20</strong>
-                            <p className="promo-desc">Get 20% OFF on your next elite purchase.</p>
-                            
-                            <div className="promo-timer">
-                                <Clock size={14} />
-                                <span>Expires in:</span>
-                                <div className="timer-pill">
-                                    {String(timeLeft.hours).padStart(2, '0')}h : {String(timeLeft.minutes).padStart(2, '0')}m : {String(timeLeft.seconds).padStart(2, '0')}s
+                <div className="reward-stats-mini">
+                    <div className="stat-box">
+                        <span className="s-label">Total Saved</span>
+                        <strong className="s-val">₹4,250</strong>
+                    </div>
+                    <div className="stat-box">
+                        <span className="s-label">Used Coupons</span>
+                        <strong className="s-val">12</strong>
+                    </div>
+                    <div className="stat-box">
+                        <span className="s-label">Active Rewards</span>
+                        <strong className="s-val">3</strong>
+                    </div>
+                </div>
+            </div>
+
+            <div className="coupons-main-content">
+                <div className="coupons-filter-bar">
+                    <button className={activeFilter === 'active' ? 'active' : ''} onClick={() => setActiveFilter('active')}>Active Offers</button>
+                    <button className={activeFilter === 'expired' ? 'active' : ''} onClick={() => setActiveFilter('expired')}>Used & Expired</button>
+                    <div className="active-line" style={{ transform: activeFilter === 'active' ? 'translateX(0)' : 'translateX(100%)' }}></div>
+                </div>
+
+                <div className="coupon-grid-v2">
+                    {filteredCoupons.length > 0 ? (
+                        filteredCoupons.map((coupon) => (
+                            <div key={coupon.id} className={`coupon-prime-card ${coupon.status === 'expired' ? 'is-expired' : ''}`}>
+                                <div className="card-top" style={{ backgroundColor: coupon.color + '10' }}>
+                                    <div className="discount-circle" style={{ backgroundColor: coupon.color }}>
+                                        <span className="amt">{coupon.discount}</span>
+                                        <span className="typ">{coupon.type}</span>
+                                    </div>
+                                    <div className="top-meta">
+                                        <div className="coupon-tag" style={{ color: coupon.color, borderColor: coupon.color + '40' }}>{coupon.tag}</div>
+                                        {coupon.status === 'active' && (
+                                            <div className="expiry-timer-sm">
+                                                <Clock size={12} />
+                                                <span>Ends in {timeLeft.hours}h : {timeLeft.minutes}m</span>
+                                            </div>
+                                        )}
+                                    </div>
                                 </div>
+                                <div className="card-body-prime">
+                                    <div className="code-row">
+                                        <code className="c-code">{coupon.code}</code>
+                                        <button 
+                                            className={`copy-btn-minimal ${copiedId === coupon.id ? 'success' : ''}`}
+                                            onClick={() => handleCopy(coupon.id, coupon.code)}
+                                            disabled={coupon.status === 'expired'}
+                                        >
+                                            {copiedId === coupon.id ? <Check size={16} /> : <Eye size={16} />}
+                                            {copiedId === coupon.id ? "COPIED" : "COPY"}
+                                        </button>
+                                    </div>
+                                    <h4 className="c-desc">{coupon.desc}</h4>
+                                    <div className="c-footer">
+                                        <span className="min-ord">Min. order: {coupon.minOrder}</span>
+                                        <button className="t-and-c">T&C Apply</button>
+                                    </div>
+                                </div>
+                                {coupon.status === 'active' && <div className="side-dash"></div>}
+                            </div>
+                        ))
+                    ) : (
+                        <div className="empty-coupons-state">
+                            <Gift size={48} />
+                            <p>No {activeFilter} coupons found.</p>
+                        </div>
+                    )}
+                </div>
+            </div>
+
+            <div className="redemption-history">
+                <div className="section-head-sm">
+                    <h3>Recent Redemption History</h3>
+                    <button className="view-all" onClick={() => setShowAllHistory(true)}>View All</button>
+                </div>
+                <div className="history-table-container">
+                    <table className="history-table">
+                        <thead>
+                            <tr>
+                                <th>COUPON CODE</th>
+                                <th>DATE USED</th>
+                                <th>ORDER SAVINGS</th>
+                                <th>STATUS</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {historyData.slice(0, 2).map((item, idx) => (
+                                <tr key={idx}>
+                                    <td className="bold">{item.code}</td>
+                                    <td>{item.date}</td>
+                                    <td className="savings">{item.savings}</td>
+                                    <td><span className="h-status-badge success">{item.status}</span></td>
+                                </tr>
+                            ))}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            {/* View All History Modal */}
+            {showAllHistory && (
+                <div className="modal-overlay" onClick={() => setShowAllHistory(false)}>
+                    <div className="history-popup-premium animate-slide-up" onClick={e => e.stopPropagation()}>
+                        <div className="modal-header-v2">
+                            <div className="h-title-group">
+                                <h3>Full Redemption History</h3>
+                                <p>Transaction log of all used coupons</p>
+                            </div>
+                            <button className="close-btn-v2" onClick={() => setShowAllHistory(false)}>
+                                <X size={20} />
+                            </button>
+                        </div>
+                        <div className="modal-body-v2">
+                            <div className="history-scroll-zone">
+                                <table className="history-table full-width">
+                                    <thead>
+                                        <tr>
+                                            <th>COUPON CODE</th>
+                                            <th>DATE</th>
+                                            <th>SAVINGS</th>
+                                            <th>STATUS</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {historyData.map((item, idx) => (
+                                            <tr key={idx}>
+                                                <td className="bold-glam">{item.code}</td>
+                                                <td>{item.date}</td>
+                                                <td className="savings-glam">{item.savings}</td>
+                                                <td><span className="status-dot-badge">Paid</span></td>
+                                            </tr>
+                                        ))}
+                                    </tbody>
+                                </table>
                             </div>
                         </div>
-                        <div className="coupon-action-zone">
-                            <button className={`btn-copy-luxury ${copied ? 'copied' : ''}`} onClick={handleCopy}>
-                                {copied ? <><CheckCircle2 size={16} /> COPIED</> : 'COPY CODE'}
+                        <div className="modal-footer-v2">
+                            <span className="record-count">Showing {historyData.length} records</span>
+                            <button className="download-btn-sm">
+                                <Plus size={14} /> Export CSV
                             </button>
                         </div>
                     </div>
                 </div>
-            </div>
+            )}
         </div>
     );
 };
+
 
 const ReturnsSection = () => {
     const [selectedReturn, setSelectedReturn] = useState(null);

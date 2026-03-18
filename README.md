@@ -23,8 +23,57 @@ A modern React-based clothing e-commerce website UI where users can browse produ
 
 ## 🚀 Run Project Locally
 
-npm install  
+### Prerequisites
+
+- **Node.js** (v18+)
+- **MongoDB** running locally (`mongod`)
+- **MongoDB Database Tools** (`mongorestore` command) — [Download here](https://www.mongodb.com/try/download/database-tools)
+
+### 1. Clone & Install
+
+```bash
+git clone https://github.com/YourUsername/E-Commerce-Clothes.git
+cd E-Commerce-Clothes
+
+# Install frontend dependencies
+npm install
+
+# Install backend dependencies
+cd backend
+npm install
+```
+
+### 2. Seed the Database & Setup Config
+
+This project includes a full database dump + `.env.example` files. One command sets up **everything**:
+
+```bash
+cd backend
+npm run seed
+```
+
+This will:
+- ✅ Auto-create `backend/.env` and `.env` (frontend) from `.env.example` if missing
+- ✅ Restore all 12 MongoDB collections (users, products, orders, payments, carts, categories, blogs, contacts, chatgroups, chatmessages, variants, wishlists)
+- ✅ Show test credentials for login
+
+### 3. Start the App
+
+```bash
+# Terminal 1 — Backend
+cd backend
 npm run dev
+
+# Terminal 2 — Frontend
+npm run dev
+```
+
+### 🔑 Test Credentials
+
+| Role  | Email             | Password   |
+|-------|-------------------|------------|
+| Admin | admin@gmail.com   | admin123   |
+
 
 ## 📸 Screenshots
 

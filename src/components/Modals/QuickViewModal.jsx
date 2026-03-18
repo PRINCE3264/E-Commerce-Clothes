@@ -45,7 +45,14 @@ const QuickViewModal = ({ product, onClose, onAddToCart, onToggleWishlist, isWis
                         <div className="qv-price-block">
                             <div style={{ display: 'flex', alignItems: 'baseline', gap: '15px' }}>
                                 <span className="qv-current-price">₹{product.price.toLocaleString()}</span>
-                                {product.oldPrice && <span className="qv-old-price">₹{product.oldPrice.toLocaleString()}</span>}
+                                {product.oldPrice && (
+                                    <>
+                                        <span className="qv-old-price">₹{product.oldPrice.toLocaleString()}</span>
+                                        <span className="qv-discount-pill">
+                                            {Math.round(((product.oldPrice - product.price) / product.oldPrice) * 100)}% OFF
+                                        </span>
+                                    </>
+                                )}
                             </div>
                             <div className={`qv-stock-badge ${product.stock > 0 ? 'in-stock' : 'out-of-stock'}`}>
                                 {product.stock > 0 ? 'In Stock' : 'Out of Stock'}

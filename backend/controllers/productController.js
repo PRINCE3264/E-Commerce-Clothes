@@ -34,12 +34,17 @@ const getProductById = async (req, res) => {
         const product = await Product.findById(req.params.id);
         if (!product) return res.status(404).json({ success: false, message: 'Product not found' });
         
-        // Filter reviews to only show approved ones for public
-        const isApproveOnly = req.query.view !== 'admin';
+        // Filter reviews: Admin sees all, Public sees approved + their own pending review
+        const isAdmin = req.query.view === 'admin';
+        const userId = req.user?._id?.toString();
         
-        const reviewList = isApproveOnly 
-            ? product.reviews.filter(r => r.isApproved) 
-            : product.reviews;
+        let reviewList = product.reviews;
+
+        if (!isAdmin) {
+            reviewList = product.reviews.filter(r => 
+                r.isApproved || (userId && r.user?.toString() === userId)
+            );
+        }
 
         // Create a copy to avoid mongoose internal issues when modifying array for response
         const productData = product.toObject();
