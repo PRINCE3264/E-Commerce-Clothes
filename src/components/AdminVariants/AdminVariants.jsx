@@ -488,6 +488,7 @@ const AdminVariants = () => {
                 }
 
                 .v-status-legend {
+                    margin:15px;
                     display: flex;
                     align-items: center;
                     gap: 8px;

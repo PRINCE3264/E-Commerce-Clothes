@@ -267,7 +267,7 @@ const AdminCustomers = () => {
                     <div className="v-stat-pill mr-15">
                         <User size={14}/> <span>{users.length} Nodes Online</span>
                     </div>
-                    <button className="btn-primary highlight-btn" onClick={() => handleOpenForm()}>
+                    <button className="btn-primary highlight-btn mt-15" onClick={() => handleOpenForm()}>
                         <Plus size={18} /> Provision User
                     </button>
                 </div>
