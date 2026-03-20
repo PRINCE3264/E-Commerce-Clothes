@@ -176,16 +176,14 @@ exports.refundPayment = async (req, res) => {
 
         try {
             if (payment.gateway === 'RAZORPAY') {
-                // Razorpay Refund - Using the most robust way
+                // Razorpay Refund - Using the most robust way (full refund by default)
                 refundResponse = await razorpay.payments.refund(payment.transactionId, {
-                    amount: Math.round(payment.amount * 100), // Full refund in paise
                     notes: { reason: req.body.reason || 'Admin Initiated Refund' }
                 });
             } else if (payment.gateway === 'STRIPE') {
-                // Stripe Refund
+                // Stripe Refund (full refund by default)
                 refundResponse = await stripe.refunds.create({
-                    payment_intent: payment.transactionId,
-                    amount: Math.round(payment.amount * 100)
+                    payment_intent: payment.transactionId
                 });
             } else if (payment.gateway === 'COD') {
                 // Manual Refund for COD
