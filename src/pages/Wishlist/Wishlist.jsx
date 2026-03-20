@@ -3,28 +3,19 @@ import { Link, useNavigate } from 'react-router-dom';
 import { Heart, ShoppingBag, Trash2, ArrowLeft, Star, X, CheckCircle, AlertCircle, Eye, Plus } from 'lucide-react';
 import './Wishlist.css';
 import './Wishlist_ProductCard.css';
+import ProductCard from '../../components/ProductCard/ProductCard';
+import QuickViewModal from '../../components/Modals/QuickViewModal';
+import '../Products/Products.css';
 
 const Wishlist = ({ wishlistItems = [], onRemoveFromWishlist, onToggleWishlist, onAddToCart }) => {
     const navigate = useNavigate();
     const [quickViewProduct, setQuickViewProduct] = useState(null);
-    const [selectedSizes, setSelectedSizes] = useState({});
 
     useEffect(() => {
         if (!localStorage.getItem('auth_token')) {
             navigate('/login?redirect=/wishlist');
         }
     }, [navigate]);
-
-    const handleSizeSelect = (itemId, size) => {
-        setSelectedSizes(prev => ({ ...prev, [itemId]: size }));
-    };
-
-    const handleMoveToCart = (item) => {
-        if (onAddToCart) {
-            onAddToCart(item);
-            onRemoveFromWishlist(item); // This will now correctly trigger the global confirmation OR direct removal via App.jsx logic
-        }
-    };
 
     const confirmDelete = (item) => {
         if (onToggleWishlist) {
@@ -59,89 +50,16 @@ const Wishlist = ({ wishlistItems = [], onRemoveFromWishlist, onToggleWishlist, 
 
             <div className="container main-content-wish">
                 {wishlistItems.length > 0 ? (
-                    <div className="wishlist-grid-premium">
+                    <div className="products-grid">
                         {wishlistItems.map((item) => (
-                            <div key={item._id} className="product-card">
-                                <div className="product-image" style={{ backgroundImage: `url(${item.image})` }}>
-                                    <div className="product-actions">
-                                        <button
-                                            className="action-btn delete-btn"
-                                            title="Remove from Wishlist"
-                                            onClick={() => confirmDelete(item)}
-                                        >
-                                            <Trash2 size={18} />
-                                        </button>
-                                        <button className="action-btn" title="Quick View" onClick={() => setQuickViewProduct(item)}>
-                                            <Eye size={18} />
-                                        </button>
-                                    </div>
-                                    {item.stock <= 0 ? (
-                                        <span className={`product-badge out-of-stock`}>Sold Out</span>
-                                    ) : item.isBestSeller ? (
-                                        <span className="product-badge best-seller">BEST SELLER</span>
-                                    ) : item.isNewArrival ? (
-                                        <span className="product-badge new-arrival">NEW ARRIVAL</span>
-                                    ) : item.badge ? (
-                                        <span className={`product-badge ${item.badge.toLowerCase()}`}>{item.badge}</span>
-                                    ) : null}
-                                </div>
-
-                                <div className="product-info">
-                                    <div className="product-meta-row">
-                                        <span className="product-category-label">{item.category}</span>
-                                        <div className="product-rating-compact">
-                                            <Star size={14} fill="#f59e0b" color="#f59e0b" />
-                                            <span className="rating-value">{item.rating}</span>
-                                        </div>
-                                    </div>
-
-                                    <h4 className="product-title">{item.name}</h4>
-
-                                    <div className="product-price">
-                                        ₹{Number(item.price).toLocaleString('en-IN')}
-                                    </div>
-
-                                    {item.size && (
-                                        <div className="product-sizes-selector" style={{ marginTop: '10px', marginBottom: '15px', display: 'flex', alignItems: 'center', flexWrap: 'wrap' }}>
-                                            <span style={{ fontSize: '0.8rem', fontWeight: '600', color: '#64748b', marginRight: '8px' }}>Sizes:</span>
-                                            <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px' }}>
-                                                {item.size.map(size => (
-                                                    <button
-                                                        key={size}
-                                                        onClick={(e) => { e.preventDefault(); handleSizeSelect(item._id, size); }}
-                                                        style={{
-                                                            padding: '4px 8px',
-                                                            border: `1px solid ${selectedSizes[item._id] === size ? '#1e3a5f' : '#e2e8f0'}`,
-                                                            borderRadius: '4px',
-                                                            background: selectedSizes[item._id] === size ? '#1e3a5f' : 'white',
-                                                            color: selectedSizes[item._id] === size ? 'white' : '#64748b',
-                                                            cursor: 'pointer',
-                                                            fontSize: '0.75rem',
-                                                            fontWeight: '600',
-                                                            transition: 'all 0.2s ease',
-                                                            minWidth: '32px'
-                                                        }}
-                                                    >
-                                                        {size}
-                                                    </button>
-                                                ))}
-                                            </div>
-                                        </div>
-                                    )}
-
-                                    <button
-                                        className="btn-add-to-cart"
-                                        onClick={() => {
-                                            const sizeToAdd = selectedSizes[item._id] || (item.size ? item.size[0] : null);
-                                            handleMoveToCart({ ...item, size: sizeToAdd });
-                                        }}
-                                    >
-                                        <Plus size={18} className="btn-plus-icon" />
-                                        <ShoppingBag size={20} />
-                                        <span>ADD TO CART</span>
-                                    </button>
-                                </div>
-                            </div>
+                            <ProductCard 
+                                key={item._id} 
+                                product={item} 
+                                wishlist={wishlistItems}
+                                onRemove={() => confirmDelete(item)}
+                                onQuickView={setQuickViewProduct}
+                                isWishlistPage={true}
+                            />
                         ))}
                     </div>
                 ) : (
@@ -161,69 +79,15 @@ const Wishlist = ({ wishlistItems = [], onRemoveFromWishlist, onToggleWishlist, 
                 )}
             </div>
 
-            {/* Advance Level Quick View Modal */}
+            {/* Standard Quick View Modal for UI Consistency */}
             {quickViewProduct && (
-                <div className="quickview-advance-overlay" onClick={() => setQuickViewProduct(null)}>
-                    <div className="quickview-advance-box animate-wow" onClick={e => e.stopPropagation()}>
-                        <button className="qv-advance-close" onClick={() => setQuickViewProduct(null)}>
-                            <X size={24} />
-                        </button>
-
-                        <div className="qv-advance-layout">
-                            <div className="qv-advance-image-zone">
-                                <img src={quickViewProduct.image} alt={quickViewProduct.name} />
-                                <div className="image-accent-glow"></div>
-                            </div>
-
-                            <div className="qv-advance-info-zone">
-                                <div className="qv-header-tags">
-                                    <span className="qv-tag-premium">{quickViewProduct.category}</span>
-                                    <div className="qv-rating-stars">
-                                        <Star size={14} fill="#f59e0b" color="#f59e0b" />
-                                        <span>{quickViewProduct.rating}</span>
-                                    </div>
-                                </div>
-
-                                <h2 className="qv-title-advance">{quickViewProduct.name}</h2>
-                                <div className="qv-price-advance">₹{quickViewProduct.price.toFixed(2)}</div>
-
-                                <div className="qv-description-premium">
-                                    <p>{quickViewProduct.description}</p>
-                                </div>
-
-                                <div className="qv-feature-list">
-                                    <div className="qv-feature">
-                                        <div className="feat-dot"></div>
-                                        <span>Premium Fabric & Materials</span>
-                                    </div>
-                                    <div className="qv-feature">
-                                        <div className="feat-dot"></div>
-                                        <span>Precision Tailored Fit</span>
-                                    </div>
-                                </div>
-
-                                <div className="qv-action-grid">
-                                    <button
-                                        className="btn-qv-cart"
-                                        onClick={() => {
-                                            handleMoveToCart(quickViewProduct);
-                                            setQuickViewProduct(null);
-                                        }}
-                                    >
-                                        <ShoppingBag size={20} />
-                                        ADD TO BAG
-                                    </button>
-                                    <button
-                                        className="btn-qv-details"
-                                        onClick={() => navigate(`/products?category=${quickViewProduct.category}`)}
-                                    >
-                                        BROWSE CATEGORY
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+                <QuickViewModal 
+                    product={quickViewProduct}
+                    onClose={() => setQuickViewProduct(null)}
+                    onAddToCart={onAddToCart}
+                    onToggleWishlist={onToggleWishlist}
+                    isWishlisted={true} // Since it's the wishlist page, we know it's wishlisted
+                />
             )}
         </div>
     );

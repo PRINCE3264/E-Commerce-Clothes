@@ -1,13 +1,13 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Heart, Eye, Star } from 'lucide-react';
+import { Heart, Eye, Star, Trash2 } from 'lucide-react';
 import '../../pages/Products/Products.css';
 
 /**
  * Shared ProductCard — uses exact same CSS classes as Products.jsx
  * so cards are pixel-perfect identical on all pages.
  */
-const ProductCard = ({ product, wishlist = [], onToggleWishlist, onQuickView }) => {
+const ProductCard = ({ product, wishlist = [], onToggleWishlist, onQuickView, isWishlistPage = false, onRemove }) => {
     const navigate = useNavigate();
     const isWishlisted = wishlist.some(w => w._id === product._id);
 
@@ -29,13 +29,19 @@ const ProductCard = ({ product, wishlist = [], onToggleWishlist, onQuickView }) 
                 onClick={() => navigate(`/product/${product._id}`)}
             >
                 <div className="product-actions">
-                    <button className="action-btn" onClick={handleWishlist} title="Add to Wishlist">
-                        <Heart
-                            size={18}
-                            fill={isWishlisted ? '#ef4444' : 'none'}
-                            color={isWishlisted ? '#ef4444' : 'currentColor'}
-                        />
-                    </button>
+                    {isWishlistPage ? (
+                        <button className="action-btn delete-btn" onClick={(e) => { e.stopPropagation(); if (onRemove) onRemove(product); }} title="Remove from Wishlist">
+                            <Trash2 size={18} color="#ef4444" />
+                        </button>
+                    ) : (
+                        <button className="action-btn" onClick={handleWishlist} title="Add to Wishlist">
+                            <Heart
+                                size={18}
+                                fill={isWishlisted ? '#ef4444' : 'none'}
+                                color={isWishlisted ? '#ef4444' : 'currentColor'}
+                            />
+                        </button>
+                    )}
                     <button className="action-btn" onClick={handleQuick} title="Quick View">
                         <Eye size={18} />
                     </button>
