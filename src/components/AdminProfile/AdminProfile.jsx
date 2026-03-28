@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Camera, Mail, User, Shield, Save, Smartphone, MapPin, CheckCircle, Lock } from 'lucide-react';
 import './AdminProfile.css';
 import Swal from 'sweetalert2';
+import API from '../../utils/api';
 
 const AdminProfile = () => {
     const defaultData = {
@@ -12,6 +13,14 @@ const AdminProfile = () => {
         location: 'Mumbai, India',
         status: 'Active'
     };
+
+    const [passData, setPassData] = useState({
+        currentPassword: '',
+        newPassword: '',
+        confirmPassword: ''
+    });
+    const [loading, setLoading] = useState(false);
+    const [showPass, setShowPass] = useState(false);
 
     const [profileData, setProfileData] = useState(() => {
         const storedUser = localStorage.getItem('admin_user');
@@ -39,6 +48,10 @@ const AdminProfile = () => {
         setProfileData({ ...profileData, [e.target.name]: e.target.value });
     };
 
+    const handlePassChange = (e) => {
+        setPassData({ ...passData, [e.target.name]: e.target.value });
+    };
+
     const handleSave = (e) => {
         e.preventDefault();
         Swal.fire({
@@ -52,17 +65,53 @@ const AdminProfile = () => {
         });
     };
 
-    const handlePassUpdate = (e) => {
+    const handlePassUpdate = async (e) => {
         e.preventDefault();
-        Swal.fire({
-            title: 'Security Verified',
-            text: 'Your cryptographic signature has been updated.',
-            icon: 'success',
-            customClass: {
-                popup: 'luxury-admin-swal',
-                confirmButton: 'b-swal-confirm-btn-blue',
+        
+        if (passData.newPassword !== passData.confirmPassword) {
+            return Swal.fire({
+                title: 'Mismatch',
+                text: 'New sequences do not match. Please verify.',
+                icon: 'warning',
+                customClass: { popup: 'luxury-admin-swal', confirmButton: 'b-swal-confirm-btn-blue' }
+            });
+        }
+
+        if (passData.newPassword.length < 6) {
+            return Swal.fire({
+                title: 'Security Requirement',
+                text: 'Sequence must be at least 6 characters long.',
+                icon: 'info',
+                customClass: { popup: 'luxury-admin-swal', confirmButton: 'b-swal-confirm-btn-blue' }
+            });
+        }
+
+        setLoading(true);
+        try {
+            const response = await API.post('/auth/change-password', {
+                currentPassword: passData.currentPassword,
+                newPassword: passData.newPassword
+            });
+
+            if (response.data.success) {
+                Swal.fire({
+                    title: 'Security Updated',
+                    text: 'Your cryptographic access sequence has been established.',
+                    icon: 'success',
+                    customClass: { popup: 'luxury-admin-swal', confirmButton: 'b-swal-confirm-btn-blue' }
+                });
+                setPassData({ currentPassword: '', newPassword: '', confirmPassword: '' });
             }
-        });
+        } catch (err) {
+            Swal.fire({
+                title: 'Authentication Error',
+                text: err.response?.data?.message || 'Unauthorized access request.',
+                icon: 'error',
+                customClass: { popup: 'luxury-admin-swal', confirmButton: 'b-swal-confirm-btn-blue' }
+            });
+        } finally {
+            setLoading(false);
+        }
     };
 
     return (
@@ -184,25 +233,49 @@ const AdminProfile = () => {
                                     <label>Current Sequence</label>
                                     <div className="input-with-icon">
                                         <Lock size={18} className="input-icon" />
-                                        <input type="password" placeholder="Enter current password..." />
+                                        <input 
+                                            type={showPass ? "text" : "password"} 
+                                            name="currentPassword"
+                                            value={passData.currentPassword}
+                                            onChange={handlePassChange}
+                                            placeholder="Enter current password..." 
+                                            required
+                                        />
                                     </div>
                                 </div>
                                 <div className="input-group">
                                     <label>New Sequence</label>
                                     <div className="input-with-icon">
                                         <Lock size={18} className="input-icon" />
-                                        <input type="password" placeholder="Enter new password..." />
+                                        <input 
+                                            type={showPass ? "text" : "password"} 
+                                            name="newPassword"
+                                            value={passData.newPassword}
+                                            onChange={handlePassChange}
+                                            placeholder="Enter new password..." 
+                                            required
+                                        />
                                     </div>
                                 </div>
                                 <div className="input-group">
                                     <label>Confirm Sequence</label>
                                     <div className="input-with-icon">
                                         <Lock size={18} className="input-icon" />
-                                        <input type="password" placeholder="Confirm new password..." />
+                                        <input 
+                                            type={showPass ? "text" : "password"} 
+                                            name="confirmPassword"
+                                            value={passData.confirmPassword}
+                                            onChange={handlePassChange}
+                                            placeholder="Confirm new password..." 
+                                            required
+                                        />
                                     </div>
                                 </div>
-                                <button type="submit" className="btn-profile-save update-pass-btn">
-                                    UPDATE ENCRYPTION <Shield size={16} />
+                                <button type="button" className="btn-check-pass" onClick={() => setShowPass(!showPass)}>
+                                    {showPass ? 'HIDE' : 'CHECK'} SEQUENCE
+                                </button>
+                                <button type="submit" className="btn-profile-save update-pass-btn" disabled={loading}>
+                                    {loading ? 'SYNCHRONIZING...' : <>UPDATE ENCRYPTION <Shield size={16} /></>}
                                 </button>
                             </form>
                         </div>

@@ -32,7 +32,7 @@ const updateContactStatus = async (req, res) => {
         const contact = await Contact.findByIdAndUpdate(
             req.params.id,
             { status: req.body.status },
-            { new: true, runValidators: true }
+            { returnDocument: 'after', runValidators: true }
         );
         if (!contact) return res.status(404).json({ success: false, message: 'Message not found' });
         res.status(200).json({ success: true, data: contact });

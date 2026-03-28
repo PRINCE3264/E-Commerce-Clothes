@@ -16,7 +16,9 @@ const sendOrderWhatsApp = async (order, customerName, mediaUrl = null) => {
 
         // Format Phone
         let phone = (order.shippingAddress?.phone || '').toString().replace(/\D/g, '');
+        // Handle common Indian number formats (10 digits, or 11 digits with leading 0)
         if (phone.length === 10) phone = `+91${phone}`;
+        else if (phone.length === 11 && phone.startsWith('0')) phone = `+91${phone.substring(1)}`;
         else if (!phone.startsWith('+')) phone = `+${phone}`;
 
         const orderId = order._id.toString().slice(-8).toUpperCase();
@@ -132,7 +134,9 @@ const sendOrderUpdateWhatsApp = async (order, customerName, status, updateInfo =
         const client = twilio(process.env.TWILIO_SID, process.env.TWILIO_AUTH_TOKEN);
 
         let phone = (order.shippingAddress?.phone || '').toString().replace(/\D/g, '');
+        // Handle common Indian number formats (10 digits, or 11 digits with leading 0)
         if (phone.length === 10) phone = `+91${phone}`;
+        else if (phone.length === 11 && phone.startsWith('0')) phone = `+91${phone.substring(1)}`;
         else if (!phone.startsWith('+')) phone = `+${phone}`;
 
         const orderId = order._id.toString().slice(-8).toUpperCase();

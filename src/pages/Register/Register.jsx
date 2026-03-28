@@ -21,6 +21,7 @@ const Register = () => {
     const navigate = useNavigate();
     const [showPassword, setShowPassword] = useState(false);
     const [passwordStrength, setPasswordStrength] = useState('');
+    const [loading, setLoading] = useState(false);
     const [formData, setFormData] = useState({
         name: '',
         email: '',
@@ -47,6 +48,7 @@ const Register = () => {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
+        setLoading(true);
         try {
             const res = await API.post('/auth/register', formData);
             if (res.data.success) {
@@ -65,6 +67,8 @@ const Register = () => {
                 title: 'Registration Fault',
                 text: err.response?.data?.message || 'Gateway communication failure'
             });
+        } finally {
+            setLoading(false);
         }
     };
 
@@ -189,9 +193,18 @@ const Register = () => {
                             </div>
                         </div>
 
-                        <button className="auth-btn-submit anim-f-7">
-                            <span>CREATE ACCOUNT</span>
-                            <ArrowRight size={18} />
+                        <button type="submit" className={`auth-btn-submit anim-f-7 ${loading ? 'btn-processing' : ''}`} disabled={loading}>
+                            {loading ? (
+                                <>
+                                    <span>CREATING ACCOUNT...</span>
+                                    <div className="btn-spinner"></div>
+                                </>
+                            ) : (
+                                <>
+                                    <span>CREATE ACCOUNT</span>
+                                    <ArrowRight size={18} />
+                                </>
+                            )}
                         </button>
                     </div>
 

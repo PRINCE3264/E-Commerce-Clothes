@@ -45,7 +45,7 @@ const createBlog = async (req, res) => {
 const updateBlog = async (req, res) => {
     try {
         const blog = await Blog.findByIdAndUpdate(req.params.id, req.body, {
-            new: true,
+            returnDocument: 'after',
             runValidators: true
         });
 

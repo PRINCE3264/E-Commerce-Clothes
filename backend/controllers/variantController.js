@@ -52,7 +52,7 @@ const createVariant = async (req, res) => {
 const updateVariant = async (req, res) => {
     try {
         const variant = await Variant.findByIdAndUpdate(req.params.id, req.body, {
-            new: true,
+            returnDocument: 'after',
             runValidators: true
         });
 

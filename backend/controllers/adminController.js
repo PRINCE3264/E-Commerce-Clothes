@@ -21,7 +21,7 @@ const createUser = async (req, res) => {
 const updateUser = async (req, res) => {
     try {
         const user = await User.findByIdAndUpdate(req.params.id, req.body, {
-            new: true,
+            returnDocument: 'after',
             runValidators: true
         });
         if (!user) return res.status(404).json({ success: false, message: 'User not found' });

@@ -106,7 +106,7 @@ const AdminDashboard = () => {
                     </div>
                     <div className="admin-user-details">
                         <h4>{adminUser.name || 'Admin User'}</h4>
-                        <p>{adminUser.email || 'admin@ecc.com'}</p>
+                        <p>{adminUser.email || 'admin@gmail.com'}</p>
                         <div className="admin-role-badge">SYSTEM OPERATOR</div>
                     </div>
                 </div>

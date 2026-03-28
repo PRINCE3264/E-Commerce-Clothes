@@ -6,7 +6,7 @@ const Product = require('../models/Product');
 // @access  Private
 const syncCart = async (req, res) => {
     try {
-        const user = await User.findByIdAndUpdate(req.user.id, { cart: req.body.cart || [] }, { new: true });
+        const user = await User.findByIdAndUpdate(req.user.id, { cart: req.body.cart || [] }, { returnDocument: 'after' });
         if (!user) return res.status(404).json({ success: false, message: 'User not found' });
         
         res.status(200).json({ success: true, data: user.cart });
@@ -20,7 +20,7 @@ const syncCart = async (req, res) => {
 // @access  Private
 const syncWishlist = async (req, res) => {
     try {
-        const user = await User.findByIdAndUpdate(req.user.id, { wishlist: req.body.wishlist || [] }, { new: true });
+        const user = await User.findByIdAndUpdate(req.user.id, { wishlist: req.body.wishlist || [] }, { returnDocument: 'after' });
         if (!user) return res.status(404).json({ success: false, message: 'User not found' });
         
         res.status(200).json({ success: true, data: user.wishlist });

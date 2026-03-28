@@ -86,17 +86,28 @@ exports.createOrder = async (req, res) => {
             try {
                 const session = await stripe.checkout.sessions.create({
                     payment_method_types: ['card'],
-                    line_items: orderItems.map(item => ({
-                        price_data: {
-                            currency: 'inr',
-                            product_data: {
-                                name: item.name,
-                                images: [item.image.startsWith('http') ? item.image : `${process.env.BACKEND_URL || 'http://localhost:8000'}${item.image}`]
+                    line_items: orderItems.map(item => {
+                        // Skip or sanitize images that are too long (Stripe limit is 2048 chars)
+                        // Data URIs/Base64 will be skipped as Stripe can't access them anyway
+                        const imageUrl = item.image.startsWith('http') 
+                            ? item.image 
+                            : `${process.env.BACKEND_URL || 'http://localhost:8000'}${item.image}`;
+                        
+                        // Only send the image if it is a valid URL and under the Stripe char limit
+                        const validImages = (imageUrl.length < 2000 && imageUrl.startsWith('http')) ? [imageUrl] : [];
+
+                        return {
+                            price_data: {
+                                currency: 'inr',
+                                product_data: {
+                                    name: item.name,
+                                    images: validImages
+                                },
+                                unit_amount: Math.round(item.price * 100),
                             },
-                            unit_amount: Math.round(item.price * 100),
-                        },
-                        quantity: item.quantity,
-                    })),
+                            quantity: item.quantity,
+                        };
+                    }),
                     mode: 'payment',
                     customer_email: req.user.email,
                     shipping_address_collection: {

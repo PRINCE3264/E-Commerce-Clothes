@@ -36,7 +36,7 @@ const syncWishlist = async (req, res) => {
         let wishlist = await Wishlist.findOneAndUpdate(
             { user: req.user._id },
             { $setOnInsert: { products: [] } },
-            { upsert: true, new: true }
+            { upsert: true, returnDocument: 'after' }
         );
 
         if (frontendWishlist && Array.isArray(frontendWishlist)) {
@@ -57,8 +57,11 @@ const syncWishlist = async (req, res) => {
                     };
                 });
             
-            wishlist.products = validItems;
-            await wishlist.save();
+            // Use findOneAndUpdate with $set to avoid VersionError (concurrency issues)
+            await Wishlist.findOneAndUpdate(
+                { user: req.user._id },
+                { $set: { products: validItems } }
+            );
         }
         
         // Final fetch with populate for consistency

@@ -17,6 +17,7 @@ const Login = () => {
     const location = useLocation();
     const [showPassword, setShowPassword] = useState(false);
     const [credentials, setCredentials] = useState({ email: '', password: '' });
+    const [loading, setLoading] = useState(false);
 
     React.useEffect(() => {
         const queryParams = new URLSearchParams(location.search);
@@ -40,6 +41,7 @@ const Login = () => {
 
     const handleLogin = async (e) => {
         e.preventDefault();
+        setLoading(true);
         
         try {
             const res = await API.post('/auth/login', credentials);
@@ -75,6 +77,8 @@ const Login = () => {
                 title: 'Auth Failure',
                 text: err.response?.data?.message || 'Invalid session credentials'
             });
+        } finally {
+            setLoading(false);
         }
     };
 
@@ -152,9 +156,18 @@ const Login = () => {
                             <Link to="/forgot-password" title="Recover Account" className="forgot-link">Forgot password?</Link>
                         </div>
 
-                        <button type="submit" className="auth-btn-submit anim-f-4">
-                            <span>LOGIN NOW</span>
-                            <ArrowRight size={18} />
+                        <button type="submit" className={`auth-btn-submit anim-f-4 ${loading ? 'btn-processing' : ''}`} disabled={loading}>
+                            {loading ? (
+                                <>
+                                    <span>PROCESSING...</span>
+                                    <div className="btn-spinner"></div>
+                                </>
+                            ) : (
+                                <>
+                                    <span>LOGIN NOW</span>
+                                    <ArrowRight size={18} />
+                                </>
+                            )}
                         </button>
 
                         <div className="auth-separator anim-f-5" style={{ display: 'flex', alignItems: 'center', margin: '20px 0' }}>

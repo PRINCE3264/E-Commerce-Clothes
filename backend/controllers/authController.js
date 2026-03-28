@@ -174,7 +174,7 @@ const updateProfile = async (req, res) => {
         if (avatar !== undefined) updateFields.avatar = avatar;
         if (addresses)  updateFields.addresses = addresses;
 
-        const user = await User.findByIdAndUpdate(req.user.id, updateFields, { new: true, runValidators: true });
+        const user = await User.findByIdAndUpdate(req.user.id, updateFields, { returnDocument: 'after', runValidators: true });
         // Update stored token data
         res.status(200).json({ success: true, data: user });
     } catch (err) {

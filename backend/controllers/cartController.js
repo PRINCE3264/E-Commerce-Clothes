@@ -35,7 +35,7 @@ const addToCart = async (req, res) => {
         let cart = await Cart.findOneAndUpdate(
             { user: req.user._id },
             { $setOnInsert: { items: [] } },
-            { upsert: true, new: true }
+            { upsert: true, returnDocument: 'after' }
         );
 
         if (frontendCart && Array.isArray(frontendCart)) {

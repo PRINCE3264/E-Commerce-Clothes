@@ -1,9 +1,10 @@
 import React, { useState } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
-import { Lock, ArrowRight, ShieldAlert, ChevronLeft, Eye, EyeOff } from 'lucide-react';
+import { Lock, ArrowRight, ChevronLeft, Eye, EyeOff } from 'lucide-react';
 import API from '../../utils/api';
 import Swal from 'sweetalert2';
 import '../Login/Login.css';
+import '../ForgotPassword/ForgotPassword.css';
 
 const ResetPassword = () => {
     const { token } = useParams();
@@ -11,10 +12,13 @@ const ResetPassword = () => {
     const [password, setPassword] = useState('');
     const [confirmPassword, setConfirmPassword] = useState('');
     const [showPassword, setShowPassword] = useState(false);
+    const [loading, setLoading] = useState(false);
 
     const handleReset = async (e) => {
         e.preventDefault();
+        setLoading(true);
         if (password !== confirmPassword) {
+            setLoading(false);
             return Swal.fire({ icon: 'error', title: 'Mismatch', text: 'Passwords do not align.' });
         }
 
@@ -36,64 +40,77 @@ const ResetPassword = () => {
                 title: 'Link Expired',
                 text: err.response?.data?.message || 'Token is no longer valid'
             });
+        } finally {
+            setLoading(false);
         }
     };
 
     return (
-        <div className="login-page">
-            <div className="glass-orb orb-1"></div>
-            <div className="glass-orb orb-2"></div>
-
-            <div className="auth-card">
+        <div className="login-page forgot-password-gateway">
+            <div className="auth-card elite-card">
                 <div className="auth-header">
-                    <div className="auth-logo-box">
-                        <ShieldAlert size={28} />
+                    <div className="auth-logo-box premium-box">
+                        <Lock size={28} />
                     </div>
-                    <h2>New Credentials</h2>
-                    <p className="auth-subtitle">Finalize your secure account restoration.</p>
+                    <h2 className="premium-title">New Credentials</h2>
+                    <p className="auth-subtitle">Establish a fresh, secure password.</p>
                 </div>
 
                 <form className="auth-body" onSubmit={handleReset}>
-                    <div className="forgot-form-container staggered-container">
-                        <div className="form-group anim-f-1">
-                            <label><Lock size={16} /> New Security Password</label>
-                            <div className="pass-wrapper">
-                                <input
-                                    type={showPassword ? "text" : "password"}
-                                    placeholder="Enter new password"
-                                    value={password}
-                                    onChange={(e) => setPassword(e.target.value)}
-                                    required
-                                />
-                                <button type="button" className="password-toggle" onClick={() => setShowPassword(!showPassword)}>
-                                    {showPassword ? <EyeOff size={18}/> : <Eye size={18}/>}
-                                </button>
-                            </div>
-                        </div>
-
-                        <div className="form-group anim-f-2">
-                            <label><Lock size={16} /> Confirm Security Password</label>
+                    <div className="form-group">
+                        <label className="premium-label"><Lock size={14} /> New Password</label>
+                        <div style={{ position: 'relative' }}>
                             <input
-                                type="password"
-                                placeholder="Re-enter password"
-                                value={confirmPassword}
-                                onChange={(e) => setConfirmPassword(e.target.value)}
+                                type={showPassword ? "text" : "password"}
+                                className="premium-input"
+                                placeholder="8+ characters"
+                                value={password}
+                                onChange={(e) => setPassword(e.target.value)}
                                 required
                             />
+                            <button 
+                                type="button" 
+                                className="password-toggle" 
+                                onClick={() => setShowPassword(!showPassword)}
+                                style={{ position: 'absolute', right: '15px', top: '15px', background: 'none', border: 'none', color: '#94a3b8', cursor: 'pointer' }}
+                            >
+                                {showPassword ? <EyeOff size={18}/> : <Eye size={18}/>}
+                            </button>
                         </div>
-
-                        <button className="auth-btn-submit anim-f-3">
-                            <span>COMMIT UPDATES</span>
-                            <ArrowRight size={18} />
-                        </button>
                     </div>
 
-                    <p className="auth-switch anim-f-4">
-                        <Link to="/login" className="back-link">
+                    <div className="form-group">
+                        <label className="premium-label"><Lock size={14} /> Confirm Password</label>
+                        <input
+                            type="password"
+                            className="premium-input"
+                            placeholder="Repeat password"
+                            value={confirmPassword}
+                            onChange={(e) => setConfirmPassword(e.target.value)}
+                            required
+                        />
+                    </div>
+
+                    <button type="submit" className={`elite-btn ${loading ? 'btn-processing' : ''}`} disabled={loading}>
+                        {loading ? (
+                            <>
+                                <span>UPDATING...</span>
+                                <div className="btn-spinner"></div>
+                            </>
+                        ) : (
+                            <>
+                                <span>UPDATE PASSWORD</span>
+                                <ArrowRight size={18} />
+                            </>
+                        )}
+                    </button>
+
+                    <div className="auth-switch">
+                        <Link to="/login" className="elite-back">
                             <ChevronLeft size={16} />
-                            <span>Return to Login Gate</span>
+                            <span>Return to Login</span>
                         </Link>
-                    </p>
+                    </div>
                 </form>
             </div>
         </div>
