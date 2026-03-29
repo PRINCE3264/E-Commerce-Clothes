@@ -89,7 +89,8 @@ const Home = ({ onAddToCart, onToggleWishlist, wishlist = [] }) => {
             btnText: "Shop Men"
         },
         {
-            bg: "https://img.freepik.com/premium-photo/young-woman-buying-some-clothes_1368-92859.jpg?semt=ais_hybrid&w=740&q=80",
+           
+            bg: "https://i.pinimg.com/originals/bc/fa/c5/bcfac5aae41ea0b2a891d50948e730db.jpg",
             title: <><span className="txt-pink">Women's</span> <span className="txt-cyan">Boutique</span></>,
             subtitle: <><span className="txt-yellow">Elevated</span> <span className="txt-yellow-light">Elegance</span></>,
             text: "Discover the perfect blend of style and sophistication in our latest collection.",
