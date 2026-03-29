@@ -60,6 +60,7 @@ const orderRoutes = require('./routes/orderRoutes');
 const paymentRoutes = require('./routes/paymentRoutes');
 const uploadRoutes = require('./routes/uploadRoutes');
 const chatRoutes = require('./routes/chatRoutes');
+const teamRoutes = require('./routes/teamRoutes');
 const socketHandler = require('./utils/socketHandler');
 
 // Registry mounting
@@ -77,6 +78,7 @@ app.use('/api/orders', orderRoutes);
 app.use('/api/payments', paymentRoutes);
 app.use('/api/upload', uploadRoutes);
 app.use('/api/chat', chatRoutes);
+app.use('/api/team', teamRoutes);
 
 // Static assets (Uploads folder)
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));

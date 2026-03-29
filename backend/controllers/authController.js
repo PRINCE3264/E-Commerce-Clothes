@@ -15,7 +15,7 @@ const register = async (req, res) => {
     try {
         const { name, email, password, phone, address, city, postalCode, country } = req.body;
         
-        // Generate a 6-digit OTP
+       
         const otp = Math.floor(100000 + Math.random() * 900000).toString();
         const hashedOtp = crypto.createHash('sha256').update(otp).digest('hex');
 

@@ -38,6 +38,7 @@ import AdminContact from '../../components/AdminContact/AdminContact';
 import AdminProfile from '../../components/AdminProfile/AdminProfile';
 import AdminReviews from '../../components/AdminReviews/AdminReviews';
 import AdminChat from '../../components/AdminChat/AdminChat';
+import AdminTeam from '../../components/AdminTeam/AdminTeam';
 import './AdminDashboard.css';
 
 
@@ -161,6 +162,11 @@ const AdminDashboard = () => {
                                 <span>System Config</span>
                                 <ChevronRight size={14} className="admin-chevron" />
                             </NavLink>
+                            <NavLink to="/admin/team" className={({isActive}) => `admin-nav-item ${isActive ? 'active' : ''}`} onClick={() => window.innerWidth <= 992 && toggleSidebar()}>
+                                <div className="admin-icon-bg"><Users size={18} /></div>
+                                <span>Team Members</span>
+                                <ChevronRight size={14} className="admin-chevron" />
+                            </NavLink>
                         </nav>
                     </div>
 
@@ -263,6 +269,7 @@ const AdminDashboard = () => {
                         <Route path="/profile" element={<AdminProfile />} />
                         <Route path="/reviews" element={<AdminReviews />} />
                         <Route path="/live-chat" element={<AdminChat />} />
+                        <Route path="/team" element={<AdminTeam />} />
                         <Route path="/dashboard" element={<Navigate to="/admin" replace />} />
                         <Route path="*" element={<Navigate to="/admin" replace />} />
                     </Routes>

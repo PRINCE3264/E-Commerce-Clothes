@@ -12,12 +12,16 @@ import {
     Instagram,
     Twitter,
     ArrowRight,
-    ChevronDown
+    ChevronDown,
+    Loader2
 } from 'lucide-react';
 import './About.css';
+import API from '../../utils/api';
 
 const About = () => {
     const [counts, setCounts] = useState({ customers: 0, designs: 0, satisfaction: 0 });
+    const [team, setTeam] = useState([]);
+    const [loading, setLoading] = useState(true);
 
     useEffect(() => {
         // Simple counter animation
@@ -45,6 +49,22 @@ const About = () => {
         return () => clearInterval(timer);
     }, []);
 
+    useEffect(() => {
+        const fetchTeam = async () => {
+            try {
+                const { data } = await API.get('/team');
+                if (data.success) {
+                    setTeam(data.data);
+                }
+            } catch (err) {
+                console.error("Error fetching team", err);
+            } finally {
+                setLoading(false);
+            }
+        };
+        fetchTeam();
+    }, []);
+
     const values = [
         {
             icon: <Star size={40} />,
@@ -68,33 +88,6 @@ const About = () => {
         }
     ];
 
-    const team = [
-        {
-            name: "PRINCE VIDYARTHI",
-            role: "CEO & Founder",
-            desc: "15+ years in fashion retail, passionate about making quality clothing accessible.",
-            //img: "https://images.unsplash.com/photo-1529626455594-4ff0802cfb7e?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80"
-            img: "/image/IMG-20241224-WA0130.jpg"
-        },
-        {
-            name: "David Chen",
-            role: "Head of Design",
-            desc: "Award-winning designer focused on creating timeless pieces that transcend seasons.",
-            img: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80"
-        },
-        {
-            name: "Sarah Miller",
-            role: "Operations Director",
-            desc: "Ensuring smooth logistics and timely delivery to customers worldwide.",
-            img: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80"
-        },
-        {
-            name: "Michael Brown",
-            role: "Experience Lead",
-            desc: "Dedicated to ensuring every customer has an exceptional shopping experience.",
-            img: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80"
-        }
-    ];
 
     return (
         <div className="about-page">
@@ -178,25 +171,31 @@ const About = () => {
                         <p className="section-subtitle">The passionate minds behind Pandit Fashion</p>
                     </div>
                     <div className="team-grid">
-                        {team.map((member, i) => (
-                            <div className={`team-card t-anim-${i + 1}`} key={i}>
-                                <div className="team-img-box">
-                                    <img src={member.img} alt={member.name} />
-                                    <div className="team-overlay">
-                                        <div className="social-box">
-                                            <a href="#"><Linkedin size={20} /></a>
-                                            <a href="#"><Instagram size={20} /></a>
-                                            <a href="#"><Twitter size={20} /></a>
+                        {loading ? (
+                            <div className="loader-container">
+                                <Loader2 className="animate-spin" size={48} />
+                            </div>
+                        ) : (
+                            team.map((member, i) => (
+                                <div className={`team-card t-anim-${i + 1}`} key={member._id || i}>
+                                    <div className="team-img-box">
+                                        <img src={member.image || member.img} alt={member.name} />
+                                        <div className="team-overlay">
+                                            <div className="social-box">
+                                                <a href={member.socials?.linkedin || "#"}><Linkedin size={20} /></a>
+                                                <a href={member.socials?.instagram || "#"}><Instagram size={20} /></a>
+                                                <a href={member.socials?.twitter || "#"}><Twitter size={20} /></a>
+                                            </div>
                                         </div>
                                     </div>
+                                    <div className="team-info">
+                                        <h4>{member.name}</h4>
+                                        <span className="role">{member.role}</span>
+                                        <p>{member.description || member.desc}</p>
+                                    </div>
                                 </div>
-                                <div className="team-info">
-                                    <h4>{member.name}</h4>
-                                    <span className="role">{member.role}</span>
-                                    <p>{member.desc}</p>
-                                </div>
-                            </div>
-                        ))}
+                            ))
+                        )}
                     </div>
                 </div>
             </section>
