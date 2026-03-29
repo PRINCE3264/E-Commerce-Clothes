@@ -296,21 +296,64 @@ const AdminTeam = () => {
     };
 
     const handleView = (member) => {
-        Swal.fire({
-            title: member.name,
-            html: `
-                <div style="text-align: left;">
-                    <img src="${member.image}" style="width: 100%; height: 200px; object-fit: cover; border-radius: 15px; margin-bottom: 15px;" />
-                    <div style="font-weight: 800; color: #3b82f6; margin-bottom: 5px;">${member.role}</div>
-                    <p style="color: #64748b;">${member.description}</p>
-                    <div style="display: flex; gap: 10px; margin-top: 15px;">
-                        ${member.socials?.linkedin !== '#' ? '<span>LinkedIn</span>' : ''}
-                        ${member.socials?.instagram !== '#' ? '<span>Instagram</span>' : ''}
-                        ${member.socials?.twitter !== '#' ? '<span>Twitter</span>' : ''}
+        MySwal.fire({
+            width: '650px',
+            padding: '0',
+            showConfirmButton: false,
+            showCloseButton: true,
+            background: '#ffffff',
+            backdrop: 'rgba(15, 23, 42, 0.85)',
+            customClass: {
+                popup: 'premium-member-modal',
+                closeButton: 'premium-close-btn'
+            },
+            html: (
+                <div className="member-detail-container">
+                    <div className="member-image-side">
+                        <img src={member.image} alt={member.name} />
+                    </div>
+                    <div className="member-info-side">
+                        <div className="info-header">
+                            <span className="member-badge">Team Member</span>
+                            <h2 className="member-name-serif">{member.name.toUpperCase()}</h2>
+                            <div className="member-role-tag">{member.role}</div>
+                        </div>
+                        
+                        <div className="info-body">
+                            <div className="section-label">Biography</div>
+                            <p className="member-bio">{member.description}</p>
+                            
+                            <div className="section-label">Connect & Socials</div>
+                            <div className="member-social-links">
+                                {member.socials?.linkedin !== '#' && (
+                                    <a href={member.socials.linkedin} target="_blank" rel="noreferrer" className="social-link-btn li">
+                                        <Linkedin size={20} />
+                                        <span>LinkedIn Profile</span>
+                                    </a>
+                                )}
+                                {member.socials?.instagram !== '#' && (
+                                    <a href={member.socials.instagram} target="_blank" rel="noreferrer" className="social-link-btn ig">
+                                        <Instagram size={20} />
+                                        <span>Instagram</span>
+                                    </a>
+                                )}
+                                {member.socials?.twitter !== '#' && (
+                                    <a href={member.socials.twitter} target="_blank" rel="noreferrer" className="social-link-btn tw">
+                                        <Twitter size={20} />
+                                        <span>Twitter / X</span>
+                                    </a>
+                                )}
+                            </div>
+                        </div>
+
+                        <div className="info-footer">
+                            <button className="btn-close-premium" onClick={() => MySwal.close()}>
+                                Close Profile
+                            </button>
+                        </div>
                     </div>
                 </div>
-            `,
-            confirmButtonText: 'Close'
+            )
         });
     };
 
@@ -466,6 +509,157 @@ const adminTeamStyles = `
     
     .b-swal-confirm-btn-blue { padding: 12px 30px !important; font-size: 0.9rem !important; font-weight: 800 !important; border-radius: 50px !important; background: #3b82f6 !important; color: white !important; cursor: pointer; border: none; }
     .b-swal-cancel-btn-blue { padding: 12px 25px !important; font-size: 0.85rem !important; font-weight: 700 !important; border-radius: 50px !important; color: #64748b !important; background: #f8fafc !important; cursor: pointer; border: none; margin-left: 10px; }
+
+    /* Premium Team Member Modal Styles (Solid Professional) */
+    .premium-member-modal {
+        border-radius: 40px !important;
+        overflow: hidden !important;
+        box-shadow: 0 40px 80px -15px rgba(0, 0, 0, 0.35) !important;
+        border: none !important;
+    }
+    .premium-close-btn {
+        color: #1e293b !important;
+        background: #f1f5f9 !important;
+        border-radius: 50% !important;
+        padding: 6px !important;
+        top: 25px !important;
+        right: 25px !important;
+        transition: 0.3s !important;
+    }
+    .premium-close-btn:hover {
+        background: #e2e8f0 !important;
+        transform: rotate(90deg) !important;
+    }
+    .member-detail-container {
+        display: flex;
+        background: #ffffff;
+        text-align: left;
+        min-height: 400px;
+    }
+    .member-image-side {
+        flex: 1;
+        position: relative;
+        background: #f8fafc;
+        overflow: hidden;
+    }
+    .member-image-side img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        display: block;
+    }
+    .member-info-side {
+        flex: 1.3;
+        padding: 30px 25px;
+        display: flex;
+        flex-direction: column;
+        background: #ffffff;
+    }
+    .member-badge {
+        display: inline-block;
+        padding: 6px 18px;
+        background: #1e3a5f;
+        color: #ffffff;
+        font-size: 0.75rem;
+        font-weight: 800;
+        text-transform: uppercase;
+        letter-spacing: 2px;
+        border-radius: 50px;
+        margin-bottom: 25px;
+    }
+    .member-name-serif {
+        font-family: 'Playfair Display', serif;
+        font-size: 2.8rem;
+        color: #0f172a;
+        margin-bottom: 8px;
+        font-weight: 900;
+        line-height: 1.1;
+    }
+    .member-role-tag {
+        font-size: 1.3rem;
+        color: #475569;
+        font-weight: 600;
+        margin-bottom: 35px;
+    }
+    .section-label {
+        font-size: 0.85rem;
+        font-weight: 800;
+        text-transform: uppercase;
+        color: #94a3b8;
+        letter-spacing: 1.5px;
+        margin-bottom: 18px;
+        display: flex;
+        align-items: center;
+        gap: 15px;
+    }
+    .section-label::after {
+        content: '';
+        flex: 1;
+        height: 1px;
+        background: #f1f5f9;
+    }
+    .member-bio {
+        color: #334155;
+        line-height: 1.8;
+        font-size: 1.05rem;
+        margin-bottom: 40px;
+    }
+    .member-social-links {
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+    }
+    .social-link-btn {
+        display: flex;
+        align-items: center;
+        gap: 15px;
+        padding: 14px 22px;
+        border-radius: 18px;
+        text-decoration: none;
+        font-weight: 700;
+        font-size: 1rem;
+        transition: 0.3s;
+        background: #ffffff;
+        border: 1px solid #e2e8f0;
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+    }
+    .social-link-btn.li { background: #0077b5; color: #ffffff; border-color: #0077b5; }
+    .social-link-btn.ig { background: radial-gradient(circle at 30% 107%, #fdf497 0%, #fdf497 5%, #fd5949 45%, #d6249f 60%, #285AEB 90%); color: #ffffff; border-color: transparent; }
+    .social-link-btn.tw { background: #00d2ff; color: #ffffff; border-color: #00d2ff; }
+    .social-link-btn:hover { opacity: 0.95; transform: translateX(8px); box-shadow: 0 8px 15px rgba(0,0,0,0.1); }
+
+    .info-footer {
+        margin-top: auto;
+        padding-top: 50px;
+        display: flex;
+        justify-content: flex-end;
+    }
+    .btn-close-premium {
+        padding: 16px 45px;
+        background: #0f172a;
+        color: white;
+        border: none;
+        border-radius: 18px;
+        font-weight: 800;
+        cursor: pointer;
+        transition: 0.3s;
+        text-transform: uppercase;
+        letter-spacing: 2px;
+        font-size: 0.9rem;
+    }
+    .btn-close-premium:hover {
+        background: #1e3a5f;
+        transform: translateY(-4px);
+        box-shadow: 0 15px 30px rgba(15, 23, 42, 0.3);
+    }
+    
+    @media (max-width: 768px) {
+        .member-detail-container { flex-direction: column; }
+        .member-image-side { height: 400px; }
+        .premium-member-modal { width: 95% !important; }
+        .member-info-side { padding: 40px 30px; }
+        .member-name-serif { font-size: 2.2rem; }
+    }
 `;
 
 // Inject styles into the head

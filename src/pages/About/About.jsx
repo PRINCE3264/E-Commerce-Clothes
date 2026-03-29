@@ -17,6 +17,10 @@ import {
 } from 'lucide-react';
 import './About.css';
 import API from '../../utils/api';
+import Swal from 'sweetalert2';
+import withReactContent from 'sweetalert2-react-content';
+
+const MySwal = withReactContent(Swal);
 
 const About = () => {
     const [counts, setCounts] = useState({ customers: 0, designs: 0, satisfaction: 0 });
@@ -87,6 +91,68 @@ const About = () => {
             desc: "Our dedicated customer service team is always ready to assist you with any questions."
         }
     ];
+
+    const handleViewMember = (member) => {
+        MySwal.fire({
+            width: '650px',
+            padding: '0',
+            showConfirmButton: false,
+            showCloseButton: true,
+            background: '#ffffff',
+            backdrop: 'rgba(15, 23, 42, 0.85)',
+            customClass: {
+                popup: 'premium-member-modal',
+                closeButton: 'premium-close-btn'
+            },
+            html: (
+                <div className="member-detail-container">
+                    <div className="member-image-side">
+                        <img src={member.image || member.img} alt={member.name} />
+                    </div>
+                    <div className="member-info-side">
+                        <div className="info-header">
+                            <span className="member-badge">Founding Team</span>
+                            <h2 className="member-name-serif">{member.name.toUpperCase()}</h2>
+                            <div className="member-role-tag">{member.role}</div>
+                        </div>
+                        
+                        <div className="info-body">
+                            <div className="section-label">Biography</div>
+                            <p className="member-bio">{member.description || member.desc}</p>
+                            
+                            <div className="section-label">Connect & Socials</div>
+                            <div className="member-social-links">
+                                {(member.socials?.linkedin && member.socials.linkedin !== '#') && (
+                                    <a href={member.socials.linkedin} target="_blank" rel="noreferrer" className="social-link-btn li">
+                                        <Linkedin size={20} />
+                                        <span>LinkedIn Profile</span>
+                                    </a>
+                                )}
+                                {(member.socials?.instagram && member.socials.instagram !== '#') && (
+                                    <a href={member.socials.instagram} target="_blank" rel="noreferrer" className="social-link-btn ig">
+                                        <Instagram size={20} />
+                                        <span>Instagram</span>
+                                    </a>
+                                )}
+                                {(member.socials?.twitter && member.socials.twitter !== '#') && (
+                                    <a href={member.socials.twitter} target="_blank" rel="noreferrer" className="social-link-btn tw">
+                                        <Twitter size={20} />
+                                        <span>Twitter / X</span>
+                                    </a>
+                                )}
+                            </div>
+                        </div>
+
+                        <div className="info-footer">
+                            <button className="btn-close-premium" onClick={() => MySwal.close()}>
+                                Close Profile
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )
+        });
+    };
 
 
     return (
@@ -177,14 +243,19 @@ const About = () => {
                             </div>
                         ) : (
                             team.map((member, i) => (
-                                <div className={`team-card t-anim-${i + 1}`} key={member._id || i}>
+                                <div 
+                                    className={`team-card t-anim-${i + 1}`} 
+                                    key={member._id || i}
+                                    onClick={() => handleViewMember(member)}
+                                    style={{ cursor: 'pointer' }}
+                                >
                                     <div className="team-img-box">
                                         <img src={member.image || member.img} alt={member.name} />
                                         <div className="team-overlay">
                                             <div className="social-box">
-                                                <a href={member.socials?.linkedin || "#"}><Linkedin size={20} /></a>
-                                                <a href={member.socials?.instagram || "#"}><Instagram size={20} /></a>
-                                                <a href={member.socials?.twitter || "#"}><Twitter size={20} /></a>
+                                                <a href={member.socials?.linkedin || "#"} className="li-icon"><Linkedin size={20} /></a>
+                                                <a href={member.socials?.instagram || "#"} className="ig-icon"><Instagram size={20} /></a>
+                                                <a href={member.socials?.twitter || "#"} className="tw-icon"><Twitter size={20} /></a>
                                             </div>
                                         </div>
                                     </div>

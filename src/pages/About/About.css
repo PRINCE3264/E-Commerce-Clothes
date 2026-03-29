@@ -386,13 +386,17 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    transition: all 0.3s ease;
+    transition: 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    box-shadow: 0 4px 10px rgba(0,0,0,0.08);
 }
 
+.social-box a.li-icon { color: #0077b5; }
+.social-box a.ig-icon { background: radial-gradient(circle at 30% 107%, #fdf497 0%, #fdf497 5%, #fd5949 45%, #d6249f 60%, #285AEB 90%); color: white; }
+.social-box a.tw-icon { color: #00d2ff; }
+
 .social-box a:hover {
-    background: #00d2ff;
-    color: white;
-    transform: scale(1.1);
+    transform: scale(1.15) translateY(-5px);
+    box-shadow: 0 8px 20px rgba(0,0,0,0.15);
 }
 
 .team-info h4 {
@@ -547,3 +551,184 @@
         text-align: center;
     }
 }
+/* Premium Team Member Modal Styles (Solid Professional) */
+.premium-member-modal {
+    border-radius: 40px !important;
+    overflow: hidden !important;
+    box-shadow: 0 40px 80px -15px rgba(0, 0, 0, 0.35) !important;
+    border: none !important;
+}
+
+.premium-close-btn {
+    color: #1e293b !important;
+    background: #f1f5f9 !important;
+    border-radius: 50% !important;
+    padding: 6px !important;
+    top: 25px !important;
+    right: 25px !important;
+    transition: 0.3s !important;
+}
+
+.premium-close-btn:hover {
+    background: #e2e8f0 !important;
+    transform: rotate(90deg) !important;
+}
+
+.member-detail-container {
+    display: flex;
+    background: #ffffff;
+    text-align: left;
+    min-height: 400px;
+}
+
+.member-image-side {
+    flex: 1;
+    position: relative;
+    background: #f8fafc;
+    overflow: hidden;
+}
+
+.member-image-side img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+}
+
+.member-info-side {
+    flex: 1.25;
+    padding: 25px;
+    display: flex;
+    flex-direction: column;
+    background: #ffffff;
+}
+
+.member-badge {
+    display: inline-block;
+    padding: 6px 18px;
+    background: #1e3a5f;
+    color: #ffffff;
+    font-size: 0.75rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    border-radius: 50px;
+    margin-bottom: 25px;
+}
+
+.member-name-serif {
+    font-family: 'Playfair Display', serif;
+    font-size: 2.1rem;
+    color: #0f172a;
+    margin-bottom: 5px;
+    font-weight: 900;
+    line-height: 1.1;
+}
+
+.member-role-tag {
+    font-size: 1.15rem;
+    color: #475569;
+    font-weight: 600;
+    margin-bottom: 25px;
+}
+
+.section-label {
+    font-size: 0.85rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    color: #94a3b8;
+    letter-spacing: 1.5px;
+    margin-bottom: 18px;
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.section-label::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: #f1f5f9;
+}
+
+.member-bio {
+    color: #334155;
+    line-height: 1.8;
+    font-size: 1.05rem;
+    margin-bottom: 40px;
+}
+
+.member-social-links {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.social-link-btn {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    padding: 14px 22px;
+    border-radius: 18px;
+    text-decoration: none;
+    font-weight: 700;
+    font-size: 1rem;
+    transition: 0.3s;
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+}
+
+.social-link-btn.li { background: #0077b5; color: #ffffff; border-color: #0077b5; }
+.social-link-btn.ig { background: radial-gradient(circle at 30% 107%, #fdf497 0%, #fdf497 5%, #fd5949 45%, #d6249f 60%, #285AEB 90%); color: #ffffff; border-color: transparent; }
+.social-link-btn.tw { background: #00d2ff; color: #ffffff; border-color: #00d2ff; }
+
+.social-link-btn:hover { 
+    opacity: 0.95;
+    transform: translateX(8px);
+    box-shadow: 0 8px 15px rgba(0,0,0,0.1);
+}
+
+.info-footer {
+    margin-top: auto;
+    padding-top: 50px;
+    display: flex;
+    justify-content: flex-end;
+}
+
+.btn-close-premium {
+    padding: 16px 45px;
+    background: #0f172a;
+    color: white;
+    border: none;
+    border-radius: 18px;
+    font-weight: 800;
+    cursor: pointer;
+    transition: 0.3s;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    font-size: 0.9rem;
+}
+
+.btn-close-premium:hover {
+    background: #1e3a5f;
+    transform: translateY(-4px);
+    box-shadow: 0 15px 30px rgba(15, 23, 42, 0.3);
+}
+
+@media (max-width: 768px) {
+    .member-detail-container {
+        flex-direction: column;
+        min-height: auto;
+    }
+    .member-image-side {
+        height: 400px;
+    }
+    .member-info-side {
+        padding: 40px 30px;
+    }
+    .member-name-serif {
+        font-size: 2.2rem;
+    }
+}
+
