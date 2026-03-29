@@ -81,7 +81,7 @@ const Home = ({ onAddToCart, onToggleWishlist, wishlist = [] }) => {
 
     const slides = [
         {
-            bg: "https://www.centralembassy.com/wp-content/uploads/layerslider/men/siwilai-banner03-1024x478.jpg",
+            bg: "https://brattelifamilystores.com/cdn/shop/files/Screen_Shot_2022-09-07_at_8.06.43_AM_3024x.png?v=1662556036",
             title: <><span className="txt-yellow">Men's</span> <span className="txt-cyan">Golden Style </span></>,
             subtitle: <><span className="txt-pink">Authentic</span> <span className="txt-yellow-light">Denim & More</span></>,
             text: "Crafted for comfort and presence. Explore our new season arrivals.",
@@ -98,7 +98,7 @@ const Home = ({ onAddToCart, onToggleWishlist, wishlist = [] }) => {
             btnText: "Shop Women"
         },
         {
-            bg: "https://static.vecteezy.com/system/resources/thumbnails/013/400/398/small/education-concept-with-cartoon-students-vector.jpg",
+            bg: "https://www.mylittlethieves.com/cdn/shop/files/About-Us-Banner.jpg?crop=center&height=597&v=1741205765&width=1280",
             title: <><span className="txt-yellow">Kids</span> <span className="txt-pink">Adventures</span></>,
             subtitle: <><span className="txt-cyan">Playful</span> <span className="txt-yellow-light">& Durable</span></>,
             text: "Vibrant colors and comfortable fabrics for your little explorers.",
@@ -114,7 +114,7 @@ const Home = ({ onAddToCart, onToggleWishlist, wishlist = [] }) => {
             btnText: "Accessories"
         },
         {
-            bg: "https://res.cloudinary.com/purnesh/image/upload/w_540,f_auto,q_auto:eco,c_limit/31609753253532.jpg",
+            bg: "https://media.istockphoto.com/id/1415437494/photo/clothing-and-jeans-on-hangers-in-a-store-close-up.jpg?s=612x612&w=0&k=20&c=ux8jLRD31w931Jt9L91VIfiU1y2V92M-zAKaNUr6ZqM=",
             title: <><span className="txt-yellow-light">Eco-Friendly</span></>,
             subtitle: <><span className="txt-pink">Sustainable</span> <span className="txt-cyan">Choice</span></>,
             text: "Fashion that cares for the planet. Discover our organic and recycled fabrics.",
